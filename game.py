@@ -102,21 +102,27 @@ class Jeu():
         return [[Case(0, (y, x), Player(0)) for x in range(self.getSquareWidth())]
                 for y in range(self.getSquareWidth())]
 
+    def placePlayer(self, player: Player, coordinates: tuple) -> None:
+        self.getGrid()[coordinates[0]][coordinates[1]].setPlayer(player)
+        player.setCoordinates((coordinates[0], coordinates[1]))
+
     def initializePawns(self) -> None:
         grid = self.getGrid()
 
-        grid[0][self.getSquareWidth()//2].setPlayer(self.getPlayerList()[0])
-        grid[self.getSquareWidth()-1][self.getSquareWidth() //
-                                      2].setPlayer(self.getPlayerList()[1])
+        self.placePlayer(self.getPlayerList()[
+                         0], (0, self.getSquareWidth()//2))
+        self.placePlayer(self.getPlayerList()[
+                         1], (self.getSquareWidth()-1, self.getSquareWidth()//2))
 
         if self.getNumberOfPlayers() == 4:
-            grid[self.getSquareWidth()//2][0].setPlayer(self.getPlayerList()[2])
-            grid[self.getSquareWidth()//2][self.getSquareWidth() -
-                                           1].setPlayer(self.getPlayerList()[3])
+            self.placePlayer(self.getPlayerList()[
+                             2], (self.getSquareWidth()//2, 0))
+            self.placePlayer(self.getPlayerList()[
+                             3], (self.getSquareWidth()//2, self.getSquareWidth()-1))
 
         self.setGrid(grid)
 
-    def createPlayerList(self):
+    def createPlayerList(self) -> list[Player]:
         return [Player(x+1) for x in range(self.getNumberOfPlayers())]
 
     def display(self) -> None:
@@ -124,22 +130,22 @@ class Jeu():
             for i in range(3):
                 for c, cell in enumerate(row):
                     if i == 0:
-                        if self.getGrid()[r][c].getWalls()[0] == 0:
+                        if self.getGrid()[r][c].getWalls()["Up"] == 0:
                             print("   ", end="")
                         else:
                             print(" - ", end="")
                     elif i == 1:
-                        if cell.getWalls()[1] == 0:
+                        if cell.getWalls()["Left"] == 0:
                             print(" ", end="")
                         else:
                             print("|", end="")
                         print(cell, end="")
-                        if cell.getWalls()[3] == 0:
+                        if cell.getWalls()["Right"] == 0:
                             print(" ", end="")
                         else:
                             print("|", end="")
                     elif i == 2:
-                        if self.getGrid()[r][c].getWalls()[2] == 0:
+                        if self.getGrid()[r][c].getWalls()["Down"] == 0:
                             print("   ", end="")
                         else:
                             print(" - ", end="")
@@ -151,7 +157,7 @@ class Jeu():
                     coord[0] >= self.getSquareWidth() or
                     coord[1] >= self.getSquareWidth())
 
-    def getNeighbours(self, coord: tuple) -> list:
+    def getNeighbours(self, coord: tuple) -> list[Case]:
         neighbours = []
 
         if coord[0]-1 >= 0:
@@ -172,10 +178,9 @@ class Jeu():
         return len(self.getNeighbours(coord))
 
     def getCell(self, coord: tuple) -> Case:
-        # print(coord, self.getGrid())
         return self.getGrid()[coord[0]][coord[1]]
 
-    def playerInGrid(self, player):
+    def playerInGrid(self, player: Player) -> bool:
         for row in self.getGrid():
             for cell in row:
                 if cell.getPlayer().getNumber() == player.getNumber():
@@ -196,6 +201,36 @@ class Jeu():
 
         self.setCurrentPlayer(self.getPlayerList()[self.getCurrentPlayerN()])
         self.setNextPlayer(self.getPlayerList()[self.getNextPlayerN()])
+
+    def movePawn(self, coordo: tuple, player: Player):
+        for neighbour in self.getNeighbours(player.getCoordinates()):
+            if coordo != neighbour.getCoordinates():
+                continue
+
+            if self.WallColide(player, coordo):
+                return
+
+            self.placePlayer(Player(0), player.getCoordinates())
+            self.placePlayer(player, coordo)
+
+    def getDirection(self, player: Player, coordo: tuple, reverse: bool = False) -> str:
+        playerCoord = player.getCoordinates()
+        if reverse:
+            coordo, playerCoord = playerCoord, coordo
+        if coordo[0] - playerCoord[0] == -1:
+            return "Up"
+        if coordo[1] - playerCoord[1] == -1:
+            return "Left"
+        if coordo[0] - playerCoord[0] == 1:
+            return "Down"
+        if coordo[1] - playerCoord[1] == 1:
+            return "Right"
+
+    def WallColide(self, player: Player, coordo: tuple,):
+        if (self.getCell(coordo).getWalls()[self.getDirection(player, coordo)] or
+                self.getCell(player.getCoordinates()).getWalls()[self.getDirection(player, coordo, True)]):
+            return True
+        return False
 
 
 def intInput(message: str) -> int:
@@ -236,11 +271,11 @@ def play():
         print(player.getNumber()+1)
         if isinstance(player, Bot):
             coordo = player.pickCoordo(Game)
-            while Game.placePawn(coordo, player) == False:
+            while Game.movePawn(coordo, player) == False:
                 coordo = player.pickCoordo(Game)
         else:
             coordo = (intInput("row")-1, intInput("Col")-1)
-            while Game.placePawn(coordo, player) == False:
+            while Game.movePawn(coordo, player) == False:
                 coordo = (intInput("row")-1, intInput("Col")-1)
 
         Game.display()
