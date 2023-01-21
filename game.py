@@ -1,3 +1,4 @@
+import random
 from Player import Player
 from Case import Case
 from Bot import Bot
@@ -9,10 +10,8 @@ class Jeu():
         self.__grid = self.createGrid()
         self.__NumberOfPlayers = self.validNumberOfPlayers(nbPlayers)
         self.__PlayerList = self.createPlayerList()
-        self.__currentPlayerN = 0
-        self.__currentPlayer = self.getPlayerList()[0]
-        self.__nextPlayerN = 1
-        self.__nextPlayer = self.getPlayerList()[1]
+        self.__currentPlayerN = random.randint(0, self.getNumberOfPlayers()-1)
+        self.__currentPlayer = self.getPlayerList()[self.getCurrentPlayerN()]
 
         self.initializePawns()
 
@@ -59,17 +58,11 @@ class Jeu():
     def getPlayerList(self) -> int:
         return self.__PlayerList
 
-    def getCurrentPlayer(self) -> Player:
-        return self.__currentPlayer
-
-    def getNextPlayer(self) -> Player:
-        return self.__nextPlayer
-
     def getCurrentPlayerN(self) -> int:
         return self.__currentPlayerN
 
-    def getNextPlayerN(self) -> int:
-        return self.__nextPlayerN
+    def getCurrentPlayer(self) -> Player:
+        return self.__currentPlayer
 
     def setSquareWidth(self, value: int) -> None:
         self.__squareWidth = value
@@ -86,17 +79,11 @@ class Jeu():
     def setPlayerList(self, value: list) -> None:
         self.__PlayerList = value
 
-    def setCurrentPlayer(self, value: Player) -> None:
-        self.__currentPlayer = value
-
-    def setNextPlayer(self, value: Player) -> None:
-        self.__nextPlayer = value
-
     def setCurrentPlayerN(self, value: int) -> None:
         self.__currentPlayerN = value
 
-    def setNextPlayerN(self, value: int) -> None:
-        self.__nextPlayerN = value
+    def setCurrentPlayer(self, value: Player) -> None:
+        self.__currentPlayer = value
 
     def createGrid(self) -> list:
         return [[Case(0, (y, x), Player(0)) for x in range(self.getSquareWidth())]
@@ -194,13 +181,7 @@ class Jeu():
         else:
             self.setCurrentPlayerN(0)
 
-        if self.getNextPlayerN() < len(self.getPlayerList())-1:
-            self.setNextPlayerN(self.getNextPlayerN() + 1)
-        else:
-            self.setNextPlayerN(0)
-
         self.setCurrentPlayer(self.getPlayerList()[self.getCurrentPlayerN()])
-        self.setNextPlayer(self.getPlayerList()[self.getNextPlayerN()])
 
     def movePawn(self, coordo: tuple, player: Player):
         for neighbour in self.getNeighbours(player.getCoordinates()):
@@ -265,10 +246,10 @@ def play():
     Game = initializeGame()
     Game.display()
 
-    # play one time for all the players before checking and eliminating them
-    for a in Game.getPlayerList():
+    # TODO: replace True by while not Game.gameOver(), do function self.gameOver()
+    while True:
         player = Game.getCurrentPlayer()
-        print(player.getNumber()+1)
+        print(player.getNumber())
         if isinstance(player, Bot):
             coordo = player.pickCoordo(Game)
             while Game.movePawn(coordo, player) == False:
