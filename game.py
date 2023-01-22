@@ -4,7 +4,7 @@ from Case import Case
 from Bot import Bot
 
 
-class Jeu():
+class Game():
     def __init__(self, width: int, nbPlayers: int) -> None:
         self.__squareWidth = self.validWidth(width)
         self.__grid = self.createGrid()
@@ -183,33 +183,125 @@ class Jeu():
 
         self.setCurrentPlayer(self.getPlayerList()[self.getCurrentPlayerN()])
 
-    def movePawn(self, coordo: tuple, player: Player):
+    def movePawn(self, coordo: tuple, player: Player, jump: bool = False) -> bool:
         for neighbour in self.getNeighbours(player.getCoordinates()):
-            if coordo != neighbour.getCoordinates():
-                continue
+            if not jump:
+                if coordo != neighbour.getCoordinates():
+                    continue
+            if self.wallColide(player, coordo):
+                return False
 
-            if self.WallColide(player, coordo):
-                return
+            if self.playerColide(coordo):
+                return self.jumpPawn(player, coordo)
 
             self.placePlayer(Player(0), player.getCoordinates())
             self.placePlayer(player, coordo)
+            return True
+        return False
+
+    def jumpPawn(self, player: Player, coordo: tuple) -> bool:
+        coordo = self.getCoordoFromDirection(player, coordo)
+        if self.wallColide(player, coordo, True) or self.playerColide(coordo):
+            return self.diagonalMove(player, coordo)
+        return self.movePawn(coordo, player, True)
+
+    def diagonalMove(self, player: Player, coordo: tuple) -> bool:
+        # 0 = Left, 1 = Right
+        secondMove = self.diagonalInput(player, coordo)
+        coordo = self.getCoordoFromDirection(player, coordo, secondMove)
+        return self.movePawn(coordo, player, True)
+
+    def diagonalInput(self, player: Player, coordo: tuple) -> int:
+        secondMove = -1
+        neighnourDir = self.getNeighbourDirection(
+            self.getDirection(player, coordo))
+
+        if (self.getCell(self.getJumpCoordo(player, coordo)).getWalls()[neighnourDir[0]] == 1):
+            secondMove = 0
+        elif (self.getCell(self.getJumpCoordo(player, coordo)).getWalls()[neighnourDir[1]] == 1):
+            secondMove = 1
+        else:
+            while secondMove != 0 and secondMove != 1:
+                secondMove = int(input("Enter second direction"))
+
+        return secondMove
+
+    def getNeighbourDirection(self, direction: str) -> tuple:
+        dirArray = ["Up", "Left", "Down", "Right"]
+        index = dirArray.index(direction)
+        LeftElement, RightElement = index-1, index+1
+
+        LeftElement = len(dirArray)-1 if LeftElement == -1 else LeftElement
+        RightElement = 0 if RightElement == len(dirArray) else RightElement
+
+        return dirArray[LeftElement], dirArray[RightElement]
 
     def getDirection(self, player: Player, coordo: tuple, reverse: bool = False) -> str:
         playerCoord = player.getCoordinates()
         if reverse:
             coordo, playerCoord = playerCoord, coordo
-        if coordo[0] - playerCoord[0] == -1:
+        if coordo[0] - playerCoord[0] <= -1:
             return "Up"
-        if coordo[1] - playerCoord[1] == -1:
+        if coordo[1] - playerCoord[1] <= -1:
             return "Left"
-        if coordo[0] - playerCoord[0] == 1:
+        if coordo[0] - playerCoord[0] >= 1:
             return "Down"
-        if coordo[1] - playerCoord[1] == 1:
+        if coordo[1] - playerCoord[1] >= 1:
             return "Right"
 
-    def WallColide(self, player: Player, coordo: tuple,):
-        if (self.getCell(coordo).getWalls()[self.getDirection(player, coordo)] or
-                self.getCell(player.getCoordinates()).getWalls()[self.getDirection(player, coordo, True)]):
+    def getCoordoFromDirection(self, player: Player, coordo: tuple, secondMove: int = -1, reverse: bool = False) -> tuple:
+
+        if secondMove != -1:
+            if secondMove == 0:
+                secondMove = "Left"
+            if secondMove == 1:
+                secondMove = "Right"
+
+        if self.getDirection(player, coordo, reverse) == "Up":
+            if secondMove == "Left":
+                return (coordo[0], coordo[1]-1)
+            if secondMove == "Right":
+                return (coordo[0], coordo[1]+1)
+            return (coordo[0]-1, coordo[1])
+        if self.getDirection(player, coordo, reverse) == "Left":
+            if secondMove == "Left":
+                return (coordo[0]+1, coordo[1])
+            if secondMove == "Right":
+                return (coordo[0]-1, coordo[1])
+            return (coordo[0], coordo[1]-1)
+        if self.getDirection(player, coordo, reverse) == "Down":
+            if secondMove == "Left":
+                return (coordo[0], coordo[1]+1)
+            if secondMove == "Right":
+                return (coordo[0], coordo[1]-1)
+            return (coordo[0]+1, coordo[1])
+        if self.getDirection(player, coordo, reverse) == "Right":
+            if secondMove == "Left":
+                return (coordo[0]-1, coordo[1])
+            if secondMove == "Right":
+                return (coordo[0]+1, coordo[1])
+            return (coordo[0], coordo[1]+1)
+
+    def wallColide(self, player: Player, coordo: tuple, jump: bool = False) -> bool:
+        targetCell = self.getCell(coordo)
+        PlayerCell = self.getCell(player.getCoordinates())
+        if (targetCell.getWalls()[self.getDirection(player, coordo, True)] or
+                PlayerCell.getWalls()[self.getDirection(player, coordo)]):
+            return True
+
+        if jump:
+            jumpCoordo = self.getJumpCoordo(player, coordo)
+            jumpCell = self.getCell(jumpCoordo)
+            if (jumpCell.getWalls()[self.getDirection(player, jumpCoordo)] or
+                    jumpCell.getWalls()[self.getDirection(player, jumpCoordo, True)]):
+                return True
+        return False
+
+    def getJumpCoordo(self, player: Player, coordo: tuple) -> tuple:
+        return self.getCoordoFromDirection(player, coordo, reverse=True)
+
+    def playerColide(self, coordo: tuple) -> bool:
+        if self.getCell(coordo).getPlayer().getNumber() != 0:
             return True
         return False
 
@@ -230,11 +322,11 @@ def yesNoInput(message: str) -> bool:
             return False
 
 
-def createGame(width: int, nbPlayer: int):
-    return Jeu(width, nbPlayer)
+def createGame(width: int, nbPlayer: int) -> Game:
+    return Game(width, nbPlayer)
 
 
-def initializeGame():
+def initializeGame() -> Game:
     width = intInput(
         "Select the size of the square you want to create, minimum 5, maximum 11. \nOnly odd numbers")
     nbPlayer = intInput("How many players ? \nminimum 2, maximum 4")
@@ -242,7 +334,7 @@ def initializeGame():
     return createGame(width, nbPlayer)
 
 
-def play():
+def play() -> None:
     Game = initializeGame()
     Game.display()
 
@@ -257,6 +349,7 @@ def play():
         else:
             coordo = (intInput("row")-1, intInput("Col")-1)
             while Game.movePawn(coordo, player) == False:
+                print(Game.movePawn(coordo, player))
                 coordo = (intInput("row")-1, intInput("Col")-1)
 
         Game.display()

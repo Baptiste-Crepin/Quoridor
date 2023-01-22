@@ -3,7 +3,7 @@ class Case():
     def __init__(self, pawnNumber: int, coordinates: tuple, player: object) -> None:
         self.__coordinates = coordinates
         self.__player = player
-        self.__walls = {"Up": 1, "Left": 0, "Down": 0, "Right": 0}
+        self.__walls = {"Up": 0, "Left": 0, "Down": 0, "Right": 0}
 
     def getCoordinates(self) -> tuple:
         return self.__coordinates
