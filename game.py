@@ -305,6 +305,30 @@ class Game():
             return True
         return False
 
+    def checkGameOver(self) -> bool:
+        # top row
+        for cell in self.getGrid()[0]:
+            if cell.getPlayer().getNumber() == 2:
+                return True
+        # bottom row
+        for cell in self.getGrid()[self.getSquareWidth()-1]:
+            if cell.getPlayer().getNumber() == 1:
+                return True
+
+        if self.getNumberOfPlayers() == 2:
+            return False
+
+        # Left row
+        for row in self.getGrid():
+            if row[0].getPlayer().getNumber() == 4:
+                return True
+        # Right row
+        for row in self.getGrid():
+            if row[self.getSquareWidth()-1].getPlayer().getNumber() == 3:
+                return True
+
+        return False
+
 
 def intInput(message: str) -> int:
     try:
@@ -338,8 +362,7 @@ def play() -> None:
     Game = initializeGame()
     Game.display()
 
-    # TODO: replace True by while not Game.gameOver(), do function self.gameOver()
-    while True:
+    while not Game.checkGameOver():
         player = Game.getCurrentPlayer()
         print(player.getNumber())
         if isinstance(player, Bot):
