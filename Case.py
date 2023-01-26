@@ -4,6 +4,7 @@ class Case():
         self.__coordinates = coordinates
         self.__player = player
         self.__walls = {"Up": 0, "Left": 0, "Down": 0, "Right": 0}
+        self.__visited = False
 
     def getCoordinates(self) -> tuple:
         return self.__coordinates
@@ -14,6 +15,9 @@ class Case():
     def getWalls(self) -> list:
         return self.__walls
 
+    def getVisited(self) -> bool:
+        return self.__visited
+
     def setCoordinates(self, value: tuple) -> None:
         self.__coordinates = value
 
@@ -22,6 +26,9 @@ class Case():
 
     def setWalls(self, value: list) -> None:
         self.__walls = value
+
+    def setVisited(self, value: bool) -> None:
+        self.__visited = value
 
     def __repr__(self) -> str:
         return str(self.getPlayer())

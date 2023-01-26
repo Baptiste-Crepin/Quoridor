@@ -184,41 +184,45 @@ class Game():
         self.setCurrentPlayer(self.getPlayerList()[self.getCurrentPlayerN()])
 
     def movePawn(self, coordo: tuple, player: Player, jump: bool = False) -> bool:
-        for neighbour in self.getNeighbours(player.getCoordinates()):
+        playerCoord = player.getCoordinates()
+        for neighbour in self.getNeighbours(playerCoord):
             if not jump:
                 if coordo != neighbour.getCoordinates():
                     continue
-            if self.wallColide(player, coordo):
+            if self.wallColide(playerCoord, coordo):
                 return False
 
             if self.playerColide(coordo):
                 return self.jumpPawn(player, coordo)
 
-            self.placePlayer(Player(0), player.getCoordinates())
+            self.placePlayer(Player(0), playerCoord)
             self.placePlayer(player, coordo)
             return True
         return False
 
     def jumpPawn(self, player: Player, coordo: tuple) -> bool:
-        coordo = self.getCoordoFromDirection(player, coordo)
-        if self.wallColide(player, coordo, True) or self.playerColide(coordo):
+        playerCoord = player.getCoordinates()
+        coordo = self.getCoordoFromDirection(playerCoord, coordo)
+        if self.wallColide(playerCoord, coordo, True) or self.playerColide(coordo):
             return self.diagonalMove(player, coordo)
         return self.movePawn(coordo, player, True)
 
     def diagonalMove(self, player: Player, coordo: tuple) -> bool:
+        playerCoord = player.getCoordinates()
         # 0 = Left, 1 = Right
         secondMove = self.diagonalInput(player, coordo)
-        coordo = self.getCoordoFromDirection(player, coordo, secondMove)
+        coordo = self.getCoordoFromDirection(playerCoord, coordo, secondMove)
         return self.movePawn(coordo, player, True)
 
     def diagonalInput(self, player: Player, coordo: tuple) -> int:
+        playerCoord = player.getCoordinates()
         secondMove = -1
         neighnourDir = self.getNeighbourDirection(
-            self.getDirection(player, coordo))
+            self.getDirection(playerCoord, coordo))
 
-        if (self.getCell(self.getJumpCoordo(player, coordo)).getWalls()[neighnourDir[0]] == 1):
+        if (self.getCell(self.getJumpCoordo(playerCoord, coordo)).getWalls()[neighnourDir[0]] == 1):
             secondMove = 0
-        elif (self.getCell(self.getJumpCoordo(player, coordo)).getWalls()[neighnourDir[1]] == 1):
+        elif (self.getCell(self.getJumpCoordo(playerCoord, coordo)).getWalls()[neighnourDir[1]] == 1):
             secondMove = 1
         else:
             while secondMove != 0 and secondMove != 1:
@@ -236,20 +240,22 @@ class Game():
 
         return dirArray[LeftElement], dirArray[RightElement]
 
-    def getDirection(self, player: Player, coordo: tuple, reverse: bool = False) -> str:
-        playerCoord = player.getCoordinates()
+    def getDirection(self, currentCoordo: tuple, nextCoordo: tuple, reverse: bool = False) -> str:
         if reverse:
-            coordo, playerCoord = playerCoord, coordo
-        if coordo[0] - playerCoord[0] <= -1:
+            nextCoordo, currentCoordo = currentCoordo, nextCoordo
+
+        # print(coordo, playerCoord, coordo[0] -
+            #   playerCoord[0], coordo[1] - playerCoord[1])
+        if nextCoordo[0] - currentCoordo[0] <= -1:
             return "Up"
-        if coordo[1] - playerCoord[1] <= -1:
+        if nextCoordo[1] - currentCoordo[1] <= -1:
             return "Left"
-        if coordo[0] - playerCoord[0] >= 1:
+        if nextCoordo[0] - currentCoordo[0] >= 1:
             return "Down"
-        if coordo[1] - playerCoord[1] >= 1:
+        if nextCoordo[1] - currentCoordo[1] >= 1:
             return "Right"
 
-    def getCoordoFromDirection(self, player: Player, coordo: tuple, secondMove: int = -1, reverse: bool = False) -> tuple:
+    def getCoordoFromDirection(self, currentCoordo: tuple, nextCoordo: tuple, secondMove: int = -1, reverse: bool = False) -> tuple:
 
         if secondMove != -1:
             if secondMove == 0:
@@ -257,48 +263,49 @@ class Game():
             if secondMove == 1:
                 secondMove = "Right"
 
-        if self.getDirection(player, coordo, reverse) == "Up":
+        if self.getDirection(currentCoordo, nextCoordo, reverse) == "Up":
             if secondMove == "Left":
-                return (coordo[0], coordo[1]-1)
+                return (nextCoordo[0], nextCoordo[1]-1)
             if secondMove == "Right":
-                return (coordo[0], coordo[1]+1)
-            return (coordo[0]-1, coordo[1])
-        if self.getDirection(player, coordo, reverse) == "Left":
+                return (nextCoordo[0], nextCoordo[1]+1)
+            return (nextCoordo[0]-1, nextCoordo[1])
+        if self.getDirection(currentCoordo, nextCoordo, reverse) == "Left":
             if secondMove == "Left":
-                return (coordo[0]+1, coordo[1])
+                return (nextCoordo[0]+1, nextCoordo[1])
             if secondMove == "Right":
-                return (coordo[0]-1, coordo[1])
-            return (coordo[0], coordo[1]-1)
-        if self.getDirection(player, coordo, reverse) == "Down":
+                return (nextCoordo[0]-1, nextCoordo[1])
+            return (nextCoordo[0], nextCoordo[1]-1)
+        if self.getDirection(currentCoordo, nextCoordo, reverse) == "Down":
             if secondMove == "Left":
-                return (coordo[0], coordo[1]+1)
+                return (nextCoordo[0], nextCoordo[1]+1)
             if secondMove == "Right":
-                return (coordo[0], coordo[1]-1)
-            return (coordo[0]+1, coordo[1])
-        if self.getDirection(player, coordo, reverse) == "Right":
+                return (nextCoordo[0], nextCoordo[1]-1)
+            return (nextCoordo[0]+1, nextCoordo[1])
+        if self.getDirection(currentCoordo, nextCoordo, reverse) == "Right":
             if secondMove == "Left":
-                return (coordo[0]-1, coordo[1])
+                return (nextCoordo[0]-1, nextCoordo[1])
             if secondMove == "Right":
-                return (coordo[0]+1, coordo[1])
-            return (coordo[0], coordo[1]+1)
+                return (nextCoordo[0]+1, nextCoordo[1])
+            return (nextCoordo[0], nextCoordo[1]+1)
 
-    def wallColide(self, player: Player, coordo: tuple, jump: bool = False) -> bool:
-        targetCell = self.getCell(coordo)
-        PlayerCell = self.getCell(player.getCoordinates())
-        if (targetCell.getWalls()[self.getDirection(player, coordo, True)] or
-                PlayerCell.getWalls()[self.getDirection(player, coordo)]):
+    def wallColide(self, currentCoordo: tuple, NextCoordo: tuple, jump: bool = False) -> bool:
+        CurrentCell = self.getCell(currentCoordo)
+        targetCell = self.getCell(NextCoordo)
+        # print(self.getDirection(player, coordo, True))
+        if (targetCell.getWalls()[self.getDirection(currentCoordo, NextCoordo, True)] or
+                CurrentCell.getWalls()[self.getDirection(currentCoordo, NextCoordo)]):
             return True
 
         if jump:
-            jumpCoordo = self.getJumpCoordo(player, coordo)
+            jumpCoordo = self.getJumpCoordo(currentCoordo, NextCoordo)
             jumpCell = self.getCell(jumpCoordo)
-            if (jumpCell.getWalls()[self.getDirection(player, jumpCoordo)] or
-                    jumpCell.getWalls()[self.getDirection(player, jumpCoordo, True)]):
+            if (jumpCell.getWalls()[self.getDirection(currentCoordo, jumpCoordo)] or
+                    jumpCell.getWalls()[self.getDirection(currentCoordo, jumpCoordo, True)]):
                 return True
         return False
 
-    def getJumpCoordo(self, player: Player, coordo: tuple) -> tuple:
-        return self.getCoordoFromDirection(player, coordo, reverse=True)
+    def getJumpCoordo(self, currentCoordo: tuple, nextCoordo: tuple) -> tuple:
+        return self.getCoordoFromDirection(currentCoordo, nextCoordo, reverse=True)
 
     def playerColide(self, coordo: tuple) -> bool:
         if self.getCell(coordo).getPlayer().getNumber() != 0:
@@ -306,28 +313,75 @@ class Game():
         return False
 
     def checkGameOver(self) -> bool:
-        # top row
-        for cell in self.getGrid()[0]:
-            if cell.getPlayer().getNumber() == 2:
-                return True
-        # bottom row
-        for cell in self.getGrid()[self.getSquareWidth()-1]:
-            if cell.getPlayer().getNumber() == 1:
-                return True
+        if (self.checkPlayerInRow(1, self.getSquareWidth()-1) or
+                self.checkPlayerInRow(2, 0)):
+            return True
 
-        if self.getNumberOfPlayers() == 2:
-            return False
-
-        # Left row
-        for row in self.getGrid():
-            if row[0].getPlayer().getNumber() == 4:
-                return True
-        # Right row
-        for row in self.getGrid():
-            if row[self.getSquareWidth()-1].getPlayer().getNumber() == 3:
+        if self.getNumberOfPlayers() == 4:
+            if (self.checkPlayerInCol(3, self.getSquareWidth()-1) or
+                    self.checkPlayerInCol(4, 0)):
                 return True
 
         return False
+
+    def checkPlayerInRow(self, playerN: int, row: int) -> bool:
+        for cell in self.getGrid()[row]:
+            if cell.getPlayer().getNumber() == playerN:
+                return True
+        return False
+
+    def checkPlayerInCol(self, playerN: int, col: int) -> bool:
+        for row in self.getGrid():
+            if row[col].getPlayer().getNumber() == playerN:
+                return True
+        return False
+
+    def winningSide(self, player: Player):
+        direction = ["Down", "Up", "Right", "Left"]
+        return direction[player.getNumber()-1]
+
+    def getWinningLine(self, player: Player):
+        if self.winningSide(player) == "Down" or self.winningSide(player) == "Right":
+            return self.getSquareWidth()-1
+        if self.winningSide(player) == "Up" or self.winningSide(player) == "Left":
+            return 0
+
+    def stuck(self):
+        for player in self.getPlayerList():
+            coordo = player.getCoordinates()
+            self.getCell(coordo).setVisited(True)
+
+            if not self.stuckNeighbour(player, coordo):
+                print("BLOCK", player.getNumber())
+            self.resetVisited()
+
+    def stuckNeighbour(self, player, coordo):
+        if self.winningSide(player) == "Up" or self.winningSide(player) == "Down":
+            if coordo[0] == self.getWinningLine(player):
+                return True
+        if self.winningSide(player) == "Left" or self.winningSide(player) == "Right":
+            if coordo[1] == self.getWinningLine(player):
+                return True
+
+        for neighbour in self.getNeighbours(coordo):
+            if neighbour.getCoordinates() == player.getCoordinates():
+                continue
+            if self.wallColide(coordo, neighbour.getCoordinates()):
+                continue
+            if neighbour.getVisited():
+                continue
+
+            nextCellCoordo = neighbour.getCoordinates()
+            neighbour.setVisited(True)
+            nextCell = self.stuckNeighbour(player, nextCellCoordo)
+            if nextCell:
+                return nextCell
+        return False
+
+    def resetVisited(self) -> None:
+        for row in self.getGrid():
+            for cell in row:
+                cell.setVisited(False)
 
 
 def intInput(message: str) -> int:
@@ -362,20 +416,32 @@ def play() -> None:
     Game = initializeGame()
     Game.display()
 
+    # TODO: Place Barrier method and suppress lines below that hard codes barriers for the tests
+    Game.getGrid()[0][1].setWalls({"Up": 0, "Left": 0, "Down": 0, "Right": 1})
+    Game.getGrid()[1][1].setWalls({"Up": 0, "Left": 0, "Down": 0, "Right": 1})
+    Game.getGrid()[0][3].setWalls({"Up": 0, "Left": 1, "Down": 0, "Right": 0})
+    Game.getGrid()[1][3].setWalls({"Up": 0, "Left": 1, "Down": 0, "Right": 0})
+    Game.getGrid()[2][1].setWalls({"Up": 0, "Left": 1, "Down": 0, "Right": 1})
+    Game.getGrid()[1][2].setWalls({"Up": 0, "Left": 0, "Down": 1, "Right": 0})
+    Game.display()
+
+    Game.stuck()
+
     while not Game.checkGameOver():
         player = Game.getCurrentPlayer()
         print(player.getNumber())
-        if isinstance(player, Bot):
-            coordo = player.pickCoordo(Game)
-            while Game.movePawn(coordo, player) == False:
-                coordo = player.pickCoordo(Game)
-        else:
+        # if isinstance(player, Bot):
+        #     coordo = player.pickCoordo(Game)
+        #     while Game.movePawn(coordo, player) == False:
+        #         coordo = player.pickCoordo(Game)
+        # else:
+        coordo = (intInput("row")-1, intInput("Col")-1)
+        while Game.movePawn(coordo, player) == False:
+            print(Game.movePawn(coordo, player))
             coordo = (intInput("row")-1, intInput("Col")-1)
-            while Game.movePawn(coordo, player) == False:
-                print(Game.movePawn(coordo, player))
-                coordo = (intInput("row")-1, intInput("Col")-1)
 
         Game.display()
+        Game.stuck()
         Game.NextPlayer()
 
 
