@@ -23,7 +23,7 @@ class TablePlayer:
         return sizeY
 
     def coordX(self,i):
-        x = ((self.boardX//self.numberCase()))*i+2
+        x = ((self.boardX//self.numberCase()))*i+5
         return x
     
     def coordY(self,j):
@@ -54,7 +54,7 @@ class VerticalBarrer():
         return n
 
     def sizeVBarrerX(self):
-        sizeX=12
+        sizeX=15
         return sizeX
 
     def sizeVBarrerY(self):
@@ -101,7 +101,7 @@ class HorrizontalBarrer():
         return sizeY
 
     def coordX(self,i):
-        x = ((self.boardX//self.numberCase()))*i
+        x = ((self.boardX//self.numberCase()))*i+5
         return x
 
     def coordY(self,j):
