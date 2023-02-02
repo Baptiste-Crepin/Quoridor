@@ -1,11 +1,15 @@
 class Player():
-    def __init__(self, number: int):
+    def __init__(self, number: int, barrer: int = 0):
         self.__number = number
+        self.__barrer = barrer
         self.__color = self.setColorFromNumber()
         self.__coordinates = None
 
     def getNumber(self) -> int:
         return self.__number
+
+    def getBarrer(self) -> int:
+        return self.__barrer
 
     def getColor(self) -> str:
         return self.__color
@@ -15,6 +19,9 @@ class Player():
 
     def setNumber(self, value: int) -> None:
         self.__number = value
+
+    def setBarrer(self, value: int) -> None:
+        self.__barrer = value
 
     def setColor(self, value: str) -> None:
         self.__color = value

@@ -1,6 +1,7 @@
 import pygame
 import sys
 from pygame.locals import *
+from Player import Player
 
 class TablePlayer:
     def __init__(self,boardX,boardY,Col,Row):
@@ -9,6 +10,12 @@ class TablePlayer:
         self.col = Col
         self.row = Row
         self.black =(0,0,0)
+        
+        self.green =(0, 255, 0)
+        self.red = (255,0,0)
+        self.blue = (0,0,255)
+        self.yellow = (255,0,255)
+        self.player = Player
 
     def numberCase(self):
         n= self.col
@@ -36,10 +43,7 @@ class TablePlayer:
         width = self.sizeCaseX()
         height = self.sizeCaseY()
         casePlayer = pygame.draw.rect(surface, self.black, (x, y, width, height),2)
-        
-        for i in range(self.col):
-            for j in range(self.row):
-                casePlayer 
+        return casePlayer
 
 class VerticalBarrer():
     def __init__(self,boardX,boardY,Col,Row):
@@ -48,21 +52,22 @@ class VerticalBarrer():
         self.col = Col
         self.row = Row
         self.black =(0,0,0)
+        self.white =(255,255,255)
 
     def numberCase(self):
         n = self.col
         return n
 
     def sizeVBarrerX(self):
-        sizeX=15
+        sizeX=10
         return sizeX
 
     def sizeVBarrerY(self):
-        sizeY=(self.boardY//self.numberCase())-10
+        sizeY=(self.boardY//self.numberCase())
         return sizeY
 
     def coordX(self,i):
-        x = ((self.boardX//self.numberCase()))*i+(self.boardX//self.numberCase())-10
+        x = ((self.boardX//self.numberCase()))*i+(self.boardX//self.numberCase())-5
         return x
 
     def coordY(self,j):
@@ -74,11 +79,8 @@ class VerticalBarrer():
         y = self.coordY(j)
         width = self.sizeVBarrerX()
         height = self.sizeVBarrerY()
-        Vbarrer = pygame.draw.rect(surface, self.black, (x, y, width, height))
-        
-        for i in range(self.col):
-            for j in range(self.row):
-                Vbarrer
+        Vbarrer = pygame.draw.rect(surface, self.white, (x, y, width, height))
+        return Vbarrer
 
 class HorrizontalBarrer():
     def __init__(self,boardX,boardY,Col,Row):
@@ -87,13 +89,14 @@ class HorrizontalBarrer():
         self.col = Col
         self.row = Row
         self.black =(0,0,0)
+        self.white =(255,255,255)
 
     def numberCase(self):
         n = self.col
         return n
 
     def sizeHBarrerX(self):
-        sizeX=(self.boardY//self.numberCase())-10
+        sizeX=(self.boardY//self.numberCase())
         return sizeX
 
     def sizeHBarrerY(self):
@@ -113,24 +116,23 @@ class HorrizontalBarrer():
         y = self.coordY(j)
         width = self.sizeHBarrerX()
         height = self.sizeHBarrerY()
-        Hbarrer = pygame.draw.rect(surface, self.black, (x, y, width, height))
-        
-        for i in range(self.col):
-            for j in range(self.row):
-                Hbarrer
+        Hbarrer = pygame.draw.rect(surface, self.white, (x, y, width, height))
+        return Hbarrer
 
-class Game:
+class Board:
     def __init__(self, Col, Row):
         self.col = Col
         self.row = Row
         self.windowXmax = 800
         self.windowYmax = 800
-        self.window= pygame.display.set_mode((self.windowXmax, self.windowYmax))
+        self.window=  pygame.display.set_mode((self.windowXmax, self.windowYmax))
 
-        
+        self.player =Player
 
         pygame.display.set_caption("plateau")
         self.play = True
+    
+
 
     def displayBoard(self):
         while self.play:
@@ -141,6 +143,8 @@ class Game:
             for i in range(self.col):
                 for j in range(self.row):
                     TablePlayer(self.windowXmax, self.windowYmax,self.col,self.row).drawCase(self.window,i,j)
+                    if self.player == 1:
+                        pygame.draw.circle(self.window,self.red,(TablePlayer(self.windowXmax, self.windowYmax,self.col,self.row).sizeCaseX(i)//2,))
             for i in range(self.col-1):
                 for j in range(self.row):
                     VerticalBarrer(self.windowXmax, self.windowYmax,self.col,self.row).drawVBarrer(self.window,i,j)
@@ -153,5 +157,5 @@ class Game:
 
 
 pygame.init()
-Game(7,7).displayBoard()
+Board(7,7).displayBoard()
 pygame.quit()

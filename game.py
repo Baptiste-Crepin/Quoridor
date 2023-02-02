@@ -2,7 +2,7 @@ import random
 from Player import Player
 from Case import Case
 from Bot import Bot
-
+# from Table import Board
 
 class Game():
     def __init__(self, width: int, nbPlayers: int) -> None:
@@ -304,6 +304,55 @@ class Game():
                 return True
         return False
 
+    def placeBarrer(self, coordo: tuple, direction: str):
+        if self.detectBarrer(coordo, direction):
+            return False
+        if self.ignoreSideBarrer(coordo,direction):
+            return False
+
+        celWalls = self.getGrid()[coordo[0]][coordo[1]].getWalls()
+        celWalls[direction] = 1
+
+        self.getGrid()[coordo[0]][coordo[1]].setWalls(celWalls)
+        self.setOpositeWall(coordo,direction)
+        return True
+
+    def detectBarrer(self, coordo: tuple, direction: str):
+        if self.getGrid()[coordo[0]][coordo[1]].getWalls()[direction] == 1:
+            return True
+        return False
+
+    def ignoreSideBarrer(self,coordo :tuple, direction: str):
+        if direction == 'Right':
+            if coordo[1] == self.getSquareWidth():
+                return True 
+            return False 
+        if direction == 'Left':
+            if coordo[1] == 0:
+                return True 
+            return False
+        if direction =='Down':
+            if coordo[0] == self.getSquareWidth():
+                return True
+            return False
+        if direction =='Up':
+            if coordo[0] ==0:
+                return True
+            return False
+
+    def setOpositeWall(self,coordo: tuple, direction: str):
+        if direction == 'Right':
+            self.placeBarrer((coordo[0],coordo[1]+1), "Left")
+
+        if direction == 'Left':
+            self.placeBarrer((coordo[0],coordo[1]-1), "Right")
+
+        if direction == 'Down':
+            self.placeBarrer((coordo[0]+1,coordo[1]), "Up")
+
+        if direction == 'Up':
+            self.placeBarrer((coordo[0]-1,coordo[1]), "Down")
+
     def getJumpCoordo(self, currentCoordo: tuple, nextCoordo: tuple) -> tuple:
         return self.getCoordoFromDirection(currentCoordo, nextCoordo, reverse=True)
 
@@ -391,13 +440,21 @@ def intInput(message: str) -> int:
         return intInput("\nIncorect Value, please enter a number")
 
 
-def yesNoInput(message: str) -> bool:
+def yesNoInput(message: str, inp1:str, inp2:str) -> bool:
     while True:
-        inp = input("\n" + message + " : (y/n)  ").lower()
-        if inp == "y":
+        inp = input("\n" + message + " : ("+inp1[0]+"/"+inp2[0]+")")
+        if inp.lower() == inp1[0].lower():
             return True
-        if inp == "n":
+        if inp.lower == inp2[0].lower():
             return False
+
+
+def directionInput(message: str) -> str|bool:
+    directions = ["Up", "Down", "Left", "Right"]
+    inp = input(message).capitalize()
+    if inp in directions:
+        return inp
+    return False
 
 
 def createGame(width: int, nbPlayer: int) -> Game:
@@ -417,13 +474,13 @@ def play() -> None:
     Game.display()
 
     # TODO: Place Barrier method and suppress lines below that hard codes barriers for the tests
-    Game.getGrid()[0][1].setWalls({"Up": 0, "Left": 0, "Down": 0, "Right": 1})
-    Game.getGrid()[1][1].setWalls({"Up": 0, "Left": 0, "Down": 0, "Right": 1})
-    Game.getGrid()[0][3].setWalls({"Up": 0, "Left": 1, "Down": 0, "Right": 0})
-    Game.getGrid()[1][3].setWalls({"Up": 0, "Left": 1, "Down": 0, "Right": 0})
-    Game.getGrid()[2][1].setWalls({"Up": 0, "Left": 1, "Down": 0, "Right": 1})
-    Game.getGrid()[1][2].setWalls({"Up": 0, "Left": 0, "Down": 1, "Right": 0})
-    Game.display()
+    # Game.getGrid()[0][1].setWalls({"Up": 0, "Left": 0, "Down": 0, "Right": 1})
+    # Game.getGrid()[1][1].setWalls({"Up": 0, "Left": 0, "Down": 0, "Right": 1})
+    # Game.getGrid()[0][3].setWalls({"Up": 0, "Left": 1, "Down": 0, "Right": 0})
+    # Game.getGrid()[1][3].setWalls({"Up": 0, "Left": 1, "Down": 0, "Right": 0})
+    # Game.getGrid()[2][1].setWalls({"Up": 0, "Left": 1, "Down": 0, "Right": 1})
+    # Game.getGrid()[1][2].setWalls({"Up": 0, "Left": 0, "Down": 1, "Right": 0})
+    # Game.display()
 
     Game.stuck()
 
@@ -436,9 +493,22 @@ def play() -> None:
         #         coordo = player.pickCoordo(Game)
         # else:
         coordo = (intInput("row")-1, intInput("Col")-1)
-        while Game.movePawn(coordo, player) == False:
-            print(Game.movePawn(coordo, player))
-            coordo = (intInput("row")-1, intInput("Col")-1)
+        
+
+        choise=yesNoInput('to place barrer enter "p"\n to play enter "m"', "p", "m")
+
+        if choise:
+            direction = directionInput("direction")
+            while direction == False:
+                direction = directionInput("direction")
+            while Game.placeBarrer(coordo,direction) == False:
+                coordo = (intInput("row")-1, intInput("Col")-1)
+                while direction == False:
+                    direction = directionInput("direction")
+        else:
+            while Game.movePawn(coordo, player) == False:
+                print(Game.movePawn(coordo, player))
+                coordo = (intInput("row")-1, intInput("Col")-1)
 
         Game.display()
         Game.stuck()
