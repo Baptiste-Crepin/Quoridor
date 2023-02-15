@@ -139,6 +139,7 @@ class Board:
 
         pygame.display.set_caption("plateau")
         self.play = True
+<<<<<<< Updated upstream
 
     def mouseLogic(self, event):
         if pygame.mouse.get_pressed()[0] == 1 and not self.clicked:
@@ -200,3 +201,33 @@ if __name__ == "__main__":
         board.newFrame()
 
     pygame.quit()
+=======
+    
+
+
+    def displayBoard(self):
+        while self.play:
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    sys.exit()
+            self.window.fill((240,240,240))
+            for i in range(self.col):
+                for j in range(self.row):
+                    TablePlayer(self.windowXmax, self.windowYmax,self.col,self.row).drawCase(self.window,i,j)
+                    if self.player == 1:
+                        pygame.draw.circle(self.window,self.red,(TablePlayer(self.windowXmax, self.windowYmax,self.col,self.row).sizeCaseX(i)//2,))
+            for i in range(self.col-1):
+                for j in range(self.row):
+                    VerticalBarrer(self.windowXmax, self.windowYmax,self.col,self.row).drawVBarrer(self.window,i,j)
+            for i in range(self.col):
+                for j in range(self.row-1):
+                    HorrizontalBarrer(self.windowXmax, self.windowYmax,self.col,self.row).drawHBarrer(self.window,i,j)
+            
+
+            pygame.display.flip()
+
+
+pygame.init()
+Board(5,5).displayBoard()
+pygame.quit()
+>>>>>>> Stashed changes
