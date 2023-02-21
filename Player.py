@@ -1,5 +1,5 @@
 class Player():
-    def __init__(self, number: int, barrer: int):
+    def __init__(self, number: int, barrer: int = 0):
         self.__number = number
         self.__barrer = barrer
         self.__color = self.setColorFromNumber()

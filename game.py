@@ -45,7 +45,7 @@ class Game():
             n = max
         return n
 
-    def validateNumberOfBarrers(self, n: int, min: int =4):
+    def validateNumberOfBarrers(self, n: int, min: int = 4):
         if n % 4 == 1:
             print("You mush set an even amount of barrers")
         if n < min:
@@ -104,10 +104,10 @@ class Game():
         self.__currentPlayer = value
 
     def setNumberOfBarrers(self, value: int) -> None:
-        if self.getNumberOfPlayers == 2 : 
+        if self.getNumberOfPlayers == 2:
             numberOfBarrers = value//2
             return numberOfBarrers
-        elif self.getNumberOfPlayers == 4: 
+        elif self.getNumberOfPlayers == 4:
             numberOfBarrers = value//4
             return numberOfBarrers
 
@@ -136,8 +136,7 @@ class Game():
         self.setGrid(grid)
 
     def createPlayerList(self) -> list[Player]:
-        print("AAAA",self.getNumberOfBarrers())
-        return [Player(x+1,self.getNumberOfBarrers()) for x in range(self.getNumberOfPlayers())]
+        return [Player(x+1, self.getNumberOfBarrers()) for x in range(self.getNumberOfPlayers())]
 
     def display(self) -> None:
         for r, row in enumerate(self.getGrid()):
@@ -228,6 +227,7 @@ class Game():
         return False
 
     def jumpPawn(self, player: Player, coordo: tuple) -> bool:
+        # TODO: fix oor bug when jumping to a sidewall
         playerCoord = player.getCoordinates()
         coordo = self.getCoordoFromDirection(playerCoord, coordo)
         if self.wallColide(playerCoord, coordo, True) or self.playerColide(coordo):
@@ -337,7 +337,7 @@ class Game():
         if self.ignoreSideBarrer(coordo, direction):
             return False
         if player.getBarrer() == 0:
-            return False  
+            return False
         celWalls = self.getGrid()[coordo[0]][coordo[1]].getWalls()
         celWalls[direction] = 1
 
@@ -346,7 +346,7 @@ class Game():
         return True
 
     def detectBarrer(self, coordo: tuple, direction: str):
-        print(self.getGrid(), coordo)
+        # print(self.getGrid(), coordo)
         if self.getGrid()[coordo[0]][coordo[1]].getWalls()[direction] == 1:
             return True
         return False
@@ -369,51 +369,43 @@ class Game():
                 return True
             return False
 
-<<<<<<< Updated upstream
     def setOpositeWall(self, coordo: tuple, direction: str):
         if direction == 'Right':
-            self.placeBarrer((coordo[0], coordo[1]+1), "Left")
+            self.placeBarrer((coordo[0], coordo[1]+1),
+                             "Left", self.getCurrentPlayer())
 
         if direction == 'Left':
-            self.placeBarrer((coordo[0], coordo[1]-1), "Right")
+            self.placeBarrer((coordo[0], coordo[1]-1),
+                             "Right", self.getCurrentPlayer())
 
         if direction == 'Down':
-            self.placeBarrer((coordo[0]+1, coordo[1]), "Up")
+            self.placeBarrer((coordo[0]+1, coordo[1]),
+                             "Up", self.getCurrentPlayer())
 
         if direction == 'Up':
-            self.placeBarrer((coordo[0]-1, coordo[1]), "Down")
-=======
+            self.placeBarrer((coordo[0]-1, coordo[1]),
+                             "Down", self.getCurrentPlayer())
 
-    def setOpositeWall(self,coordo: tuple, direction: str):
+    def setNeighbourWalls(self, coordo: tuple, direction: str):
         if direction == 'Right':
-            self.placeBarrer((coordo[0],coordo[1]+1), "Left", self.getCurrentPlayer())
+            self.placeBarrer((coordo[0]+1, coordo[1]),
+                             "Right", self.getCurrentPlayer())
+            self.setOpositeWall((coordo[0]+1, coordo[1]), 'Right')
 
         if direction == 'Left':
-            self.placeBarrer((coordo[0],coordo[1]-1), "Right", self.getCurrentPlayer())
+            self.placeBarrer((coordo[0]+1, coordo[1]),
+                             "Left", self.getCurrentPlayer())
+            self.setOpositeWall((coordo[0]+1, coordo[1]), 'Left')
 
         if direction == 'Down':
-            self.placeBarrer((coordo[0]+1,coordo[1]), "Up", self.getCurrentPlayer())
+            self.placeBarrer((coordo[0], coordo[1]+1),
+                             "Down", self.getCurrentPlayer())
+            self.setOpositeWall((coordo[0], coordo[1]+1), 'Down')
 
         if direction == 'Up':
-            self.placeBarrer((coordo[0]-1,coordo[1]), "Down", self.getCurrentPlayer())
-
-    def setNeighbourWalls(self,coordo: tuple, direction: str):
-        if direction == 'Right':
-            self.placeBarrer((coordo[0]+1,coordo[1]), "Right", self.getCurrentPlayer())
-            self.setOpositeWall((coordo[0]+1,coordo[1]),'Right')
-
-        if direction == 'Left':
-            self.placeBarrer((coordo[0]+1,coordo[1]), "Left", self.getCurrentPlayer())
-            self.setOpositeWall((coordo[0]+1,coordo[1]),'Left')
-
-        if direction == 'Down':
-            self.placeBarrer((coordo[0],coordo[1]+1),"Down", self.getCurrentPlayer())
-            self.setOpositeWall((coordo[0],coordo[1]+1),'Down')
-
-        if direction == 'Up':
-            self.placeBarrer((coordo[0],coordo[1]+1), "Up", self.getCurrentPlayer())
-            self.setOpositeWall((coordo[0],coordo[1]+1),'Up')
->>>>>>> Stashed changes
+            self.placeBarrer((coordo[0], coordo[1]+1),
+                             "Up", self.getCurrentPlayer())
+            self.setOpositeWall((coordo[0], coordo[1]+1), 'Up')
 
     def getJumpCoordo(self, currentCoordo: tuple, nextCoordo: tuple) -> tuple:
         return self.getCoordoFromDirection(currentCoordo, nextCoordo, reverse=True)
@@ -495,10 +487,10 @@ class Game():
             for cell in row:
                 cell.setVisited(False)
 
-    def maxBarrer(key:int):
-        numberMax = {5:'8', 7:'12', 9:'20', 11:'40'}
+    def maxBarrer(key: int):
+        numberMax = {5: '8', 7: '12', 9: '20', 11: '40'}
         return numberMax[key]
-    
+
     def playerBarrer(self):
         if self.getSquareWidth() == 5:
             return 8
@@ -535,15 +527,15 @@ def directionInput(message: str) -> str | bool:
 
 
 def createGame(width: int, nbPlayer: int, nbBarrer: int) -> Game:
-    return Game(width, nbPlayer,nbBarrer)
-
+    return Game(width, nbPlayer, nbBarrer)
 
 
 def initializeGame() -> Game:
     width = intInput(
         "Select the size of the square you want to create, minimum 5, maximum 11. \nOnly odd numbers")
     nbPlayer = intInput("How many players ? \nminimum 2, maximum 4")
-    nbBarrer = intInput("How many Barrers? \nminimum 4, maximum "+Game.maxBarrer(width))
+    nbBarrer = intInput(
+        "How many Barrers? \nminimum 4, maximum "+Game.maxBarrer(width))
     return createGame(width, nbPlayer, nbBarrer)
 
 
@@ -564,7 +556,7 @@ def play() -> None:
 
     while not Game.checkGameOver():
         player = Game.getCurrentPlayer()
-        
+
         print(player.getNumber())
         print(player.getBarrer())
         # if isinstance(player, Bot):
@@ -581,11 +573,8 @@ def play() -> None:
             direction = directionInput("direction")
             while direction == False:
                 direction = directionInput("direction")
-<<<<<<< Updated upstream
-            while Game.placeBarrer(coordo, direction) == False:
-=======
-            while Game.placeBarrer(coordo,direction,player) == False:
->>>>>>> Stashed changes
+
+            while Game.placeBarrer(coordo, direction, player) == False:
                 coordo = (intInput("row")-1, intInput("Col")-1)
                 while direction == False:
                     direction = directionInput("direction")
@@ -597,7 +586,7 @@ def play() -> None:
                 coordo = (intInput("row")-1, intInput("Col")-1)
 
         Game.display()
-        Game.stuck()
+        # Game.stuck()
         Game.NextPlayer()
 
 
