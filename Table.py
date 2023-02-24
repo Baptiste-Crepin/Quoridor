@@ -11,10 +11,6 @@ class TablePlayer:
         self.row = Row
         self.black = (0, 0, 0)
 
-        self.green = (0, 255, 0)
-        self.red = (255, 0, 0)
-        self.blue = (0, 0, 255)
-        self.yellow = (255, 0, 255)
         self.player = Player(0)
 
         self.x = 0
@@ -64,7 +60,7 @@ class TablePlayer:
         return True
 
 
-class VerticalBarrer():
+class VerticalBarrier():
     def __init__(self, boardX, boardY, Col, Row):
         self.boardX = boardX
         self.boardY = boardY
@@ -83,12 +79,12 @@ class VerticalBarrer():
         n = self.col
         return n
 
-    def sizeVBarrerX(self):
+    def sizeVBarrierX(self):
         sizeX = 10
         self.sizeX = sizeX
         return sizeX
 
-    def sizeVBarrerY(self):
+    def sizeVBarrierY(self):
         sizeY = (self.boardY//self.numberCase())
         self.sizeY = sizeY
         return sizeY
@@ -104,18 +100,18 @@ class VerticalBarrer():
         self.y = y
         return y
 
-    def drawVBarrer(self, surface, i, j):
+    def drawVBarrier(self, surface, i, j):
         x = self.coordX(i)
         y = self.coordY(j)
-        width = self.sizeVBarrerX()
-        height = self.sizeVBarrerY()
+        width = self.sizeVBarrierX()
+        height = self.sizeVBarrierY()
         if self.placed == 0:
-            Vbarrer = pygame.draw.rect(
+            Vbarrier = pygame.draw.rect(
                 surface, self.white, (x, y, width, height))
         else:
-            Vbarrer = pygame.draw.rect(
+            Vbarrier = pygame.draw.rect(
                 surface, self.black, (x, y, width, height))
-        return Vbarrer
+        return Vbarrier
 
     def collides(self, otherCoord):
         if otherCoord[0] < self.x or otherCoord[0] > self.x + self.sizeX:
@@ -126,7 +122,7 @@ class VerticalBarrer():
         return True
 
 
-class HorrizontalBarrer():
+class HorrizontalBarrier():
     def __init__(self, boardX, boardY, Col, Row):
         self.boardX = boardX
         self.boardY = boardY
@@ -145,12 +141,12 @@ class HorrizontalBarrer():
         n = self.col
         return n
 
-    def sizeHBarrerX(self):
+    def sizeHBarrierX(self):
         sizeX = (self.boardY//self.numberCase())
         self.sizeX = sizeX
         return sizeX
 
-    def sizeHBarrerY(self):
+    def sizeHBarrierY(self):
         sizeY = 10
         self.sizeY = sizeY
         return sizeY
@@ -166,20 +162,20 @@ class HorrizontalBarrer():
         self.y = y
         return y
 
-    def drawHBarrer(self, surface, i, j):
+    def drawHBarrier(self, surface, i, j):
         x = self.coordX(i)
         y = self.coordY(j)
-        width = self.sizeHBarrerX()
-        height = self.sizeHBarrerY()
-        Hbarrer = pygame.draw.rect(surface, self.white, (x, y, width, height))
+        width = self.sizeHBarrierX()
+        height = self.sizeHBarrierY()
+        Hbarrier = pygame.draw.rect(surface, self.white, (x, y, width, height))
 
         if self.placed == 0:
-            Hbarrer = pygame.draw.rect(
+            Hbarrier = pygame.draw.rect(
                 surface, self.white, (x, y, width, height))
         else:
-            Hbarrer = pygame.draw.rect(
+            Hbarrier = pygame.draw.rect(
                 surface, self.black, (x, y, width, height))
-        return Hbarrer
+        return Hbarrier
 
     def collides(self, otherCoord):
         if otherCoord[0] < self.x or otherCoord[0] > self.x + self.sizeX:
@@ -201,8 +197,8 @@ class Board:
         self.clicked = False
 
         self.rect = self.initializeGrid()
-        self.Vbarrers = self.initializeVBarrers()
-        self.Hbarrers = self.initializeHBarrers()
+        self.Vbarriers = self.initializeVBarriers()
+        self.Hbarriers = self.initializeHBarriers()
 
         self.player = Player(0)
 
@@ -222,30 +218,30 @@ class Board:
             rectArray.append(row)
         return rectArray
 
-    def initializeVBarrers(self):
+    def initializeVBarriers(self):
         rectArray = []
         for i in range(self.col-1):
             row = []
             for j in range(self.row):
-                barrer = VerticalBarrer(
+                barrier = VerticalBarrier(
                     self.windowXmax,
                     self.windowYmax,
                     self.col,
                     self.row)
-                row.append(barrer)
+                row.append(barrier)
             rectArray.append(row)
         return rectArray
 
-    def initializeHBarrers(self):
+    def initializeHBarriers(self):
         rectArray = []
         for i in range(self.col):
             row = []
             for j in range(self.row-1):
-                barrer = HorrizontalBarrer(self.windowXmax,
-                                           self.windowYmax,
-                                           self.col,
-                                           self.row)
-                row.append(barrer)
+                barrier = HorrizontalBarrier(self.windowXmax,
+                                             self.windowYmax,
+                                             self.col,
+                                             self.row)
+                row.append(barrier)
             rectArray.append(row)
         return rectArray
 
@@ -258,14 +254,14 @@ class Board:
                     colli = cell.collides(pos)
                     if colli:
                         return ('move', j, i)
-            for i, row in enumerate(self.Vbarrers):
-                for j, barrer in enumerate(row):
-                    colli = barrer.collides(pos)
+            for i, row in enumerate(self.Vbarriers):
+                for j, barrier in enumerate(row):
+                    colli = barrier.collides(pos)
                     if colli:
                         return ('placeV', j, i)
-            for i, row in enumerate(self.Hbarrers):
-                for j, barrer in enumerate(row):
-                    colli = barrer.collides(pos)
+            for i, row in enumerate(self.Hbarriers):
+                for j, barrier in enumerate(row):
+                    colli = barrier.collides(pos)
                     if colli:
                         return ('placeH', j, i)
 
@@ -308,22 +304,20 @@ class Board:
                                        ((cell.x + cell.sizeCaseX()//2),
                                         (cell.y + cell.sizeCaseY()//2)),
                                        cell.sizeCaseX()//4)
-                    # pygame.display.flip()
 
-    def displayBarrers(self):
-        for i, row in enumerate(self.Vbarrers):
-            for j, barrer in enumerate(row):
-                barrer.drawVBarrer(self.window, i, j)
+    def displayBarriers(self):
+        for i, row in enumerate(self.Vbarriers):
+            for j, barrier in enumerate(row):
+                barrier.drawVBarrier(self.window, i, j)
 
-        for i, row in enumerate(self.Hbarrers):
-            for j, barrer in enumerate(row):
-                barrer.drawHBarrer(self.window, i, j)
-
+        for i, row in enumerate(self.Hbarriers):
+            for j, barrier in enumerate(row):
+                barrier.drawHBarrier(self.window, i, j)
 
     def newFrame(self):
         self.clearScreen()
 
-        self.displayBarrers()
+        self.displayBarriers()
         self.displayTable()
         self.higlightPlayer(self.player)
         pygame.display.flip()
