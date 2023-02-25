@@ -7,6 +7,11 @@ class GraphicalGame():
         self.game = Game(width, nbPlayer, nbBarrier)
         self.board = Board(self.game.getSquareWidth())
 
+    def highlightPlayer(self, player):
+        for PossibleMoveCoordo in self.game.possibleMoves(player.getCoordinates()):
+            self.board.rect[PossibleMoveCoordo[1]
+                            ][PossibleMoveCoordo[0]].highlighted = True
+
     def actualizeGame(self):
         for i, row in enumerate(self.game.getGrid()):
             for j, cell in enumerate(row):
@@ -29,23 +34,24 @@ class GraphicalGame():
         (action, x, y) = event
         clickCoordo = (x, y)
 
-        if action == 'move' and not self.game.movePawn(clickCoordo, self.game.getCurrentPlayer()):
-            return
+        if action == 'move':
+            if clickCoordo not in self.game.possibleMoves(self.game.getCurrentPlayer().getCoordinates()):
+                return
+            self.game.movePlayer(self.game.getCurrentPlayer(), clickCoordo)
 
         if action == 'placeV':
             if not self.game.placeWall(clickCoordo, 'Right', self.game.getCurrentPlayer()):
                 return
-
         if action == 'placeH':
             if not self.game.placeWall(clickCoordo, 'Down', self.game.getCurrentPlayer()):
                 return
 
-        self.game.display()
-
+        self.board.clearHighlight()
         self.game.NextPlayer()
+        self.highlightPlayer(self.game.getCurrentPlayer())
 
     def mainLoop(self) -> None:
-
+        self.highlightPlayer(self.game.getCurrentPlayer())
         while self.board.play:
             while not self.game.checkGameOver():
                 self.placement()

@@ -12,6 +12,7 @@ class TablePlayer:
         self.black = (0, 0, 0)
 
         self.player = Player(0)
+        self.highlighted = False
 
         self.x = 0
         self.y = 0
@@ -42,13 +43,14 @@ class TablePlayer:
         self.y = y
         return y
 
-    def drawCase(self, surface, i, j):
+    def drawCase(self, surface, i, j, color):
         x = self.coordX(i)
         y = self.coordY(j)
         width = self.sizeCaseX()
         height = self.sizeCaseY()
         casePlayer = pygame.draw.rect(
-            surface, self.black, (x, y, width, height), 2)
+            surface, color, (x, y, width, height), 2)
+
         return casePlayer
 
     def collides(self, otherCoord):
@@ -283,10 +285,19 @@ class Board:
     def clearScreen(self):
         self.window.fill((240, 240, 240))
 
+    def clearHighlight(self):
+        for row in self.rect:
+            for cell in row:
+                cell.highlighted = False
+
     def displayTable(self):
         for i, row in enumerate(self.rect):
             for j, cell in enumerate(row):
-                cell.drawCase(self.window, i, j)
+                if cell.highlighted:
+                    cell.drawCase(self.window, i, j, (255, 0, 0))
+                    
+                else:
+                    cell.drawCase(self.window, i, j, cell.black)
 
                 if cell.player.getNumber() != 0:
                     pygame.draw.circle(self.window,
