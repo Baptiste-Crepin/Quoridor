@@ -37,6 +37,7 @@ class GraphicalGame():
         if action == 'move':
             if clickCoordo not in self.game.possibleMoves(self.game.getCurrentPlayer().getCoordinates()):
                 return
+            self.board.clearHover()
             self.game.movePlayer(self.game.getCurrentPlayer(), clickCoordo)
 
         if action == 'placeV':
@@ -47,6 +48,7 @@ class GraphicalGame():
                 return
 
         self.board.clearHighlight()
+        self.game.display()
         self.game.NextPlayer()
         self.highlightPlayer(self.game.getCurrentPlayer())
 
@@ -66,8 +68,8 @@ if __name__ == "__main__":
     # width = int(input('Width'))
     # nbPlayer = int(input('Nb Player'))
     # nbBarrier = int(input('Nb barrier'))
-    width = 5
-    nbBarrier = 4
+    width = 11
+    nbBarrier = 16
     nbPlayer = 4
     G = GraphicalGame(width, nbPlayer, nbBarrier)
     G.mainLoop()

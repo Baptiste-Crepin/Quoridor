@@ -13,6 +13,7 @@ class TablePlayer:
 
         self.player = Player(0)
         self.highlighted = False
+        self.hover = False
 
         self.x = 0
         self.y = 0
@@ -247,7 +248,19 @@ class Board:
             rectArray.append(row)
         return rectArray
 
+    def hoverCells(self):
+        for i, row in enumerate(self.rect):
+            for j, cell in enumerate(row):
+                if not cell.highlighted:
+                    continue
+                if cell.collides(pygame.mouse.get_pos()):
+                    cell.hover = True
+                    return
+                self.clearHover()
+
     def mouseLogic(self, event):
+        self.hoverCells()
+
         if pygame.mouse.get_pressed()[0] == 1 and not self.clicked:
             self.clicked = True
             pos = pygame.mouse.get_pos()
@@ -273,7 +286,7 @@ class Board:
             return False
 
     def quitWindow(self, event):
-        if event.type == pygame.QUIT:
+        if event.type == pygame.QUIT or event.type == 32787:
             pygame.quit()
             raise SystemExit
 
@@ -290,14 +303,22 @@ class Board:
             for cell in row:
                 cell.highlighted = False
 
+    def clearHover(self):
+        for row in self.rect:
+            for cell in row:
+                cell.hover = False
+
     def displayTable(self):
         for i, row in enumerate(self.rect):
             for j, cell in enumerate(row):
+                cell.drawCase(self.window, i, j, cell.black)
+
                 if cell.highlighted:
-                    cell.drawCase(self.window, i, j, (255, 0, 0))
-                    
-                else:
-                    cell.drawCase(self.window, i, j, cell.black)
+                    pygame.draw.rect(self.window, (255, 204, 255),
+                                     (cell.x+2, cell.y+2, cell.sizeX-4, cell.sizeY-4))
+                if cell.hover:
+                    pygame.draw.rect(self.window, (255, 0, 0),
+                                     (cell.x+2, cell.y+2, cell.sizeX-4, cell.sizeY-4))
 
                 if cell.player.getNumber() != 0:
                     pygame.draw.circle(self.window,
