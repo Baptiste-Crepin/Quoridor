@@ -252,7 +252,7 @@ class Game():
         if nextCoordo[1] - currentCoordo[1] >= 1:
             return "Right"
 
-    def getCoordoFromDirection(self, currentCoordo: tuple, nextCoordo: tuple, secondMove: int = None, reverse: bool = False, jump: bool = False) -> tuple:
+    def getCoordoFromDirection(self, currentCoordo: tuple, nextCoordo: tuple, secondMove: int = None, jump: bool = False) -> tuple:
 
         if jump:
             jump = 2
@@ -279,7 +279,7 @@ class Game():
             ("Right", "Right"): (currentCoordo[0]+jump, currentCoordo[1]+jump),
         }
 
-        return move_map[(self.getDirection(currentCoordo, nextCoordo, reverse), secondMove)]
+        return move_map[(self.getDirection(currentCoordo, nextCoordo), secondMove)]
 
     def wallColide(self, currentCoordo: tuple, NextCoordo: tuple, jump: bool = False) -> bool:
         CurrentCell = self.getCell(currentCoordo)
@@ -397,14 +397,13 @@ class Game():
 
         if self.detectBarrier(neighbourCoordo, direction):
             self.cancelPlacement(neighbourCoordo, direction)
-            # self.cancelPlacement(coordo, direction)
             return False
 
         return self.placeWholeBarrier((neighbourCoordo[0], neighbourCoordo[1]),
                                       direction, self.getCurrentPlayer())
 
     def getJumpCoordo(self, currentCoordo: tuple, nextCoordo: tuple) -> tuple:
-        return self.getCoordoFromDirection(currentCoordo, nextCoordo, reverse=True)
+        return self.getCoordoFromDirection(currentCoordo, nextCoordo)
 
     def playerColide(self, coordo: tuple) -> bool:
         if self.getCell(coordo).getPlayer().getNumber() != 0:
@@ -523,7 +522,7 @@ class Game():
             if self.playerColide(neighbourCoordo):
                 jumpCoordo = self.getCoordoFromDirection(
                     playerCoord, neighbourCoordo, jump=True)
-                if self.checkJump(playerCoord, neighbourCoordo):  # oor problem
+                if self.checkJump(playerCoord, neighbourCoordo):
                     result.append(jumpCoordo)
                     continue
 
