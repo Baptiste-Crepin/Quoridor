@@ -458,25 +458,34 @@ class Board:
     def displayIntersection(self):
         for i, row in enumerate(self.intersection):
             for j, intersection in enumerate(row):
-                if ((self.Vbarriers[i][j].placed and self.Vbarriers[i][j+1].placed)
-                        or self.Hbarriers[i][j].placed and self.Hbarriers[i+1][j].placed):
-                    # TODO: disable intersection displaye on barrier intersection
+                if ((self.Vbarriers[i][j].placed and
+                     self.Vbarriers[i][j+1].placed) or
+                    (self.Hbarriers[i][j].placed and
+                     self.Hbarriers[i+1][j].placed)):
 
-                    Va = 0
-                    if self.Hbarriers[i][j].placed == 1:
-                        while j-Va > 0 and self.Vbarriers[i][j-Va].placed:
-                            Va += 1
-
-                    Ha = 0
+                    VnbBarriers = 0
                     if self.Vbarriers[i][j].placed == 1:
-                        while i-Ha > 0 and self.Hbarriers[i-Ha][j].placed:
-                            Ha += 1
+                        while j-VnbBarriers >= 0 and self.Vbarriers[i][j-VnbBarriers].placed:
+                            VnbBarriers += 1
 
-                    if Ha % 2 != 0 and Va % 2 == 0:
+                    HnbBarriers = 0
+                    if self.Hbarriers[i][j].placed == 1:
+                        while i-HnbBarriers >= 0 and self.Hbarriers[i-HnbBarriers][j].placed:
+                            HnbBarriers += 1
+
+                    if VnbBarriers % 2 == HnbBarriers % 2 == 0:
                         continue
 
+                    if i < len(self.Vbarriers)-1 and i < len(self.Hbarriers)-1:
+                        if self.Vbarriers[i+1][j].placed:
+                            intersection.draw(
+                                self.window, i+1, j, intersection.black)
+                    if j < len(self.Vbarriers)-1 and j < len(self.Hbarriers)-1:
+                        if self.Hbarriers[i][j+1].placed:
+                            intersection.draw(
+                                self.window, i, j+1, intersection.black)
+
                     intersection.draw(self.window, i, j, intersection.black)
-                    continue
 
                 intersection.draw(self.window, i, j, intersection.white)
                 if intersection.hover:

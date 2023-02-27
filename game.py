@@ -572,21 +572,21 @@ class Game():
         return result
 
     def checkBarrierIntersection(self, i, j, direction):
-        a = 0
+        nbBarrier = 0
         if direction == 'Down':
             otherDirection = 'Right'
-            while i-a >= 0 and self.getGrid()[i-a][j].getWalls()[otherDirection] == 1:
-                a += 1
-            if a % 2 == 0:
+            while i-nbBarrier >= 0 and self.getGrid()[i-nbBarrier][j].getWalls()[otherDirection] == 1:
+                nbBarrier += 1
+            if nbBarrier % 2 == 0:
                 return False
             if self.getGrid()[i][j].getWalls()[otherDirection] == 1:
                 return True
 
         if direction == 'Right':
             otherDirection = 'Down'
-            while j-a >= 0 and self.getGrid()[i][j-a].getWalls()[otherDirection] == 1:
-                a += 1
-            if a % 2 == 0:
+            while j-nbBarrier >= 0 and self.getGrid()[i][j-nbBarrier].getWalls()[otherDirection] == 1:
+                nbBarrier += 1
+            if nbBarrier % 2 == 0:
                 return False
             if self.getGrid()[i][j].getWalls()[otherDirection] == 1:
                 return True
