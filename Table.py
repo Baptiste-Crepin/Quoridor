@@ -473,7 +473,7 @@ class Board:
                         while i-HnbBarriers >= 0 and self.Hbarriers[i-HnbBarriers][j].placed:
                             HnbBarriers += 1
 
-                    if VnbBarriers % 2 == HnbBarriers % 2 == 0:
+                    if VnbBarriers % 2 == 0 and HnbBarriers % 2 == 0:
                         continue
 
                     if i < len(self.Vbarriers)-1 and i < len(self.Hbarriers)-1:
@@ -486,6 +486,7 @@ class Board:
                                 self.window, i, j+1, intersection.black)
 
                     intersection.draw(self.window, i, j, intersection.black)
+                    continue
 
                 intersection.draw(self.window, i, j, intersection.white)
                 if intersection.hover:

@@ -139,28 +139,19 @@ class Game():
 
     def display(self) -> None:
         for r, row in enumerate(self.getGrid()):
-            for i in range(3):
+            for i in range(2):
                 for c, cell in enumerate(row):
                     if i == 0:
-                        if self.getGrid()[r][c].getWalls()["Up"] == 0:
-                            print("   ", end="")
-                        else:
-                            print(" - ", end="")
-                    elif i == 1:
-                        if cell.getWalls()["Left"] == 0:
-                            print(" ", end="")
-                        else:
-                            print("|", end="")
                         print(cell, end="")
                         if cell.getWalls()["Right"] == 0:
                             print(" ", end="")
                         else:
                             print("|", end="")
-                    elif i == 2:
+                    elif i == 1:
                         if self.getGrid()[r][c].getWalls()["Down"] == 0:
-                            print("   ", end="")
+                            print("  ", end="")
                         else:
-                            print(" - ", end="")
+                            print("- ", end="")
                 print()
 
     def inGrid(self, coord: tuple) -> bool:
@@ -260,12 +251,12 @@ class Game():
         if nextCoordo[1] - currentCoordo[1] >= 1:
             return "Right"
 
+    def isValidWall(self, direction: str) -> bool:
+        return direction == "Right" or direction == "Down"
+
     def getCoordoFromDirection(self, currentCoordo: tuple, nextCoordo: tuple, secondMove: int = None, jump: bool = False) -> tuple:
 
-        if jump:
-            jump = 2
-        else:
-            jump = 1
+        jump = 2 if jump else 1
 
         if secondMove == 0:
             secondMove = "Left"
@@ -293,24 +284,31 @@ class Game():
         CurrentCell = self.getCell(currentCoordo)
         targetCell = self.getCell(NextCoordo)
 
-        if (targetCell.getWalls()[self.getDirection(currentCoordo, NextCoordo, True)] or
-                CurrentCell.getWalls()[self.getDirection(currentCoordo, NextCoordo)]):
-            return True
+        if self.isValidWall(self.getDirection(currentCoordo, NextCoordo, True)):
+            if targetCell.getWalls()[self.getDirection(currentCoordo, NextCoordo, True)]:
+                return True
+        if self.isValidWall(self.getDirection(currentCoordo, NextCoordo)):
+            if CurrentCell.getWalls()[self.getDirection(currentCoordo, NextCoordo)]:
+                return True
+
         if jump:
             jumpCoordo = self.getJumpCoordo(currentCoordo, NextCoordo)
             if not self.inGrid(jumpCoordo):
                 return False
             jumpCell = self.getCell(jumpCoordo)
-            if (jumpCell.getWalls()[self.getDirection(currentCoordo, jumpCoordo)] or
-                    jumpCell.getWalls()[self.getDirection(currentCoordo, jumpCoordo, True)]):
-                return True
+            if self.isValidWall(self.getDirection(currentCoordo, jumpCoordo)):
+                if (CurrentCell.getWalls()[self.getDirection(currentCoordo, jumpCoordo)]):
+                    return True
+            if self.isValidWall(self.getDirection(currentCoordo, jumpCoordo, True)):
+                if (jumpCell.getWalls()[self.getDirection(currentCoordo, jumpCoordo, True)]):
+                    return True
         return False
 
     def placeWholeBarrier(self, coordo: tuple, direction: str, player: Player, place=True) -> bool:
         if not self.placeBarrier(coordo, direction, player, place=place):
             return False
-        if not self.setOpositeWall(coordo, direction, place=place):
-            return False
+        # if not self.setOpositeWall(coordo, direction, place=place):
+        #     return False
         return True
 
     def placeBarrier(self, coordo: tuple, direction: str, player: Player, place=True) -> bool:
@@ -350,38 +348,11 @@ class Game():
     def ignoreSideBarrier(self, coordo: tuple, direction: str) -> bool:
         if direction == 'Right':
             return coordo[1] == self.getSquareWidth()
-        if direction == 'Left':
-            return coordo[1] == 0
         if direction == 'Down':
             return coordo[0] == self.getSquareWidth()
-        if direction == 'Up':
-            return coordo[0] == 0
 
-    def setOpositeWall(self, coordo: tuple, direction: str, place=True) -> bool:
-
-        directionMap = {
-            'Right': (coordo[0], coordo[1]+1),
-            'Left': (coordo[0], coordo[1]-1),
-            'Down': (coordo[0]+1, coordo[1]),
-            'Up': (coordo[0]-1, coordo[1])
-        }
-
-        return self.placeBarrier(directionMap[direction], self.oppositeDirection(direction), self.getCurrentPlayer(), place=place)
-
-    def cancelBarrierPlacement(self, coordo: tuple, direction: str, firstIteration: bool = True) -> None:
+    def cancelBarrierPlacement(self, coordo: tuple, direction: str) -> None:
         '''Cancel the placement of a barrier'''
-        if firstIteration:
-            if direction == 'Left':
-                oppositeWallCellCoordo = (coordo[0], coordo[1]-1)
-            if direction == 'Right':
-                oppositeWallCellCoordo = (coordo[0], coordo[1]+1)
-            if direction == 'Up':
-                oppositeWallCellCoordo = (coordo[0]-1, coordo[1])
-            if direction == 'Down':
-                oppositeWallCellCoordo = (coordo[0]+1, coordo[1])
-
-            self.cancelBarrierPlacement(oppositeWallCellCoordo,
-                                        self.oppositeDirection(direction), False)
 
         walls = self.getGrid()[coordo[0]][coordo[1]].getWalls()
         walls[direction] = 0
@@ -389,12 +360,12 @@ class Game():
 
     def setNeighbourWalls(self, coordo: tuple, direction: str, place=True) -> bool:
 
-        if (direction == 'Right' or direction == 'Left'):
+        if (direction == 'Right'):
             if coordo[0] >= len(self.getGrid())-1:
                 return False
             neighbourCoordo = (coordo[0]+1, coordo[1])
 
-        if (direction == 'Up' or direction == 'Down'):
+        if (direction == 'Down'):
             if coordo[1] >= len(self.getGrid())-1:
                 return False
             neighbourCoordo = (coordo[0], coordo[1]+1)
@@ -409,12 +380,12 @@ class Game():
 
     def cancelNeighbourBarriers(self, coordo: tuple, direction: str) -> bool:
 
-        if (direction == 'Right' or direction == 'Left'):
+        if (direction == 'Right'):
             if coordo[0] >= len(self.getGrid())-1:
                 return False
             neighbourCoordo = (coordo[0]+1, coordo[1])
 
-        if (direction == 'Up' or direction == 'Down'):
+        if (direction == 'Down'):
             if coordo[1] >= len(self.getGrid())-1:
                 return False
             neighbourCoordo = (coordo[0], coordo[1]+1)
@@ -457,12 +428,6 @@ class Game():
             if row[col].getPlayer().getNumber() == playerN:
                 return True
         return False
-
-    def oppositeDirection(self, direction: str) -> str:
-        '''Return the opposite direction of the given direction'''
-        directions = list(self.getGrid()[0][0].getWalls().keys())
-
-        return directions[directions.index(direction)-2]
 
     def winningSide(self, player: Player):
         '''Return the side that the player must reach to win'''
@@ -604,7 +569,6 @@ class Game():
                 cell = self.getGrid()[i][j]
                 for direction in cell.getWalls().keys():
                     if not (direction == 'Down' or direction == 'Right'):
-                        # TODO: stop using left and up in the wall logic to allow for quicker barrier placement in other functions
                         continue
                     if self.checkBarrierIntersection(i, j, direction):
                         continue
@@ -616,7 +580,7 @@ class Game():
                     if not self.stuck():
                         result.append(((i, j), direction))
 
-                    self.cancelBarrierPlacement((i, j), direction, True)
+                    self.cancelBarrierPlacement((i, j), direction)
                     self.cancelNeighbourBarriers((i, j), direction)
         return result
 
@@ -625,13 +589,13 @@ class Game():
         self.placePlayer(Player(0), player.getCoordinates())
         self.placePlayer(player, coordo)
 
-    def directionInput(self, message: str) -> str | bool:
+    def directionInput(self) -> str | None:
         '''Return the direction input by the user or False if the input is invalid'''
         directions = list(self.getGrid()[0][0].getWalls().keys())
-        inp = input(message).capitalize()
+        inp = input("Direction |Right or Down|").capitalize()
         if inp in directions:
             return inp
-        return False
+        return
 
 
 def intInput(message: str) -> int:
@@ -678,14 +642,14 @@ def play() -> None:
         coordo = (intInput("row")-1, intInput("Col")-1)
 
         if choise:
-            direction = Game.directionInput("direction")
-            while direction == False:
-                direction = Game.directionInput("direction")
+            direction = Game.directionInput()
+            while not direction:
+                direction = Game.directionInput()
 
-            while Game.placeWall(coordo, direction, player) == False:
+            while not Game.placeWall(coordo, direction, player):
                 coordo = (intInput("row")-1, intInput("Col")-1)
                 while direction == False:
-                    direction = Game.directionInput("direction")
+                    direction = Game.directionInput()
 
             player.setBarrier(player.getBarrier()-1)
         else:
