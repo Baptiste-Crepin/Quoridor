@@ -233,3 +233,5 @@ poetry.toml
 /httpRequests/
 /dataSources/
 /dataSources.local.xml
+*.xml
+.idea/Quoridor.iml

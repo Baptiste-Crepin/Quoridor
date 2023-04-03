@@ -4,18 +4,16 @@ from Case import Case
 from Bot import Bot
 
 
+
 class Game():
-    def __init__(self, width: int, nbPlayers: int, nbBarrier: int, nbBots: int, num:int) -> None:
+    def __init__(self, width: int, nbPlayers: int, nbBarrier: int) -> None:
         self.__squareWidth = self.validWidth(width)
-        self.__NumberOfBots = nbBots
-        # self.__NumberOfPlayers = self.validNumberOfPlayers(nbPlayers)
-        self.__NumberOfPlayers = nbPlayers
+        self.__grid = self.createGrid()
+        self.__NumberOfPlayers = self.validNumberOfPlayers(nbPlayers)
         self.__NumberOfBarriers = self.validateNumberOfBarriers(nbBarrier)
         self.__PlayerList = self.createPlayerList()
-        #self.__currentPlayerN = random.randint(0, self.getNumberOfPlayers()-1)
-        self.__currentPlayerN = 0
+        self.__currentPlayerN = random.randint(0, self.getNumberOfPlayers()-1)
         self.__currentPlayer = self.getPlayerList()[self.getCurrentPlayerN()]
-        self.__grid = self.createGrid()
 
         self.initializePawns()
 
@@ -84,9 +82,6 @@ class Game():
     def getCurrentPlayer(self) -> Player:
         return self.__currentPlayer
 
-    def getNumberOfBots(self):
-        return self.__NumberOfBots
-
     def setSquareWidth(self, value: int) -> None:
         self.__squareWidth = value
 
@@ -109,18 +104,15 @@ class Game():
         self.__currentPlayer = value
 
     def setNumberOfBarriers(self, value: int) -> None:
-        if len(self.getPlayerList()) == 2:
+        if self.getNumberOfPlayers == 2:
             numberOfBarriers = value//2
             return numberOfBarriers
-        elif len(self.getPlayerList()) == 4:
+        elif self.getNumberOfPlayers == 4:
             numberOfBarriers = value//4
             return numberOfBarriers
 
-    def setNumberOfBots(self, value: int):
-        self.__NumberOfBots = value
-
     def createGrid(self) -> list[list[Case]]:
-        return [[Case(0, (y, x), Player(0, self.getNumberOfBarriers())) for x in range(self.getSquareWidth())]
+        return [[Case(0, (y, x), Player(0, self.setNumberOfBarriers(self.getNumberOfBarriers))) for x in range(self.getSquareWidth())]
                 for y in range(self.getSquareWidth())]
 
     def placePlayer(self, player: Player, coordinates: tuple) -> None:
@@ -135,7 +127,7 @@ class Game():
         self.placePlayer(self.getPlayerList()[
                          1], (self.getSquareWidth()-1, self.getSquareWidth()//2))
 
-        if len(self.getPlayerList()) == 4:
+        if self.getNumberOfPlayers() == 4:
             self.placePlayer(self.getPlayerList()[
                              2], (self.getSquareWidth()//2, 0))
             self.placePlayer(self.getPlayerList()[
@@ -143,14 +135,8 @@ class Game():
 
         self.setGrid(grid)
 
-    def createPlayerList(self) -> list:
-        playerList = [Player(x+1, self.getNumberOfBarriers())
-                      for x in range(self.getNumberOfPlayers())]
-        if self.getNumberOfBots() != 0:
-            bots = [Bot(len(playerList)+x+1, self.getNumberOfBarriers())
-                    for x in range(self.getNumberOfBots())]
-            playerList += bots
-        return playerList
+    def createPlayerList(self) -> list[Player]:
+        return [Player(x+1, self.getNumberOfBarriers()) for x in range(self.getNumberOfPlayers())]
 
     def display(self) -> None:
         for r, row in enumerate(self.getGrid()):
@@ -423,7 +409,7 @@ class Game():
                 self.checkPlayerInRow(2, 0)):
             return True
 
-        if len(self.getPlayerList()) == 4:
+        if self.getNumberOfPlayers() == 4:
             if (self.checkPlayerInCol(3, self.getSquareWidth()-1) or
                     self.checkPlayerInCol(4, 0)):
                 return True
@@ -641,9 +627,7 @@ def initializeGame() -> Game:
     nbPlayer = intInput("How many players ? \nminimum 2, maximum 4")
     nbBarrier = intInput(
         "How many Barriers? \nminimum 4, maximum "+Game.maxBarrier(width))
-    bots = intInput("how many bots do you want to play against?")
-
-    return Game(width, nbPlayer, nbBarrier, bots)
+    return Game(width, nbPlayer, nbBarrier)
 
 
 def play() -> None:
@@ -654,31 +638,28 @@ def play() -> None:
     while not Game.checkGameOver():
         player = Game.getCurrentPlayer()
         print(player)
+        choise = yesNoInput(
+            'to place barrier enter "p"\n to play enter "m"', "p", "m")
+        coordo = (intInput("row")-1, intInput("Col")-1)
 
-        if isinstance(player, Bot):
-            player.randomMoves(Game)
-        else:
-            choise = yesNoInput(
-                'to place barrier enter "p"\n to play enter "m"', "p", "m")
-            coordo = (intInput("row")-1, intInput("Col")-1)
-            if choise:
+        if choise:
+            direction = Game.directionInput()
+            while not direction:
                 direction = Game.directionInput()
-                while not direction:
+
+            while not Game.placeWall(coordo, direction, player):
+                coordo = (intInput("row")-1, intInput("Col")-1)
+                while direction == False:
                     direction = Game.directionInput()
 
-                while not Game.placeWall(coordo, direction, player):
-                    coordo = (intInput("row")-1, intInput("Col")-1)
-                    while direction == False:
-                        direction = Game.directionInput()
-
-                player.setBarrier(player.getBarrier()-1)
-            else:
-                while coordo not in Game.possibleMoves(player.getCoordinates()):
-                    coordo = (intInput("row")-1, intInput("Col")-1)
-                Game.movePlayer(player, coordo)
+            player.setBarrier(player.getBarrier()-1)
+        else:
+            while coordo not in Game.possibleMoves(player.getCoordinates()):
+                coordo = (intInput("row")-1, intInput("Col")-1)
+            Game.movePlayer(player, coordo)
 
         Game.display()
-        #Game.nextPlayer()
+        Game.nextPlayer()
 
 
 if __name__ == "__main__":
