@@ -1,6 +1,7 @@
 import pygame
 from pygame.locals import *
 from Player import Player
+lejoueur = 0
 
 
 class TablePlayer:
@@ -247,7 +248,7 @@ class Intersection():
 
 
 class Board:
-    def __init__(self, Width):
+    def __init__(self, Width,num):
         self.col = Width
         self.row = Width
         self.windowXmax = 800
@@ -255,15 +256,16 @@ class Board:
         self.window = pygame.display.set_mode(
             (self.windowXmax, self.windowYmax))
         self.clicked = False
+        self.num = num
 
         self.rect = self.initializeGrid()
         self.Vbarriers = self.initializeVBarriers()
         self.Hbarriers = self.initializeHBarriers()
         self.intersection = self.initializeIntersection()
 
-        self.player = Player(0)
+        self.player = Player(num)
 
-        pygame.display.set_caption("plateau")
+        pygame.display.set_caption("plateau :" + str(num))
         self.play = True
 
     def initializeGrid(self):
@@ -365,22 +367,25 @@ class Board:
                     return (type(element).__name__, j, i)
 
     def mouseLogic(self, event):
-        self.hoverCells()
-        self.hoverVbarriers()
-        self.hoverHbarriers()
 
-        if pygame.mouse.get_pressed()[0] == 1 and not self.clicked:
-            self.clicked = True
-            pos = pygame.mouse.get_pos()
 
-            for array in [self.rect, self.Vbarriers, self.Hbarriers]:
-                clickedElement = self.interactObject(array, pos)
-                if clickedElement:
-                    return clickedElement
+        if self.player.getNumber() == self.num+1:
+            self.hoverCells()
+            self.hoverVbarriers()
+            self.hoverHbarriers()
 
-        if pygame.mouse.get_pressed()[0] == 0 and self.clicked:
-            self.clicked = False
-            return False
+            if pygame.mouse.get_pressed()[0] == 1 and not self.clicked:
+                self.clicked = True
+                pos = pygame.mouse.get_pos()
+
+                for array in [self.rect, self.Vbarriers, self.Hbarriers]:
+                    clickedElement = self.interactObject(array, pos)
+                    if clickedElement:
+                        return clickedElement
+
+            if pygame.mouse.get_pressed()[0] == 0 and self.clicked:
+                self.clicked = False
+                return False
 
     def quitWindow(self, event):
         if event.type == pygame.QUIT or event.type == 32787:
