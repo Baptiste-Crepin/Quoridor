@@ -1,11 +1,12 @@
 from game import Game
 from Table import Board
+import socket, sys, threading, pickle
 
 
 class GraphicalGame():
-    def __init__(self, width, nbPlayer, nbBarrier) -> None:
-        self.game = Game(width, nbPlayer, nbBarrier)
-        self.board = Board(self.game.getSquareWidth())
+    def __init__(self, width, nbPlayer, nbBarrier,num) -> None:
+        self.game = Game(width, nbPlayer, nbBarrier,num)
+        self.board = Board(self.game.getSquareWidth(),num)
 
     def highlightPlayer(self, player):
         for PossibleMoveCoordo in self.game.possibleMoves(player.getCoordinates()):
@@ -28,10 +29,10 @@ class GraphicalGame():
 
                 self.board.rect[j][i].player = cell.getPlayer()
 
-                if i < len(self.game.getGrid())-1:
+                if i < len(self.game.getGrid()) - 1:
                     self.board.Hbarriers[j][i].placed = cell.getWalls()['Down']
 
-                if j < len(row)-1:
+                if j < len(row) - 1:
                     self.board.Vbarriers[j][i].placed = cell.getWalls()[
                         'Right']
 
@@ -68,6 +69,10 @@ class GraphicalGame():
         self.highlightPlayer(self.game.getCurrentPlayer())
         self.highlightBarrier()
 
+        msg = "tour fini pour " + str(numero)
+        print(msg)
+        th.emet(msg)
+
     def mainLoop(self) -> None:
         self.highlightPlayer(self.game.getCurrentPlayer())
         self.highlightBarrier()
@@ -75,10 +80,43 @@ class GraphicalGame():
             while not self.game.checkGameOver():
                 self.placement()
                 self.actualizeGame()
-
                 self.board.newFrame()
             # TODO: Game has ended. display the end screen
             self.board.newFrame()
+
+# --------------------------------------------------------
+class Thread_client(threading.Thread):
+    def __init__(self, c):
+        threading.Thread.__init__(self)
+        self.connexion = c
+        self.start()
+
+    def run(self):
+        while 1:
+            print("R")
+            message = self.reco()
+            print("reciev:")
+            print( type(message))
+            if type(message) is list:
+                G.game.setGrid(message)
+                G.game.nextPlayer()
+                #G.actualizeGame()
+                #G.board.newFrame()
+                #G.nextPlayer()
+
+            print(message)
+        #self.connexion.close()
+
+    def emet(self,msg):
+        gr = G.game.getGrid()
+        data = pickle.dumps(gr)
+        self.connexion.send(data)
+        #self.connexion.send(msg.encode("Utf8"))
+        #self.connexion.close()
+    def reco(self):
+        dump = self.connexion.recv(4096)
+        message = pickle.loads(dump)
+        return message
 
 
 if __name__ == "__main__":
@@ -88,5 +126,33 @@ if __name__ == "__main__":
     width = 5
     nbBarrier = 4
     nbPlayer = 2
-    G = GraphicalGame(width, nbPlayer, nbBarrier)
+    # client avec Thread
+
+
+    # ============================================================
+    hostname = socket.gethostname()
+
+    host = socket.gethostbyname(hostname)
+    #host = 'LocalHost'
+    port = 45678
+
+    connexion = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    try:
+        connexion.connect((host, port))
+        print("Connexion active")
+    except socket.error:
+        print("Erreur sur la connection")
+        sys.exit()
+
+    msg = connexion.recv(4096).decode("Utf8")
+    print("reccu:",msg)
+
+    numero = int(msg)
+
+    th = Thread_client(connexion)
+
+
+    # =========================================================
+
+    G = GraphicalGame(width, nbPlayer, nbBarrier,numero)
     G.mainLoop()
