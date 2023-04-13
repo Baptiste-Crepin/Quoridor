@@ -262,8 +262,6 @@ class Board:
         self.Hbarriers = self.initializeHBarriers()
         self.intersection = self.initializeIntersection()
 
-        self.player = Player(num)
-
         pygame.display.set_caption("plateau :" + str(num))
         self.play = True
 
@@ -364,9 +362,9 @@ class Board:
                 if colli:
                     return (type(element).__name__, j, i)
 
-    def mouseLogic(self, event,n):
-        #print(n.getNumber(), self.num)
-        if n == self.num:
+    def mouseLogic(self, event, currentPlayer):
+        #print(currentPlayer.getNumber(), self.num)
+        if currentPlayer == self.num:
             self.hoverCells()
             self.hoverVbarriers()
             self.hoverHbarriers()
