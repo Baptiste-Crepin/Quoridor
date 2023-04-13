@@ -355,7 +355,6 @@ class Board:
                     return
                 if not barrier.possiblePlacement:
                     continue
-
                 self.clearHover(self.Hbarriers)
 
     def interactObject(self, listeObject: list[object], pos):
@@ -366,18 +365,15 @@ class Board:
                 if colli:
                     return (type(element).__name__, j, i)
 
-    def mouseLogic(self, event):
-
-
-        if self.player.getNumber() == self.num+1:
+    def mouseLogic(self, event,n):
+        #print(n.getNumber(), self.num)
+        if n == self.num:
             self.hoverCells()
             self.hoverVbarriers()
             self.hoverHbarriers()
-
             if pygame.mouse.get_pressed()[0] == 1 and not self.clicked:
                 self.clicked = True
                 pos = pygame.mouse.get_pos()
-
                 for array in [self.rect, self.Vbarriers, self.Hbarriers]:
                     clickedElement = self.interactObject(array, pos)
                     if clickedElement:
@@ -392,10 +388,10 @@ class Board:
             pygame.quit()
             raise SystemExit
 
-    def handleEvents(self):
+    def handleEvents(self,n):
         for event in pygame.event.get():
             self.quitWindow(event)
-            return self.mouseLogic(event)
+            return self.mouseLogic(event,n)
 
     def clearScreen(self):
         self.window.fill((240, 240, 240))
@@ -442,7 +438,7 @@ class Board:
     def higlightPlayer(self, player):
         for i, row in enumerate(self.rect):
             for j, cell in enumerate(row):
-                if cell.player == player:
+                if cell.player.getNumber() == player.getNumber():
                     pygame.draw.circle(self.window,
                                        (255, 255, 255),
                                        ((cell.x + cell.sizeCaseX()//2),
