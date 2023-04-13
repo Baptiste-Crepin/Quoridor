@@ -9,7 +9,7 @@ class GraphicalGame():
         self.game = Game(width, nbPlayer, nbBarrier,num)
         self.board = Board(self.game.getSquareWidth(),num)
         print(num)
-        print(self.board.player.getNumber())
+        print(self.board.num)
 
     def highlightPlayer(self, player):
         for PossibleMoveCoordo in self.game.possibleMoves(player.getCoordinates()):
@@ -39,9 +39,9 @@ class GraphicalGame():
                     self.board.Vbarriers[j][i].placed = cell.getWalls()[
                         'Right']
 
-    def placement(self,n):
+    def placement(self, currentPlayer: int):
         #self.board.player = self.game.getCurrentPlayer()
-        event = self.board.handleEvents(n)
+        event = self.board.handleEvents(currentPlayer)
 
         if not event:
             return
@@ -83,11 +83,13 @@ class GraphicalGame():
             while not self.game.checkGameOver():
                 self.placement(G.game.getCurrentPlayerN())
                 self.actualizeGame()
-                self.board.newFrame()
+                self.board.newFrame(G.game.getCurrentPlayer().getNumber())
             # TODO: Game has ended. display the end screen
             self.board.newFrame()
 
 # --------------------------------------------------------
+
+
 class Thread_client(threading.Thread):
     def __init__(self, c):
         threading.Thread.__init__(self)
