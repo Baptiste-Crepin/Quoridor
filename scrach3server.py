@@ -1,7 +1,7 @@
 # serveur avec Thread pour plusieurs clients
 
 
-
+import queue
 import socket, sys, threading, pickle
 
 hostname = socket.gethostname()
@@ -11,6 +11,10 @@ host = socket.gethostbyname(hostname)
 port = 45678
 client_list = []
 i = 0
+# created an unbounded queue
+q = queue.Queue()
+q.put(0)
+q.task_done()
 
 # ---------------------------------------------
 class ThreadClient(threading.Thread,):
@@ -20,15 +24,20 @@ class ThreadClient(threading.Thread,):
         self.connexion = c
         self.start()
         self.idc = idd
-        self.current_client = 0
+
+
 
 
     def nextClient(self) -> None:
-        print(self.current_client < (len(connected) - 1), self.current_client, (len(connected) - 1))
-        if self.current_client < (len(connected) - 1):
-            self.current_client += 1
+        current_client = q.get()
+        print(current_client)
+        if current_client < (len(connected) - 1):
+            current_client += 1
         else:
-            self.current_client = 0
+            current_client = 0
+        q.put(current_client)
+        q.task_done()
+        return current_client
 
 
     def run(self):
@@ -44,8 +53,8 @@ class ThreadClient(threading.Thread,):
                     # envoi du message à tous les clients
                     connected[0].send(msg1)
                     connected[1].send(msg1)
-                    self.nextClient()
-                    msg2 = self.current_client
+
+                    msg2 = self.nextClient()
                     print(msg2)
 
 
