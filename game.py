@@ -13,7 +13,7 @@ class Game():
         self.__NumberOfBarriers = self.validateNumberOfBarriers(nbBarrier)
         self.__PlayerList = self.createPlayerList()
         #self.__currentPlayerN = random.randint(0, self.getNumberOfPlayers()-1)
-        self.__currentPlayerN = 0
+        self.__currentPlayerN = 1
         self.__currentPlayer = self.getPlayerList()[self.getCurrentPlayerN()]
         self.__grid = self.createGrid()
 

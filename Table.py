@@ -364,18 +364,15 @@ class Board:
                 if colli:
                     return (type(element).__name__, j, i)
 
-    def mouseLogic(self, event):
-
-
-        if self.player.getNumber() == self.num+1:
+    def mouseLogic(self, event,n):
+        #print(n.getNumber(), self.num)
+        if n == self.num:
             self.hoverCells()
             self.hoverVbarriers()
             self.hoverHbarriers()
-
             if pygame.mouse.get_pressed()[0] == 1 and not self.clicked:
                 self.clicked = True
                 pos = pygame.mouse.get_pos()
-
                 for array in [self.rect, self.Vbarriers, self.Hbarriers]:
                     clickedElement = self.interactObject(array, pos)
                     if clickedElement:
