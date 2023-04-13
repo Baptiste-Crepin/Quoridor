@@ -13,6 +13,7 @@ class Game():
         self.__PlayerList = self.createPlayerList()
         self.__currentPlayerN = random.randint(0, self.getNumberOfPlayers()-1)
         self.__currentPlayer = self.getPlayerList()[self.getCurrentPlayerN()]
+        self.__NumberOfBots = 0
 
         self.initializePawns()
 
@@ -640,22 +641,24 @@ def play() -> None:
         choise = yesNoInput(
             'to place barrier enter "p"\n to play enter "m"', "p", "m")
         coordo = (intInput("row")-1, intInput("Col")-1)
+        if isinstance(player, Bot):
 
-        if choise:
-            direction = Game.directionInput()
-            while not direction:
+        else:
+            if choise:
                 direction = Game.directionInput()
-
-            while not Game.placeWall(coordo, direction, player):
-                coordo = (intInput("row")-1, intInput("Col")-1)
-                while direction == False:
+                while not direction:
                     direction = Game.directionInput()
 
-            player.setBarrier(player.getBarrier()-1)
-        else:
-            while coordo not in Game.possibleMoves(player.getCoordinates()):
-                coordo = (intInput("row")-1, intInput("Col")-1)
-            Game.movePlayer(player, coordo)
+                while not Game.placeWall(coordo, direction, player):
+                    coordo = (intInput("row")-1, intInput("Col")-1)
+                    while direction == False:
+                        direction = Game.directionInput()
+
+                player.setBarrier(player.getBarrier()-1)
+            else:
+                while coordo not in Game.possibleMoves(player.getCoordinates()):
+                    coordo = (intInput("row")-1, intInput("Col")-1)
+                Game.movePlayer(player, coordo)
 
         Game.display()
         Game.nextPlayer()

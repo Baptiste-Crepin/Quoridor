@@ -1,4 +1,5 @@
 from Player import Player
+from game import Game
 import random
 
 
@@ -13,7 +14,7 @@ class Bot(Player):
     def setLevel(self, value: int) -> None:
         self.__level = value
 
-    def randomCoords(self, game: object) -> tuple:
+    def randommove(self, game: object) -> tuple:
         return (random.randint(0, game.getWidth()-1), random.randint(0, game.getHeight()-1))
 
     def pickCoordo(self, game: object) -> tuple:
