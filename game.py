@@ -5,15 +5,17 @@ from Bot import Bot
 
 
 class Game():
-    def __init__(self, width: int, nbPlayers: int, nbBarrier: int) -> None:
+    def __init__(self, width: int, nbPlayers: int, nbBarrier: int, nbBots: int) -> None:
         self.__squareWidth = self.validWidth(width)
         self.__grid = self.createGrid()
-        self.__NumberOfPlayers = self.validNumberOfPlayers(nbPlayers)
+        self.__NumberOfBots = nbBots
+        #self.__NumberOfPlayers = self.validNumberOfPlayers(nbPlayers)
+        self.__NumberOfPlayers = nbPlayers
         self.__NumberOfBarriers = self.validateNumberOfBarriers(nbBarrier)
         self.__PlayerList = self.createPlayerList()
         self.__currentPlayerN = random.randint(0, self.getNumberOfPlayers()-1)
         self.__currentPlayer = self.getPlayerList()[self.getCurrentPlayerN()]
-        self.__NumberOfBots = 0
+
 
         self.initializePawns()
 
@@ -82,6 +84,9 @@ class Game():
     def getCurrentPlayer(self) -> Player:
         return self.__currentPlayer
 
+    def getNumberOfBots(self):
+        return self.__NumberOfBots
+
     def setSquareWidth(self, value: int) -> None:
         self.__squareWidth = value
 
@@ -111,6 +116,10 @@ class Game():
             numberOfBarriers = value//4
             return numberOfBarriers
 
+    def setNumberOfBots(self, value: int):
+        self.__NumberOfBots = value
+
+
     def createGrid(self) -> list[list[Case]]:
         return [[Case(0, (y, x), Player(0, self.setNumberOfBarriers(self.getNumberOfBarriers))) for x in range(self.getSquareWidth())]
                 for y in range(self.getSquareWidth())]
@@ -135,8 +144,14 @@ class Game():
 
         self.setGrid(grid)
 
-    def createPlayerList(self) -> list[Player]:
-        return [Player(x+1, self.getNumberOfBarriers()) for x in range(self.getNumberOfPlayers())]
+
+    def createPlayerList(self) -> list:
+        playerList = [Player(x+1, self.getNumberOfBarriers()) for x in range(self.getNumberOfPlayers())]
+        if self.getNumberOfBots() != 0:
+            bots = [Bot(len(playerList)+x+1,self.getNumberOfBarriers())for x in range(self.getNumberOfBots())]
+            playerList += bots
+        return playerList
+
 
     def display(self) -> None:
         for r, row in enumerate(self.getGrid()):
@@ -627,7 +642,9 @@ def initializeGame() -> Game:
     nbPlayer = intInput("How many players ? \nminimum 2, maximum 4")
     nbBarrier = intInput(
         "How many Barriers? \nminimum 4, maximum "+Game.maxBarrier(width))
-    return Game(width, nbPlayer, nbBarrier)
+    bots = intInput("how many bots do you want to play against?")
+
+    return Game(width, nbPlayer, nbBarrier,bots)
 
 
 def play() -> None:
@@ -638,12 +655,13 @@ def play() -> None:
     while not Game.checkGameOver():
         player = Game.getCurrentPlayer()
         print(player)
-        choise = yesNoInput(
-            'to place barrier enter "p"\n to play enter "m"', "p", "m")
-        coordo = (intInput("row")-1, intInput("Col")-1)
-        if isinstance(player, Bot):
 
+        if isinstance(player, Bot):
+            player.randomMoves(Game)
         else:
+            choise = yesNoInput(
+            'to place barrier enter "p"\n to play enter "m"', "p", "m")
+            coordo = (intInput("row")-1, intInput("Col")-1)
             if choise:
                 direction = Game.directionInput()
                 while not direction:
