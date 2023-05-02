@@ -1,10 +1,10 @@
 from game import Game
 from Table import Board
+import socket, sys, threading
 
 
 class GraphicalGame():
-    def __init__(self, width, nbPlayer, nbBarrier,status) -> None:
-        self.inGame =status
+    def __init__(self, width, nbPlayer, nbBarrier) -> None:
         self.game = Game(width, nbPlayer, nbBarrier)
         self.board = Board(self.game.getSquareWidth())
 
@@ -29,10 +29,10 @@ class GraphicalGame():
 
                 self.board.rect[j][i].player = cell.getPlayer()
 
-                if i < len(self.game.getGrid())-1:
+                if i < len(self.game.getGrid()) - 1:
                     self.board.Hbarriers[j][i].placed = cell.getWalls()['Down']
 
-                if j < len(row)-1:
+                if j < len(row) - 1:
                     self.board.Vbarriers[j][i].placed = cell.getWalls()[
                         'Right']
 
@@ -69,17 +69,41 @@ class GraphicalGame():
         self.highlightPlayer(self.game.getCurrentPlayer())
         self.highlightBarrier()
 
+        msg = "tour fini pour " + str(numero)
+        print(msg)
+        th.emet(msg)
+
     def mainLoop(self) -> None:
         self.highlightPlayer(self.game.getCurrentPlayer())
         self.highlightBarrier()
-        while self.inGame:
+        while self.board.play:
             while not self.game.checkGameOver():
                 self.placement()
                 self.actualizeGame()
-
                 self.board.newFrame()
             # TODO: Game has ended. display the end screen
             self.board.newFrame()
+
+# --------------------------------------------------------
+class Thread_client(threading.Thread):
+    def __init__(self, c):
+        threading.Thread.__init__(self)
+        self.connexion = c
+        self.start()
+
+    def run(self):
+        while 1:
+            print("R")
+            msg = self.connexion.recv(1024).decode("Utf8")
+            print("in  = " + msg)
+        #self.connexion.close()
+
+    def emet(self,msg):
+        self.connexion.send(msg.encode("Utf8"))
+        #self.connexion.close()
+    def reco(self):
+        dump = self.connexion.recv(1024).decode("Utf8")
+        return dump
 
 
 if __name__ == "__main__":
@@ -89,5 +113,34 @@ if __name__ == "__main__":
     width = 5
     nbBarrier = 4
     nbPlayer = 4
-    G = GraphicalGame(width, nbPlayer, nbBarrier,True)
+    # client avec Thread
+
+
+    # ============================================================
+    hostname = socket.gethostname()
+
+    host ="10.128.173.35"
+    #host = 'LocalHost'
+    port = 45678
+
+    connexion = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    try:
+        connexion.connect((host, port))
+        print("Connexion active")
+    except socket.error:
+        print("Erreur sur la connection")
+        sys.exit()
+
+    msg = connexion.recv(1024).decode("Utf8")
+    #numero = int(msg[0])
+    #print(msg + "  / " + str(numero))
+    #connexion.close()
+    numero = 0
+
+    th = Thread_client(connexion)
+
+
+    # =========================================================
+
+    G = GraphicalGame(width, nbPlayer, nbBarrier)
     G.mainLoop()

@@ -11,7 +11,7 @@ class TablePlayer:
         self.row = Row
         self.black = (0, 0, 0)
         self.white = (255, 255, 255)
-
+        self.brown= (59,39,28)
         self.player = Player(0)
         self.highlighted = False
         self.hover = False
@@ -26,24 +26,20 @@ class TablePlayer:
         return n
 
     def sizeCaseX(self):
-        sizeX = (self.boardX//self.numberCase())-10
-        self.sizeX = sizeX
-        return sizeX
+        self.sizeX = (((self.boardY//2)-10)//self.numberCase())
+        return self.sizeX
 
     def sizeCaseY(self):
-        sizeY = (self.boardY//self.numberCase())-10
-        self.sizeY = sizeY
-        return sizeY
+        self.sizeY = (((self.boardY//2)-10)//self.numberCase())
+        return self.sizeY
 
     def coordX(self, i):
-        x = ((self.boardX//self.numberCase()))*i+5
-        self.x = x
-        return x
+        self.x = ((self.boardX-900)//self.numberCase())*i+(self.boardX*0.33)
+        return self.x
 
     def coordY(self, j):
-        y = ((self.boardY//self.numberCase()))*j
-        self.y = y
-        return y
+        self.y = (((self.boardY-330)//self.numberCase()))*j+(self.boardY*0.25)
+        return self.y
 
     def drawCase(self, surface, i, j, color):
         x = self.coordX(i)
@@ -51,8 +47,7 @@ class TablePlayer:
         width = self.sizeCaseX()
         height = self.sizeCaseY()
         casePlayer = pygame.draw.rect(
-            surface, color, (x, y, width, height), 2)
-
+            surface, color, (x, y, width, height))
         return casePlayer
 
     def collides(self, otherCoord):
@@ -64,198 +59,133 @@ class TablePlayer:
         return True
 
 
-class VerticalBarrier():
-    def __init__(self, boardX, boardY, Col, Row):
+class barrer():
+    def __init__(self,boardX,boardY,col,row):
         self.boardX = boardX
         self.boardY = boardY
-        self.col = Col
-        self.row = Row
-        self.black = (0, 0, 0)
-        self.white = (255, 255, 255)
-
+        self.col = col
+        self.row = row
         self.placed = 0
         self.x = 0
         self.y = 0
-        self.sizeX = 0
-        self.sizeY = 0
+        self.height = 0
+        self.width = 0
         self.possiblePlacement = False
         self.hover = False
 
     def numberCase(self):
         n = self.col
         return n
-
-    def sizeVBarrierX(self):
-        sizeX = 10
-        self.sizeX = sizeX
-        return sizeX
-
-    def sizeVBarrierY(self):
-        sizeY = (self.boardY//self.numberCase()-10)
-        self.sizeY = sizeY
-        return sizeY
-
-    def coordX(self, i):
-        x = ((self.boardX//self.numberCase())) * \
-            i+(self.boardX//self.numberCase())-5
-        self.x = x
-        return x
-
-    def coordY(self, j):
-        y = (self.boardX//self.numberCase())*j
-        self.y = y
-        return y
 
     def draw(self, surface, i, j, color):
         x = self.coordX(i)
         y = self.coordY(j)
-        width = self.sizeVBarrierX()
-        height = self.sizeVBarrierY()
-        Vbarrier = pygame.draw.rect(
-            surface, color, (x, y, width, height))
-
-        return Vbarrier
+        width = self.sizeX()
+        height = self.sizeY()
+        barrier = pygame.draw.rect(
+            surface, color, (x, y, width, height)) 
+        
+        return barrier
 
     def collides(self, otherCoord):
-        if otherCoord[0] < self.x or otherCoord[0] > self.x + self.sizeX:
+        if otherCoord[0] < self.x or otherCoord[0] > self.x + self.height:
             return False
-        if otherCoord[1] < self.y or otherCoord[1] > self.y + self.sizeY:
+        if otherCoord[1] < self.y or otherCoord[1] > self.y + self.width:
             return False
 
         return True
 
-
-class HorrizontalBarrier():
-    def __init__(self, boardX, boardY, Col, Row):
-        self.boardX = boardX
-        self.boardY = boardY
-        self.col = Col
-        self.row = Row
-        self.black = (0, 0, 0)
-        self.white = (255, 255, 255)
-
-        self.placed = 0
-        self.x = 0
-        self.y = 0
-        self.sizeX = 0
-        self.sizeY = 0
-        self.possiblePlacement = False
-        self.hover = False
-
-    def numberCase(self):
-        n = self.col
-        return n
-
-    def sizeHBarrierX(self):
-        sizeX = (self.boardY//self.numberCase()-10)
-        self.sizeX = sizeX
+class VerticalBarrier(barrer):
+    def __init__(self, boardX, boardY,col,row):
+        super().__init__(boardX,boardY,col,row)
+    def sizeX(self):
+        sizeX = 10
+        self.height = sizeX
         return sizeX
 
-    def sizeHBarrierY(self):
-        sizeY = 10
-        self.sizeY = sizeY
-        return sizeY
+    def sizeY(self):
+        self.width = (((self.boardY//2)-10)//self.numberCase())
+        return self.width
 
     def coordX(self, i):
-        x = ((self.boardX//self.numberCase()))*i+5
+        x = ((self.boardX-900)//self.numberCase())*i+(self.boardX*0.33)+ \
+            (((self.boardX-900)//self.numberCase())-10)
         self.x = x
         return x
 
     def coordY(self, j):
-        y = (self.boardX//self.numberCase())*j + \
-            (self.boardX//self.numberCase())-10
+        y =  (((self.boardY-330)//self.numberCase()))*j+(self.boardY*0.25)
         self.y = y
         return y
 
-    def draw(self, surface, i, j, color):
-        x = self.coordX(i)
-        y = self.coordY(j)
-        width = self.sizeHBarrierX()
-        height = self.sizeHBarrierY()
-        Hbarrier = pygame.draw.rect(
-            surface, color, (x, y, width, height))
-
-        return Hbarrier
-
-    def collides(self, otherCoord):
-        if otherCoord[0] < self.x or otherCoord[0] > self.x + self.sizeX:
-            return False
-        if otherCoord[1] < self.y or otherCoord[1] > self.y + self.sizeY:
-            return False
-
-        return True
 
 
-class Intersection():
-    def __init__(self, boardX, boardY, Col, Row):
-        self.boardX = boardX
-        self.boardY = boardY
-        self.col = Col
-        self.row = Row
-        self.black = (0, 0, 0)
-        self.white = (255, 255, 255)
 
-        self.placed = 0
-        self.x = 0
-        self.y = 0
-        self.sizeX = 0
-        self.sizeY = 0
-        self.possiblePlacement = False
-        self.hover = False
+class HorrizontalBarrier(barrer):
+    def __init__(self, boardX, boardY,col,row):
+        super().__init__(boardX,boardY,col,row)
 
-    def numberCase(self):
-        n = self.col
-        return n
+    def sizeX(self):
+        self.height =(((self.boardY//2)-10)//self.numberCase())
+        return self.height
 
-    def sizeIntersectionX(self, i):
-        x = (self.boardY//self.numberCase())*(i+1)-5
+    def sizeY(self):
+        self.width  = 10
+        return  self.width
+
+    def coordX(self, i):
+        x = (((self.boardX-900)//self.numberCase()))*i+(self.boardX*0.33)
         self.x = x
         return x
 
-    def sizeIntersectionY(self, j):
-        y = (self.boardY//self.numberCase())*(j+1)-10
+    def coordY(self, j):
+        y = (((self.boardY-330)//self.numberCase()))*j+(self.boardY*0.25)+ \
+        (((self.boardY-330)//self.numberCase())-10)
         self.y = y
         return y
 
-    def coordX(self):
-        sizeX = 10
-        self.sizeX = sizeX
-        return sizeX
 
-    def coordY(self):
-        sizeY = 10
-        self.sizeY = sizeY
-        return sizeY
 
-    def draw(self, surface, i, j, color):
-        width = self.coordX()
-        height = self.coordY()
-        x = self.sizeIntersectionX(i)
-        y = self.sizeIntersectionY(j)
-        intersection = pygame.draw.rect(
-            surface, color, (x, y, width, height))
 
-        return intersection
+class Intersection(barrer):
+    def __init__(self, boardX, boardY, col, row):
+        super().__init__(boardX, boardY, col, row)
+        self.grey= pygame.Color(217,217,217,68)
 
-    def collides(self, otherCoord):
-        if otherCoord[0] < self.x or otherCoord[0] > self.x + self.sizeX:
-            return False
-        if otherCoord[1] < self.y or otherCoord[1] > self.y + self.sizeY:
-            return False
 
-        return True
+    def coordX(self, i):
+        x = ((self.boardX-900)//self.numberCase())*i+(self.boardX*0.33)+ \
+            (((self.boardX-900)//self.numberCase())-10)
+        self.x = x
+        return x
+
+    def coordY(self, j):
+        y = (((self.boardY-330)//self.numberCase()))*j+(self.boardY*0.25)+ \
+        (((self.boardY-330)//self.numberCase())-10)
+        self.y = y
+        return y
+
+    def sizeX(self):
+        self.height = 10
+        return self.height
+
+    def sizeY(self):
+        self.width= 10
+        return self.width
+
+
 
 
 class Board:
     def __init__(self, Width):
         self.col = Width
         self.row = Width
-        self.windowXmax = 800
-        self.windowYmax = 800
+        self.windowXmax = 1330
+        self.windowYmax = 748
         self.window = pygame.display.set_mode(
             (self.windowXmax, self.windowYmax))
         self.clicked = False
-
+        self.grey= pygame.Color(217, 217, 217,35)
         self.rect = self.initializeGrid()
         self.Vbarriers = self.initializeVBarriers()
         self.Hbarriers = self.initializeHBarriers()
@@ -265,6 +195,7 @@ class Board:
 
         pygame.display.set_caption("plateau")
         self.play = True
+        
 
     def initializeGrid(self):
         rectArray = []
@@ -414,12 +345,19 @@ class Board:
         for row in objectList:
             for element in row:
                 element.hover = False
+    
+
+
 
     def displayTable(self):
+        backGround= pygame.image.load('pictures/backGround.jpg')
+        self.window.blit(backGround,(0,0))
         for i, row in enumerate(self.rect):
+            
             for j, cell in enumerate(row):
                 cell.drawCase(self.window, i, j, cell.white)
-
+                
+                
                 if cell.highlighted:
                     pygame.draw.rect(self.window, (255, 204, 255),
                                      (cell.x+2, cell.y+2, cell.sizeX-4, cell.sizeY-4))
@@ -433,6 +371,7 @@ class Board:
                                        ((cell.x + cell.sizeCaseX()//2),
                                         (cell.y + cell.sizeCaseY()//2)),
                                        cell.sizeCaseX()//2-5)
+                    
 
     def higlightPlayer(self, player):
         for i, row in enumerate(self.rect):
@@ -448,12 +387,13 @@ class Board:
         for i, row in enumerate(barrierList):
             for j, barrier in enumerate(row):
                 if barrier.placed:
-                    barrier.draw(self.window, i, j, barrier.black)
+                    barrier.draw(self.window, i, j, self.grey)
+
                     continue
 
-                barrier.draw(self.window, i, j, barrier.white)
+                barrier.draw(self.window, i, j, (255,0,0,128))
                 if barrier.hover:
-                    barrier.draw(self.window, i, j, (255, 0, 0))
+                    barrier.draw(self.window, i, j, self.clearGrey).set_alpha(79)
 
     def displayIntersection(self):
         for i, row in enumerate(self.intersection):
@@ -479,26 +419,26 @@ class Board:
                     if i < len(self.Vbarriers)-1 and i < len(self.Hbarriers)-1:
                         if self.Vbarriers[i+1][j].placed:
                             intersection.draw(
-                                self.window, i+1, j, intersection.black)
+                                self.window, i+1, j, self.grey)
                     if j < len(self.Vbarriers)-1 and j < len(self.Hbarriers)-1:
                         if self.Hbarriers[i][j+1].placed:
                             intersection.draw(
-                                self.window, i, j+1, intersection.black)
+                                self.window, i, j+1, self.grey)
 
-                    intersection.draw(self.window, i, j, intersection.black)
+                    intersection.draw(self.window, i, j, intersection.brown)
                     continue
 
-                intersection.draw(self.window, i, j, intersection.white)
+                intersection.draw(self.window, i, j, self.grey)
                 if intersection.hover:
                     intersection.draw(self.window, i, j, (255, 0, 0))
 
-    def newFrame(self):
+    def newFrame(self):  
         self.clearScreen()
-
+        self.displayTable()
         self.displayBarriers(self.Hbarriers)
         self.displayBarriers(self.Vbarriers)
         self.displayIntersection()
-        self.displayTable()
+        
         self.higlightPlayer(self.player)
         pygame.display.flip()
 
