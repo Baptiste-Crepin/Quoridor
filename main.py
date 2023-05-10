@@ -23,6 +23,11 @@ class GraphicalGame():
                 self.board.Hbarriers[possibleBarrierCoordo[1]
                                      ][possibleBarrierCoordo[0]].possiblePlacement = True
 
+    def displayPossibleMoves(self):
+        if not isinstance(self.game.getCurrentPlayer(), Bot):
+            self.highlightPlayer(self.game.getCurrentPlayer())
+            self.highlightBarrier()
+
     def actualizeGame(self):
         for i, row in enumerate(self.game.getGrid()):
             for j, cell in enumerate(row):
@@ -70,14 +75,11 @@ class GraphicalGame():
 
         self.board.clearAllHighlight()
         self.game.nextPlayer()
-        self.highlightPlayer(self.game.getCurrentPlayer())
-        self.highlightBarrier()
 
     def mainLoop(self) -> None:
-        self.highlightPlayer(self.game.getCurrentPlayer())
-        self.highlightBarrier()
         while self.board.play:
             while not self.game.checkGameOver():
+                self.displayPossibleMoves()
 
                 self.placement()
                 self.actualizeGame()
@@ -94,6 +96,6 @@ if __name__ == "__main__":
     width = 5
     nbBarrier = 4
     nbPlayer = 1
-    nbBot = 1
+    nbBot = 3
     G = GraphicalGame(width, nbPlayer, nbBarrier, nbBot)
     G.mainLoop()

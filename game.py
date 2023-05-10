@@ -136,7 +136,7 @@ class Game():
         self.placePlayer(self.getPlayerList()[
                          1], (self.getSquareWidth()-1, self.getSquareWidth()//2))
 
-        if self.getNumberOfPlayers() == 4:
+        if len(self.getPlayerList()) == 4:
             self.placePlayer(self.getPlayerList()[
                              2], (self.getSquareWidth()//2, 0))
             self.placePlayer(self.getPlayerList()[
@@ -144,14 +144,14 @@ class Game():
 
         self.setGrid(grid)
 
-
     def createPlayerList(self) -> list:
-        playerList = [Player(x+1, self.getNumberOfBarriers()) for x in range(self.getNumberOfPlayers())]
+        playerList = [Player(x+1, self.getNumberOfBarriers())
+                      for x in range(self.getNumberOfPlayers())]
         if self.getNumberOfBots() != 0:
-            bots = [Bot(len(playerList)+x+1,self.getNumberOfBarriers())for x in range(self.getNumberOfBots())]
+            bots = [Bot(len(playerList)+x+1, self.getNumberOfBarriers())
+                    for x in range(self.getNumberOfBots())]
             playerList += bots
         return playerList
-
 
     def display(self) -> None:
         for r, row in enumerate(self.getGrid()):
