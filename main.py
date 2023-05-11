@@ -44,11 +44,12 @@ class GraphicalGame():
     def placement(self):
         self.board.player = self.game.getCurrentPlayer()
         if isinstance(self.board.player, Bot):
+            self.board.newFrame()
             self.board.player.randomMoves(self.game)
             self.game.nextPlayer()
             return
-        event = self.board.handleEvents()
 
+        event = self.board.handleEvents()
         if not event:
             return
 
