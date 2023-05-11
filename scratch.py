@@ -1,13 +1,18 @@
 from game import Game
 from Table import Board
-import socket, sys, threading, pickle
+import socket
+import sys
+import threading
+import pickle
 
 
 i = 0
+
+
 class GraphicalGame():
-    def __init__(self, width, nbPlayer, nbBarrier,num) -> None:
-        self.game = Game(width, nbPlayer, nbBarrier,num)
-        self.board = Board(self.game.getSquareWidth(),num)
+    def __init__(self, width, nbPlayer, nbBarrier, nbBots=0, num=0) -> None:
+        self.game = Game(width, nbPlayer, nbBarrier, nbBots, num)
+        self.board = Board(self.game.getSquareWidth(), num)
         print(num)
         print(self.board.num)
 
@@ -40,7 +45,7 @@ class GraphicalGame():
                         'Right']
 
     def placement(self, currentPlayer: int):
-        #self.board.player = self.game.getCurrentPlayer()
+        # self.board.player = self.game.getCurrentPlayer()
         event = self.board.handleEvents(currentPlayer)
 
         if not event:
@@ -68,7 +73,7 @@ class GraphicalGame():
                                 self.game.getCurrentPlayer())
 
         self.board.clearAllHighlight()
-        #self.game.nextPlayer()
+        # self.game.nextPlayer()
         self.highlightPlayer(self.game.getCurrentPlayer())
         self.highlightBarrier()
 
@@ -101,27 +106,28 @@ class Thread_client(threading.Thread):
             print("R")
             data = self.reco()
 
-            #print( type(data))
+            # print( type(data))
             if type(data) is list:
-                print("reciev:",data)
+                print("reciev:", data)
                 G.game.setGrid(data)
-                #G.actualizeGame()
-                #G.board.newFrame()
-                #G.nextPlayer
+                # G.actualizeGame()
+                # G.board.newFrame()
+                # G.nextPlayer
             else:
 
                 G.game.setCurrentPlayerN(data)
                 G.game.setCurrentPlayer(G.game.getPlayerList()[data])
-                print("reciev:",data)
+                print("reciev:", data)
 
-        #self.connexion.close()
+        # self.connexion.close()
 
-    def emet(self,msg):
+    def emet(self, msg):
         gr = G.game.getGrid()
         data = pickle.dumps(gr)
         self.connexion.send(data)
-        #self.connexion.send(msg.encode("Utf8"))
-        #self.connexion.close()
+        # self.connexion.send(msg.encode("Utf8"))
+        # self.connexion.close()
+
     def reco(self):
         dump = self.connexion.recv(4096)
         message = pickle.loads(dump)
@@ -137,12 +143,11 @@ if __name__ == "__main__":
     nbPlayer = 2
     # client avec Thread
 
-
     # ============================================================
     hostname = socket.gethostname()
 
     host = socket.gethostbyname(hostname)
-    #host = '10.128.173.35'
+    # host = '10.128.173.35'
     port = 45678
 
     connexion = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -154,14 +159,13 @@ if __name__ == "__main__":
         sys.exit()
 
     msg = connexion.recv(4096).decode("Utf8")
-    print("reccu:",msg)
+    print("reccu:", msg)
 
     numero = int(msg)
 
     th = Thread_client(connexion)
 
-
     # =========================================================
 
-    G = GraphicalGame(width, nbPlayer, nbBarrier,numero)
+    G = GraphicalGame(width, nbPlayer, nbBarrier, numero)
     G.mainLoop()
