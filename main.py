@@ -95,7 +95,7 @@ if __name__ == "__main__":
     # nbBarrier = int(input('Nb barrier'))
     width = 5
     nbBarrier = 4
-    nbPlayer = 1
-    nbBot = 3
+    nbPlayer = 2
+    nbBot = 0
     G = GraphicalGame(width, nbPlayer, nbBarrier, nbBot)
     G.mainLoop()
