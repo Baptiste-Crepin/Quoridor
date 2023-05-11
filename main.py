@@ -1,10 +1,11 @@
 from game import Game
 from Table import Board
+from Bot import Bot
 
 
 class GraphicalGame():
-    def __init__(self, width, nbPlayer, nbBarrier) -> None:
-        self.game = Game(width, nbPlayer, nbBarrier)
+    def __init__(self, width, nbPlayer, nbBarrier,nbBots) -> None:
+        self.game = Game(width, nbPlayer, nbBarrier,nbBots)
         self.board = Board(self.game.getSquareWidth())
 
     def highlightPlayer(self, player):
@@ -22,6 +23,11 @@ class GraphicalGame():
                 self.board.Hbarriers[possibleBarrierCoordo[1]
                                      ][possibleBarrierCoordo[0]].possiblePlacement = True
 
+    def displayPossibleMoves(self):
+        if not isinstance(self.game.getCurrentPlayer(), Bot):
+            self.highlightPlayer(self.game.getCurrentPlayer())
+            self.highlightBarrier()
+
     def actualizeGame(self):
         for i, row in enumerate(self.game.getGrid()):
             for j, cell in enumerate(row):
@@ -37,8 +43,13 @@ class GraphicalGame():
 
     def placement(self):
         self.board.player = self.game.getCurrentPlayer()
-        event = self.board.handleEvents()
+        if isinstance(self.board.player, Bot):
+            self.board.newFrame()
+            self.board.player.randomMoves(self.game)
+            self.game.nextPlayer()
+            return
 
+        event = self.board.handleEvents()
         if not event:
             return
 
@@ -65,14 +76,12 @@ class GraphicalGame():
 
         self.board.clearAllHighlight()
         self.game.nextPlayer()
-        self.highlightPlayer(self.game.getCurrentPlayer())
-        self.highlightBarrier()
 
     def mainLoop(self) -> None:
-        self.highlightPlayer(self.game.getCurrentPlayer())
-        self.highlightBarrier()
         while self.board.play:
             while not self.game.checkGameOver():
+                self.displayPossibleMoves()
+
                 self.placement()
                 self.actualizeGame()
 
@@ -87,6 +96,7 @@ if __name__ == "__main__":
     # nbBarrier = int(input('Nb barrier'))
     width = 5
     nbBarrier = 4
-    nbPlayer = 4
-    G = GraphicalGame(width, nbPlayer, nbBarrier)
+    nbPlayer = 1
+    nbBot = 3
+    G = GraphicalGame(width, nbPlayer, nbBarrier, nbBot)
     G.mainLoop()
