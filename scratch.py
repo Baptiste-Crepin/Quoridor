@@ -5,11 +5,12 @@ import socket, sys, threading, pickle
 
 i = 0
 class GraphicalGame():
-    def __init__(self, width, nbPlayer, nbBarrier,num) -> None:
-        self.game = Game(width, nbPlayer, nbBarrier,num)
+    def __init__(self, width, nbPlayer, nbBarrier, nbBots=0, num=0) -> None:
+        print("NUM",num)
+        self.game = Game(width, nbPlayer, nbBarrier, nbBots, num)
         self.board = Board(self.game.getSquareWidth(),num)
-        print(num)
-        print(self.board.num)
+        # print(num)
+        # print(self.board.num)
 
     def highlightPlayer(self, player):
         for PossibleMoveCoordo in self.game.possibleMoves(player.getCoordinates()):
