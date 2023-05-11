@@ -4,9 +4,9 @@ from Bot import Bot
 
 
 class GraphicalGame():
-    def __init__(self, width, nbPlayer, nbBarrier, nbBots) -> None:
-        self.game = Game(width, nbPlayer, nbBarrier, nbBots)
-        self.board = Board(self.game.getSquareWidth())
+    def __init__(self, width, nbPlayer, nbBarrier, nbBots, num=0) -> None:
+        self.game = Game(width, nbPlayer, nbBarrier, nbBots, num)
+        self.board = Board (self.game.getSquareWidth(), num)
 
     def highlightPlayer(self, player):
         for PossibleMoveCoordo in self.game.possibleMoves(player.getCoordinates()):
@@ -42,14 +42,13 @@ class GraphicalGame():
                         'Right']
 
     def placement(self):
-        self.board.player = self.game.getCurrentPlayer()
-        if isinstance(self.board.player, Bot):
-            self.board.newFrame()
-            self.board.player.randomMoves(self.game)
+        if isinstance(self.game.getCurrentPlayer(), Bot):
+            self.board.newFrame(self.game.getCurrentPlayer())
+            self.game.getCurrentPlayer().randomMoves(self.game)
             self.game.nextPlayer()
             return
 
-        event = self.board.handleEvents()
+        event = self.board.handleEvents(self.game.getCurrentPlayer())
         if not event:
             return
 
@@ -85,9 +84,9 @@ class GraphicalGame():
                 self.placement()
                 self.actualizeGame()
 
-                self.board.newFrame()
+                self.board.newFrame(self.game.getCurrentPlayer())
             # TODO: Game has ended. display the end screen
-            self.board.newFrame()
+            self.board.newFrame(self.game.getCurrentPlayer())
 
 
 if __name__ == "__main__":
