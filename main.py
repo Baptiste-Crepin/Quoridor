@@ -4,8 +4,8 @@ from Bot import Bot
 
 
 class GraphicalGame():
-    def __init__(self, width, nbPlayer, nbBarrier,nbBots) -> None:
-        self.game = Game(width, nbPlayer, nbBarrier,nbBots)
+    def __init__(self, width, nbPlayer, nbBarrier, nbBots) -> None:
+        self.game = Game(width, nbPlayer, nbBarrier, nbBots)
         self.board = Board(self.game.getSquareWidth())
 
     def highlightPlayer(self, player):
