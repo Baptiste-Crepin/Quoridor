@@ -164,5 +164,5 @@ if __name__ == "__main__":
 
     # =========================================================
 
-    G = GraphicalGame(width, nbPlayer, nbBarrier,numero)
+    G = GraphicalGame(width, nbPlayer, nbBarrier,num = numero)
     G.mainLoop()
