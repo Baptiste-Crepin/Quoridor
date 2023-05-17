@@ -21,6 +21,7 @@ class TablePlayer:
         self.y = 0
         self.sizeX = 0
         self.sizeY = 0
+        self.player = Player(0)
 
     def numberCase(self):
         n = self.col
