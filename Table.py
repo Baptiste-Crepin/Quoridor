@@ -1,6 +1,7 @@
 import pygame
 from pygame.locals import *
 from Player import Player
+from Bot import Bot
 lejoueur = 0
 
 
@@ -363,8 +364,7 @@ class Board:
                     return (type(element).__name__, j, i)
 
     def mouseLogic(self, event, currentPlayer):
-        #print(currentPlayer.getNumber(), self.num)
-        if currentPlayer == self.num:
+        if currentPlayer.getNumber() == self.num+1:
             self.hoverCells()
             self.hoverVbarriers()
             self.hoverHbarriers()
@@ -432,10 +432,10 @@ class Board:
                                         (cell.y + cell.sizeCaseY()//2)),
                                        cell.sizeCaseX()//2-5)
 
-    def highlightPlayer(self, currentPlayer: int):
+    def highlightPlayer(self, currentPlayer: Player):
         for i, row in enumerate(self.rect):
             for j, cell in enumerate(row):
-                if cell.player.getNumber() == currentPlayer:
+                if cell.player.getNumber() == currentPlayer.getNumber():
                     pygame.draw.circle(self.window,
                                        (255, 255, 255),
                                        ((cell.x + cell.sizeCaseX()//2),
@@ -490,13 +490,14 @@ class Board:
                 if intersection.hover:
                     intersection.draw(self.window, i, j, (255, 0, 0))
 
-    def newFrame(self, currentPlayer: int):
+    def newFrame(self, currentPlayer: Player):
         self.clearScreen()
 
         self.displayBarriers(self.Hbarriers)
         self.displayBarriers(self.Vbarriers)
         self.displayIntersection()
         self.displayTable()
+
         self.highlightPlayer(currentPlayer)
         pygame.display.flip()
 

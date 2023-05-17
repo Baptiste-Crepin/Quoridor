@@ -1,18 +1,18 @@
 from game import Game
 from Table import Board
+from Bot import Bot
+from Player import Player
 import socket, sys, threading, pickle
 
 
-i = 0
 class GraphicalGame():
     def __init__(self, width, nbPlayer, nbBarrier, nbBots=0, num=0) -> None:
-        print("NUM",num)
         self.game = Game(width, nbPlayer, nbBarrier, nbBots, num)
         self.board = Board(self.game.getSquareWidth(),num)
-        # print(num)
-        # print(self.board.num)
+        self.num = num
+        print("NUM",num)
 
-    def highlightPlayer(self, player):
+    def highlightPlayer(self, player: Player):
         for PossibleMoveCoordo in self.game.possibleMoves(player.getCoordinates()):
             self.board.rect[PossibleMoveCoordo[1]
                             ][PossibleMoveCoordo[0]].highlighted = True
@@ -27,6 +27,14 @@ class GraphicalGame():
                 self.board.Hbarriers[possibleBarrierCoordo[1]
                                      ][possibleBarrierCoordo[0]].possiblePlacement = True
 
+    def displayPossibleMoves(self, player: Player):
+        self.board.clearAllHighlight()
+        if ((not isinstance(player, Bot) or player.getNumber() == self.num+1) and
+            (self.game.getCurrentPlayer().getNumber() == self.num+1)):
+            print(self.num+1, self.game.getCurrentPlayer().getNumber(), self.game.getCurrentPlayerN())
+            self.highlightPlayer(player)
+            self.highlightBarrier()
+
     def actualizeGame(self):
         for i, row in enumerate(self.game.getGrid()):
             for j, cell in enumerate(row):
@@ -40,10 +48,8 @@ class GraphicalGame():
                     self.board.Vbarriers[j][i].placed = cell.getWalls()[
                         'Right']
 
-    def placement(self, currentPlayer: int):
-        #self.board.player = self.game.getCurrentPlayer()
+    def placement(self, currentPlayer: Player):
         event = self.board.handleEvents(currentPlayer)
-
         if not event:
             return
 
@@ -51,26 +57,24 @@ class GraphicalGame():
         clickCoordo = (x, y)
 
         if action == 'TablePlayer':
-            if clickCoordo not in self.game.possibleMoves(self.game.getCurrentPlayer().getCoordinates()):
+            if clickCoordo not in self.game.possibleMoves(currentPlayer.getCoordinates()):
                 return
             self.board.clearHover(self.board.rect)
-            self.game.movePlayer(self.game.getCurrentPlayer(), clickCoordo)
+            self.game.movePlayer(currentPlayer, clickCoordo)
 
         if action == 'VerticalBarrier':
-            if (clickCoordo, 'Right') not in self.game.possibleBarrierPlacement(self.game.getCurrentPlayer()):
+            if (clickCoordo, 'Right') not in self.game.possibleBarrierPlacement(currentPlayer):
                 return
-            self.game.placeWall(clickCoordo, 'Right',
-                                self.game.getCurrentPlayer(), place=True)
+            self.game.placeWall(clickCoordo, 'Right', currentPlayer, place=True)
 
         if action == 'HorrizontalBarrier':
-            if (clickCoordo, 'Down') not in self.game.possibleBarrierPlacement(self.game.getCurrentPlayer()):
+            if (clickCoordo, 'Down') not in self.game.possibleBarrierPlacement(currentPlayer):
                 return
-            self.game.placeWall(clickCoordo, 'Down',
-                                self.game.getCurrentPlayer())
+            self.game.placeWall(clickCoordo, 'Down', currentPlayer)
 
         self.board.clearAllHighlight()
         #self.game.nextPlayer()
-        self.highlightPlayer(self.game.getCurrentPlayer())
+        self.highlightPlayer(currentPlayer)
         self.highlightBarrier()
 
         msg = "tour fini pour " + str(numero)
@@ -82,9 +86,10 @@ class GraphicalGame():
         self.highlightBarrier()
         while self.board.play:
             while not self.game.checkGameOver():
-                self.placement(G.game.getCurrentPlayerN())
+                self.displayPossibleMoves(G.game.getCurrentPlayer())
+                self.placement(G.game.getCurrentPlayer())
                 self.actualizeGame()
-                self.board.newFrame(G.game.getCurrentPlayer().getNumber())
+                self.board.newFrame(G.game.getCurrentPlayer())
             # TODO: Game has ended. display the end screen
             self.board.newFrame()
 
@@ -113,6 +118,7 @@ class Thread_client(threading.Thread):
 
                 G.game.setCurrentPlayerN(data)
                 G.game.setCurrentPlayer(G.game.getPlayerList()[data])
+                print("REC", G.game.getCurrentPlayerN(), G.game.getCurrentPlayer().getNumber(), data)
                 print("reciev:",data)
 
         #self.connexion.close()
