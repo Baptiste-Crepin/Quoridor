@@ -1,10 +1,13 @@
 import pygame
 from pygame.locals import *
+from choicePlayer import NumberPlayer
 
-class Menu:
+class Menutype:
     def __init__(self):
         self.windowXmax = 500
         self.windowYmax = 700
+        self.posSolo=(50,200)
+        self.posMulti =(50,370)
         self.window = pygame.display.set_mode(
             (self.windowXmax, self.windowYmax))
         pygame.display.set_caption("Quoridor")
@@ -32,17 +35,30 @@ class Menu:
         self.window.blit(backGround,(0,0))
         self.createButtonSolo()
         self.createButtonMulti()
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                self.choise=True
-        pygame.display.flip()
+        self.Event()
 
     def getChoise(self):
         return self.choise
 
+    def Event(self):
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                self.choise=True
+            elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
+                if pygame.Rect(self.posSolo, (400,120)).collidepoint(event.pos):
+                    
+                    pygame.init()
+                    board = NumberPlayer()
+                    while not self.getChoise():
+                        board.setWindow()
+                        pygame.display.update()
+                elif pygame.Rect(self.posMulti, (400,120)).collidepoint(event.pos):
+                    pygame.quit()
+            pygame.display.flip()
+
 if __name__ == "__main__":
     pygame.init()
-    board = Menu()
+    board = Menutype()
 
     while not board.getChoise():
         board.setWindow()

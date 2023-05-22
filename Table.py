@@ -393,7 +393,7 @@ class Board:
 
                 barrier.draw(self.window, i, j, (255,0,0,128))
                 if barrier.hover:
-                    barrier.draw(self.window, i, j, self.clearGrey).set_alpha(79)
+                    barrier.draw(self.window, i, j, self.grey)
 
     def displayIntersection(self):
         for i, row in enumerate(self.intersection):
