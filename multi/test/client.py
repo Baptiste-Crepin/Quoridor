@@ -9,7 +9,7 @@ class Network:
     def __init__(self):
         self.client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.hostname = socket.gethostname()
-        self.server = socket.gethostbyname(self.hostname)
+        self.server = "socket.gethostbyname(self.hostname)"
         self.port = 42069
 
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -30,7 +30,10 @@ class Network:
             print('in a while')
             try:
                 data, addr = self.sock.recvfrom(1024)
-                if data == DISCOVERY_MSG:
+                if DISCOVERY_MSG in data:
+                    server_info = pickle.loads(data.replace(DISCOVERY_MSG, b""))
+                    result.append(server_info)
+                    print("Server info:", server_info)
                     self.servers.add(addr[0])
             except socket.timeout:
                 break
@@ -49,7 +52,6 @@ class Network:
                 print('trying to connect')
                 self.client.connect(addr)
                 print('connected')
-                result.append(self.client.recv(2048).decode())
             except:
                 print("connection error")
                 result.append(None)
@@ -69,8 +71,8 @@ class Network:
         except socket.error as e:
             print(e)
 
-#test = Network()
-#test.connect()
+test = Network()
+test.connect()
 #test.send(input("type a message"))
 
 

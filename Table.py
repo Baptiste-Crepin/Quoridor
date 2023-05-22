@@ -249,7 +249,7 @@ class Intersection():
 
 
 class Board:
-    def __init__(self, Width,num):
+    def __init__(self, Width, num:int = -1):
         self.col = Width
         self.row = Width
         self.windowXmax = 800
@@ -365,7 +365,7 @@ class Board:
                     return (type(element).__name__, j, i)
 
     def mouseLogic(self, event, currentPlayer):
-        if currentPlayer.getNumber() == self.num+1:
+        if currentPlayer.getNumber() == self.num+1 or self.num == -1:
             self.hoverCells()
             self.hoverVbarriers()
             self.hoverHbarriers()

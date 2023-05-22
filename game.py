@@ -5,7 +5,7 @@ from Bot import Bot
 
 
 class Game():
-    def __init__(self, width: int, nbPlayers: int, nbBarrier: int, nbBots: int, num:int) -> None:
+    def __init__(self, width: int, nbPlayers: int, nbBarrier: int, nbBots: int) -> None:
         self.__squareWidth = self.validWidth(width)
         self.__NumberOfBots = nbBots
         # self.__NumberOfPlayers = self.validNumberOfPlayers(nbPlayers)
