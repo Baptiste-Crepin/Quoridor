@@ -49,15 +49,17 @@ class ThreadClient(threading.Thread,):
                     msg = pickle.loads(msg1)
                     print ("reccu:",msg)
                     print(connected[self.idc])
-                    # envoi de la board à tous les clients
-                    connected[0].send(msg1)
-                    connected[1].send(msg1)
 
                     msg2 = self.nextClient()
                     print(msg2)
-                    # envoi tour à tous les clients
-                    connected[0].send(pickle.dumps(msg2))
-                    connected[1].send(pickle.dumps(msg2))
+
+                    print("CONNECTED LIST",connected)
+
+                    for i in range(len(connected)):
+                        # sends the board to the clients
+                        connected[i].send(msg1)
+                        # sends current player turn to the clients
+                        connected[i].send(pickle.dumps(msg2))
 
 
 
