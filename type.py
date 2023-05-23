@@ -52,6 +52,7 @@ class Menutype:
                     while not self.getChoise():
                         board.setWindow()
                         pygame.display.update()
+                    pygame.quit()
                 elif pygame.Rect(self.posMulti, (400,120)).collidepoint(event.pos):
                     pygame.quit()
             pygame.display.flip()

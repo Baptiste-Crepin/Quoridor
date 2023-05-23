@@ -1,5 +1,7 @@
 import pygame
 from pygame.locals import *
+from choiseBot import NumberBots
+from sizeGrid import SizeGrid
 
 class NumberPlayer:
     def __init__(self):
@@ -57,8 +59,8 @@ class NumberPlayer:
             self.window.blit(text_surface, text_rect)
 
             self.createButtonOne()
-            self.createButtonTwo()
             self.createButtonThree()
+            self.createButtonTwo()
             self.createButtonFour()
             self.Event()
 
@@ -70,14 +72,38 @@ class NumberPlayer:
             if event.type == pygame.QUIT:
                 self.choise = True
             elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
-                if pygame.Rect(self.pos1, (400,120)).collidepoint(event.pos):
+                if pygame.Rect(self.pos1, (70,70)).collidepoint(event.pos):
+                    pygame.init()
+                    board = NumberBots(1)
+                    while not self.getChoise():
+                        board.setWindow()
+                        pygame.display.update()
                     pygame.quit()
-                elif pygame.Rect(self.pos2, (400,120)).collidepoint(event.pos):
+                elif pygame.Rect(self.pos2, (70,70)).collidepoint(event.pos):
+                    pygame.init()
+                    board = NumberBots(2)
+                    while not self.getChoise():
+                        board.setWindow()
+                        pygame.display.update()
                     pygame.quit()
-                elif pygame.Rect(self.pos3, (400,120)).collidepoint(event.pos):
+
+                elif pygame.Rect(self.pos3, (70,70)).collidepoint(event.pos):
+                    pygame.init()
+                    board = SizeGrid(3,1)
+                    while not self.getChoise():
+                            board.setWindow()
+                            pygame.display.update()
                     pygame.quit()
-                elif pygame.Rect(self.pos4, (400,120)).collidepoint(event.pos):
+
+                elif pygame.Rect(self.pos4, (70,70)).collidepoint(event.pos):
+                    pygame.init()
+                    board = SizeGrid(4,0)
+                    while not self.getChoise():
+                            board.setWindow()
+                            pygame.display.update()
                     pygame.quit()
+
+
             pygame.display.flip()
 
 if __name__ == "__main__":

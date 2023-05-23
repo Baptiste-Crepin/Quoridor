@@ -1,8 +1,11 @@
 import pygame
 from pygame.locals import *
+from barrer import selectBarrer
 
-class NumberPlayer:
-    def __init__(self):
+class SizeGrid:
+    def __init__(self, nbPlayer:int, nbBot:int):
+        self.nbPlayer = nbPlayer
+        self.nbBot = nbBot
         self.windowXmax = 500
         self.windowYmax = 700
         self.pos1=(150,200)
@@ -57,8 +60,8 @@ class NumberPlayer:
             self.window.blit(text_surface, text_rect)
 
             self.createButtonFiveToFive()
-            self.createButtonSevenToSeven()
             self.createButtonNineToNine()
+            self.createButtonSevenToSeven()
             self.createButtonElevenToEleven()
             self.Event()
 
@@ -70,19 +73,40 @@ class NumberPlayer:
             if event.type == pygame.QUIT:
                 self.choise = True
             elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
-                if pygame.Rect(self.pos1, (400,120)).collidepoint(event.pos):
+                if pygame.Rect(self.pos1, (70,70)).collidepoint(event.pos):
+                    pygame.init()
+                    board = selectBarrer(self.nbPlayers,self.nbBot,5)
+                    while not self.getChoise():
+                        board.setWindow()
+                        pygame.display.update()
                     pygame.quit()
-                elif pygame.Rect(self.pos2, (400,120)).collidepoint(event.pos):
+                elif pygame.Rect(self.pos2, (70,70)).collidepoint(event.pos):
+                    pygame.init()
+                    board = selectBarrer(self.nbPlayers,self.nbBot,7)
+                    while not self.getChoise():
+                        board.setWindow()
+                        pygame.display.update()
                     pygame.quit()
-                elif pygame.Rect(self.pos3, (400,120)).collidepoint(event.pos):
+
+                elif pygame.Rect(self.pos3, (70,70)).collidepoint(event.pos):
+                    pygame.init()
+                    board = selectBarrer(self.nbPlayers,self.nbBot,9)
+                    while not self.getChoise():
+                        board.setWindow()
+                        pygame.display.update()
                     pygame.quit()
-                elif pygame.Rect(self.pos4, (400,120)).collidepoint(event.pos):
+                elif pygame.Rect(self.pos4, (70,70)).collidepoint(event.pos):
+                    pygame.init()
+                    board = selectBarrer(self.nbPlayer,self.nbBot,11)
+                    while not self.getChoise():
+                        board.setWindow()
+                        pygame.display.update()
                     pygame.quit()
             pygame.display.flip()
 
 if __name__ == "__main__":
     pygame.init()
-    board = NumberPlayer()
+    board = SizeGrid()
 
     while not board.getChoise():
         board.setWindow()

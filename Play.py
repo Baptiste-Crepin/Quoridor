@@ -43,6 +43,7 @@ class Menu:
                         while not self.getChoise():
                             board.setWindow()
                             pygame.display.update()
+                        pygame.quit()
                 elif pygame.Rect(self.posRules, (400,120)).collidepoint(event.pos):
                     pygame.quit()
                     
