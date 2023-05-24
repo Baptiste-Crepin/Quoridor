@@ -80,7 +80,7 @@ class GraphicalGame():
     def mainLoop(self) -> None:
         self.highlightPlayer(self.game.getCurrentPlayer())
         self.highlightBarrier()
-        while self.inGame:
+        while True:
             while not self.game.checkGameOver():
                 self.displayPossibleMoves()
 
