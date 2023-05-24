@@ -55,7 +55,7 @@ class Network:
             except:
                 print("connection error")
                 result.append(None)
-            if len(result) == 0 :
+            if len(result) == 0:
                 print("server not found")
             else:
                 return result[0]

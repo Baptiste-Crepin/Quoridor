@@ -83,7 +83,7 @@ except socket.error:
     sys.exit()
 print("")
 print("==== Server on, awaiting messages ====")
-mySocket.listen(4)
+
 
 # --- acceptation des connexions
 connected = {}
@@ -93,6 +93,7 @@ width = 7
 nbBarrier = 4
 nbPlayer = 2
 nbBots = 2
+mySocket.listen(nbPlayer)
 
 init = [0, width, nbBarrier, nbPlayer, nbBots]
 
