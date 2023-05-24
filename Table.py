@@ -425,7 +425,7 @@ class Board:
                             intersection.draw(
                                 self.window, i, j+1, self.grey)
 
-                    intersection.draw(self.window, i, j, intersection.brown)
+                    intersection.draw(self.window, i, j, self.grey)
                     continue
 
                 intersection.draw(self.window, i, j, self.grey)

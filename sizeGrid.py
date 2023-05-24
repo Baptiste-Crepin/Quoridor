@@ -4,7 +4,7 @@ from barrer import selectBarrer
 
 class SizeGrid:
     def __init__(self, nbPlayer:int, nbBot:int):
-        self.nbPlayer = nbPlayer
+        self.nbPlayers = nbPlayer
         self.nbBot = nbBot
         self.windowXmax = 500
         self.windowYmax = 700
@@ -97,7 +97,7 @@ class SizeGrid:
                     pygame.quit()
                 elif pygame.Rect(self.pos4, (70,70)).collidepoint(event.pos):
                     pygame.init()
-                    board = selectBarrer(self.nbPlayer,self.nbBot,11)
+                    board = selectBarrer(self.nbPlayers,self.nbBot,11)
                     while not self.getChoise():
                         board.setWindow()
                         pygame.display.update()
