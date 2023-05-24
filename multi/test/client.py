@@ -24,17 +24,20 @@ class Network:
         #print(self.id)
         #self.send('im connecting')
 
-    def connect(self):
+    def discover(self):
         result = []
         while True:
             print('in a while')
             try:
-                data, addr = self.sock.recvfrom(1024)
-                if DISCOVERY_MSG in data:
-                    server_info = pickle.loads(data.replace(DISCOVERY_MSG, b""))
-                    result.append(server_info)
-                    print("Server info:", server_info)
-                    self.servers.add(addr[0])
+                data, _ = self.sock.recvfrom(1024)
+                try:
+                    server_info = pickle.loads(data)
+                except pickle.UnpicklingError:
+                    print("Received a non-Python object.")
+                    continue
+                result.append(server_info)
+                print("Server info:", server_info)
+                self.servers.add(server_info['ip'])
             except socket.timeout:
                 break
         print("Available servers:")
@@ -72,7 +75,7 @@ class Network:
             print(e)
 
 test = Network()
-test.connect()
+test.discover()
 #test.send(input("type a message"))
 
 
