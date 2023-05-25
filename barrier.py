@@ -1,5 +1,6 @@
 import pygame
 from pygame.locals import *
+from localGame import LocalGame
 
 class selectBarrer():
     def __init__(self, NumberPlayers:int, NumberBots:int, GridSize:int) -> None:
@@ -67,7 +68,12 @@ class selectBarrer():
                     elif self.barrer < 10 and self.GridSize==11:
                         self.barrer +=1
                 elif pygame.Rect(50,560,400,120).collidepoint(event.pos):
-                    print(self.barrer)
+                    pygame.init()
+                    board = LocalGame(self.GridSize,self.NumberPlayers, self.barrer,self.NumberBots)
+                    while not self.getChoise():
+                            board.mainLoop()
+                            pygame.display.update()
+                    pygame.quit() 
 
 
 
