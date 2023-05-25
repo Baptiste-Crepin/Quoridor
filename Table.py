@@ -1,6 +1,8 @@
 import pygame
 from pygame.locals import *
 from Player import Player
+from Bot import Bot
+lejoueur = 0
 
 
 class TablePlayer:
@@ -11,8 +13,7 @@ class TablePlayer:
         self.row = Row
         self.black = (0, 0, 0)
         self.white = (255, 255, 255)
-        self.brown= (59,39,28)
-        self.player = Player(0)
+
         self.highlighted = False
         self.hover = False
 
@@ -20,6 +21,7 @@ class TablePlayer:
         self.y = 0
         self.sizeX = 0
         self.sizeY = 0
+        self.player = Player(0)
 
     def numberCase(self):
         n = self.col
@@ -177,7 +179,7 @@ class Intersection(barrer):
 
 
 class Board:
-    def __init__(self, Width):
+    def __init__(self, Width, num:int = -1):
         self.col = Width
         self.row = Width
         self.windowXmax = 1330
@@ -185,15 +187,14 @@ class Board:
         self.window = pygame.display.set_mode(
             (self.windowXmax, self.windowYmax))
         self.clicked = False
+        self.num = num
         self.grey= pygame.Color(217, 217, 217,35)
         self.rect = self.initializeGrid()
         self.Vbarriers = self.initializeVBarriers()
         self.Hbarriers = self.initializeHBarriers()
         self.intersection = self.initializeIntersection()
 
-        self.player = Player(0)
-
-        pygame.display.set_caption("plateau")
+        pygame.display.set_caption("plateau :" + str(num))
         self.play = True
         
 
@@ -284,7 +285,6 @@ class Board:
                     return
                 if not barrier.possiblePlacement:
                     continue
-
                 self.clearHover(self.Hbarriers)
 
     def interactObject(self, listeObject: list[object], pos):
@@ -295,33 +295,32 @@ class Board:
                 if colli:
                     return (type(element).__name__, j, i)
 
-    def mouseLogic(self, event):
-        self.hoverCells()
-        self.hoverVbarriers()
-        self.hoverHbarriers()
+    def mouseLogic(self, event, currentPlayer):
+        if currentPlayer.getNumber() == self.num+1 or self.num == -1:
+            self.hoverCells()
+            self.hoverVbarriers()
+            self.hoverHbarriers()
+            if pygame.mouse.get_pressed()[0] == 1 and not self.clicked:
+                self.clicked = True
+                pos = pygame.mouse.get_pos()
+                for array in [self.rect, self.Vbarriers, self.Hbarriers]:
+                    clickedElement = self.interactObject(array, pos)
+                    if clickedElement:
+                        return clickedElement
 
-        if pygame.mouse.get_pressed()[0] == 1 and not self.clicked:
-            self.clicked = True
-            pos = pygame.mouse.get_pos()
-
-            for array in [self.rect, self.Vbarriers, self.Hbarriers]:
-                clickedElement = self.interactObject(array, pos)
-                if clickedElement:
-                    return clickedElement
-
-        if pygame.mouse.get_pressed()[0] == 0 and self.clicked:
-            self.clicked = False
-            return False
+            if pygame.mouse.get_pressed()[0] == 0 and self.clicked:
+                self.clicked = False
+                return False
 
     def quitWindow(self, event):
         if event.type == pygame.QUIT or event.type == 32787:
             pygame.quit()
             raise SystemExit
 
-    def handleEvents(self):
+    def handleEvents(self, currentPlayer):
         for event in pygame.event.get():
             self.quitWindow(event)
-            return self.mouseLogic(event)
+            return self.mouseLogic(event, currentPlayer)
 
     def clearScreen(self):
         self.window.fill((240, 240, 240))
@@ -373,10 +372,10 @@ class Board:
                                        cell.sizeCaseX()//2-5)
                     
 
-    def higlightPlayer(self, player):
+    def highlightPlayer(self, currentPlayer: Player):
         for i, row in enumerate(self.rect):
             for j, cell in enumerate(row):
-                if cell.player == player:
+                if cell.player.getNumber() == currentPlayer.getNumber():
                     pygame.draw.circle(self.window,
                                        (255, 255, 255),
                                        ((cell.x + cell.sizeCaseX()//2),
@@ -432,14 +431,15 @@ class Board:
                 if intersection.hover:
                     intersection.draw(self.window, i, j, (255, 0, 0))
 
-    def newFrame(self):  
+    def newFrame(self, currentPlayer: Player):
         self.clearScreen()
         self.displayTable()
         self.displayBarriers(self.Hbarriers)
         self.displayBarriers(self.Vbarriers)
         self.displayIntersection()
-        
-        self.higlightPlayer(self.player)
+        self.displayTable()
+
+        self.highlightPlayer(currentPlayer)
         pygame.display.flip()
 
 
@@ -449,6 +449,6 @@ if __name__ == "__main__":
 
     while board.play:
         board.handleEvents()
-        board.newFrame()
+        board.newFrame(1)
 
     pygame.quit()

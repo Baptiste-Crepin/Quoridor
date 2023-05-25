@@ -1,12 +1,13 @@
 from game import Game
 from Table import Board
 from Bot import Bot
+from Player import Player
 
 
-class GraphicalGame():
+class LocalGame():
     def __init__(self, width, nbPlayer, nbBarrier, nbBots) -> None:
         self.game = Game(width, nbPlayer, nbBarrier, nbBots)
-        self.board = Board(self.game.getSquareWidth())
+        self.board = Board (self.game.getSquareWidth())
 
     def highlightPlayer(self, player):
         for PossibleMoveCoordo in self.game.possibleMoves(player.getCoordinates()):
@@ -23,9 +24,9 @@ class GraphicalGame():
                 self.board.Hbarriers[possibleBarrierCoordo[1]
                                      ][possibleBarrierCoordo[0]].possiblePlacement = True
 
-    def displayPossibleMoves(self):
-        if not isinstance(self.game.getCurrentPlayer(), Bot):
-            self.highlightPlayer(self.game.getCurrentPlayer())
+    def displayPossibleMoves(self, player:Player):
+        if not isinstance(player, Bot):
+            self.highlightPlayer(player)
             self.highlightBarrier()
 
     def actualizeGame(self):
@@ -41,15 +42,14 @@ class GraphicalGame():
                     self.board.Vbarriers[j][i].placed = cell.getWalls()[
                         'Right']
 
-    def placement(self):
-        self.board.player = self.game.getCurrentPlayer()
-        if isinstance(self.board.player, Bot):
-            self.board.newFrame()
-            self.board.player.randomMoves(self.game)
+    def placement(self, currentPlayer: Player):
+        if isinstance(currentPlayer, Bot):
+            self.board.newFrame(currentPlayer)
+            currentPlayer.randomMoves(self.game)
             self.game.nextPlayer()
             return
 
-        event = self.board.handleEvents()
+        event = self.board.handleEvents(currentPlayer)
         if not event:
             return
 
@@ -57,22 +57,21 @@ class GraphicalGame():
         clickCoordo = (x, y)
 
         if action == 'TablePlayer':
-            if clickCoordo not in self.game.possibleMoves(self.game.getCurrentPlayer().getCoordinates()):
+            if clickCoordo not in self.game.possibleMoves(currentPlayer):
                 return
             self.board.clearHover(self.board.rect)
-            self.game.movePlayer(self.game.getCurrentPlayer(), clickCoordo)
+            self.game.movePlayer(currentPlayer, clickCoordo)
 
         if action == 'VerticalBarrier':
-            if (clickCoordo, 'Right') not in self.game.possibleBarrierPlacement(self.game.getCurrentPlayer()):
+            if (clickCoordo, 'Right') not in self.game.possibleBarrierPlacement(currentPlayer):
                 return
             self.game.placeWall(clickCoordo, 'Right',
-                                self.game.getCurrentPlayer(), place=True)
+                                currentPlayer, place=True)
 
         if action == 'HorrizontalBarrier':
-            if (clickCoordo, 'Down') not in self.game.possibleBarrierPlacement(self.game.getCurrentPlayer()):
+            if (clickCoordo, 'Down') not in self.game.possibleBarrierPlacement(currentPlayer):
                 return
-            self.game.placeWall(clickCoordo, 'Down',
-                                self.game.getCurrentPlayer())
+            self.game.placeWall(clickCoordo, 'Down', currentPlayer)
 
         self.board.clearAllHighlight()
         self.game.nextPlayer()
@@ -82,14 +81,14 @@ class GraphicalGame():
         self.highlightBarrier()
         while True:
             while not self.game.checkGameOver():
-                self.displayPossibleMoves()
+                self.displayPossibleMoves(self.game.getCurrentPlayer())
 
-                self.placement()
+                self.placement(self.game.getCurrentPlayer())
                 self.actualizeGame()
 
-                self.board.newFrame()
+                self.board.newFrame(self.game.getCurrentPlayer())
             # TODO: Game has ended. display the end screen
-            self.board.newFrame()
+            self.board.newFrame(self.game.getCurrentPlayer())
 
 
 if __name__ == "__main__":
@@ -98,7 +97,7 @@ if __name__ == "__main__":
     # nbBarrier = int(input('Nb barrier'))
     width = 11
     nbBarrier = 4
-    nbPlayer = 1
-    nbBot = 3
-    G = GraphicalGame(width, nbPlayer, nbBarrier, nbBot)
+    nbPlayer = 2
+    nbBot = 2
+    G = LocalGame(width, nbPlayer, nbBarrier, nbBot)
     G.mainLoop()

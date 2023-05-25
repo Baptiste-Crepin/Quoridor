@@ -12,7 +12,8 @@ class Game():
         self.__NumberOfPlayers = nbPlayers
         self.__NumberOfBarriers = self.validateNumberOfBarriers(nbBarrier)
         self.__PlayerList = self.createPlayerList()
-        self.__currentPlayerN = random.randint(0, self.getNumberOfPlayers()-1)
+        #self.__currentPlayerN = random.randint(0, self.getNumberOfPlayers()-1)
+        self.__currentPlayerN = 0
         self.__currentPlayer = self.getPlayerList()[self.getCurrentPlayerN()]
         self.__grid = self.createGrid()
 
@@ -677,7 +678,7 @@ def play() -> None:
                 Game.movePlayer(player, coordo)
 
         Game.display()
-        Game.nextPlayer()
+        #Game.nextPlayer()
 
 
 if __name__ == "__main__":
