@@ -1,6 +1,6 @@
 import pygame
 from pygame.locals import *
-from type import Menutype
+
 
 
 class Menu:
@@ -33,6 +33,8 @@ class Menu:
 
 
     def Event(self):
+        from rules import Rules
+        from type import Menutype
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 self.choise=True
@@ -45,13 +47,18 @@ class Menu:
                             pygame.display.update()
                         pygame.quit()
                 elif pygame.Rect(self.posRules, (400,120)).collidepoint(event.pos):
-                    pygame.quit()
+                        pygame.init()
+                        board = Rules()
+                        while not self.getChoise():
+                            board.setWindow()
+                            pygame.display.update()
+                        pygame.quit()
                     
         pygame.display.flip()
 
     def setWindow(self):
-        backGround= pygame.image.load('pictures/Foret.jpg')
-        self.window.blit(backGround,(0,0))
+        backGround= pygame.image.load('pictures/backGroundMenu3.jpg')
+        self.window.blit(backGround,(-80,-300))
         self.createButtonPlay()
         self.createButtonRules()
         self.Event()

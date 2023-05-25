@@ -2,9 +2,10 @@ import pygame
 from pygame.locals import *
 
 class selectBarrer():
-    def __init__(self, NumberPlayers:int, NumberBots:int, GridSize:int) -> None:
+    def __init__(self, NumberPlayers:int, NumberBots:int, GridSize:int,method:int) -> None:
         self.windowXmax = 500
         self.windowYmax = 700
+        self.method = method
         self.NumberPlayers = NumberPlayers
         self.NumberBots = NumberBots
         self.GridSize = GridSize
@@ -42,6 +43,15 @@ class selectBarrer():
         triangle=pygame.draw.polygon(self.window, self.white, Triangle_point)
         return triangle
 
+    def ButtonBack(self)->object:
+        coord=[(5,40),(30,10),(30,20),(70,20),(70,60),(30,60),(30,70)]
+        button= pygame.draw.polygon(self.window,self.darkerBlue,coord)
+        font=pygame.font.SysFont("Extra Bold Italic",20,False,True)
+        text=font.render("Back",True,self.white)
+        buttonText= text.get_rect(center=button.center)
+        self.window.blit(text,buttonText)
+        return button
+
     def drawButonDone(self)->None:
         button=pygame.draw.rect(self.window, self.lighterBlue, (50,560,400,120), width=0, border_radius=20)
         font=pygame.font.SysFont("Extra Bold Italic",60,False,True)
@@ -50,6 +60,8 @@ class selectBarrer():
         self.window.blit(text,buttonText)
 
     def Event(self)->None:
+        from sizeGrid import SizeGrid
+
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
@@ -57,7 +69,7 @@ class selectBarrer():
                 if self.drawfirstTriangle().collidepoint(event.pos):
                     if self.barrer>1:
                         self.barrer -= 1
-                elif self.drawSecondTriangle().collidepoint(event.pos) and event.button==1 :
+                elif self.drawSecondTriangle().collidepoint(event.pos)  :
                     if self.barrer < 3 and self.GridSize==5:
                         self.barrer += 1
                     elif self.barrer < 5 and self.GridSize==7:
@@ -68,6 +80,13 @@ class selectBarrer():
                         self.barrer +=1
                 elif pygame.Rect(50,560,400,120).collidepoint(event.pos):
                     print(self.barrer)
+                elif self.ButtonBack().collidepoint(event.pos)and event.button==1 :
+                    pygame.init()
+                    board = SizeGrid(self.NumberPlayers,self.NumberBots,self.method)
+                    while not self.getChoise():
+                        board.setWindow()
+                        pygame.display.update()
+                    pygame.quit()
 
 
 
@@ -90,6 +109,7 @@ class selectBarrer():
         self.drawSecondTriangle()
         self.drawButonDone()
         self.Event()
+        self.ButtonBack()
         pygame.display.flip()
 
 

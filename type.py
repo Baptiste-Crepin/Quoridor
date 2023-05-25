@@ -1,6 +1,6 @@
 import pygame
 from pygame.locals import *
-from choicePlayer import NumberPlayer
+
 
 class Menutype:
     def __init__(self):
@@ -14,7 +14,7 @@ class Menutype:
         self.choise = False
         self.blue=(138,201,244)
         self.white = (255,255,255)
-        
+        self.darkerBlue=(0,0,48)
 
     def createButtonSolo(self):
         button=pygame.draw.rect(self.window, self.blue, (50,200,400,120), width=0, border_radius=20)
@@ -30,17 +30,29 @@ class Menutype:
         buttonText= text.get_rect(center=button.center)
         self.window.blit(text,buttonText)
 
+    def ButtonBack(self)->object:
+        coord=[(5,40),(30,10),(30,20),(70,20),(70,60),(30,60),(30,70)]
+        button= pygame.draw.polygon(self.window,self.darkerBlue,coord)
+        font=pygame.font.SysFont("Extra Bold Italic",20,False,True)
+        text=font.render("Back",True,self.white)
+        buttonText= text.get_rect(center=button.center)
+        self.window.blit(text,buttonText)
+        return button
+
     def setWindow(self):
-        backGround= pygame.image.load('pictures/Foret.jpg')
-        self.window.blit(backGround,(0,0))
+        backGround= pygame.image.load('pictures/backGroundMenu3.jpg')
+        self.window.blit(backGround,(-80,-300))
         self.createButtonSolo()
         self.createButtonMulti()
+        self.ButtonBack()
         self.Event()
 
     def getChoise(self):
         return self.choise
 
     def Event(self):
+        from choicePlayer import NumberPlayer
+        from Play import Menu
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 self.choise=True
@@ -54,6 +66,13 @@ class Menutype:
                         pygame.display.update()
                     pygame.quit()
                 elif pygame.Rect(self.posMulti, (400,120)).collidepoint(event.pos):
+                    pygame.quit()
+                elif self.ButtonBack().collidepoint(event.pos)and event.button==1:
+                    pygame.init()
+                    board = Menu()
+                    while not self.getChoise():
+                        board.setWindow()
+                        pygame.display.update()
                     pygame.quit()
             pygame.display.flip()
 

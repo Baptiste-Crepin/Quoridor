@@ -34,11 +34,11 @@ class TablePlayer:
         return self.sizeY
 
     def coordX(self, i):
-        self.x = ((self.boardX-900)//self.numberCase())*i+(self.boardX*0.33)
+        self.x = (self.boardX*0.10)*i
         return self.x
 
     def coordY(self, j):
-        self.y = (((self.boardY-330)//self.numberCase()))*j+(self.boardY*0.25)
+        self.y = (self.boardY*0.10)*j
         return self.y
 
     def drawCase(self, surface, i, j, color):
