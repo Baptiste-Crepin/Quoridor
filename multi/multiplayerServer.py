@@ -3,6 +3,10 @@
 
 import queue
 import socket, sys, threading, pickle
+import os
+
+parent_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+sys.path.append(parent_dir)
 
 hostname = socket.gethostname()
 
