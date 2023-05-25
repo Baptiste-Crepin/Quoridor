@@ -1,12 +1,17 @@
 import pickle
 import socket
 import sys
+import os
+
+parent_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+sys.path.append(parent_dir)
 
 from Bot import Bot
 from Player import Player
 from Table import Board
 from localGame import LocalGame
 from threadClient import Thread_client
+
 
 
 class MultiplayerGame(LocalGame):
@@ -74,7 +79,7 @@ if __name__ == "__main__":
     hostname = socket.gethostname()
 
     host = socket.gethostbyname(hostname)
-    # host = '10.128.173.35'
+    host = '192.168.1.10'
     port = 45678
 
     connexion = socket.socket(socket.AF_INET, socket.SOCK_STREAM)

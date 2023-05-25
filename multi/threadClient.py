@@ -12,7 +12,6 @@ class Thread_client(threading.Thread):
     def run(self):
         while 1:
             data = self.reco()
-            print("R")
             # print( type(data))
             if type(data) is list:
                 print("reciev:", data)

@@ -64,8 +64,6 @@ class ThreadClient(threading.Thread):
                 print("connection error:")
                 print(e)
                 # connected.pop(self.idc)
-                global ide
-                ide -= 1
                 print(connected)
                 raise Exception("Player disconnected while in game")
 
