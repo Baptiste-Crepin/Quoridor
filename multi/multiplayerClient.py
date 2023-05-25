@@ -79,7 +79,7 @@ if __name__ == "__main__":
     hostname = socket.gethostname()
 
     host = socket.gethostbyname(hostname)
-    host = '192.168.1.10'
+    # host = '192.168.1.10'
     port = 45678
 
     connexion = socket.socket(socket.AF_INET, socket.SOCK_STREAM)

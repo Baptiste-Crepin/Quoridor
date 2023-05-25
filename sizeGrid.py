@@ -1,6 +1,6 @@
 import pygame
 from pygame.locals import *
-from barrer import selectBarrer
+from barrier import selectBarrer
 
 class SizeGrid:
     def __init__(self, nbPlayer:int, nbBot:int):

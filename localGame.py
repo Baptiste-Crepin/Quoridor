@@ -57,7 +57,7 @@ class LocalGame():
         clickCoordo = (x, y)
 
         if action == 'TablePlayer':
-            if clickCoordo not in self.game.possibleMoves(currentPlayer):
+            if clickCoordo not in self.game.possibleMoves(currentPlayer.getCoordinates()):
                 return
             self.board.clearHover(self.board.rect)
             self.game.movePlayer(currentPlayer, clickCoordo)
@@ -95,7 +95,7 @@ if __name__ == "__main__":
     # width = int(input('Width'))
     # nbPlayer = int(input('Nb Player'))
     # nbBarrier = int(input('Nb barrier'))
-    width = 11
+    width = 5
     nbBarrier = 4
     nbPlayer = 2
     nbBot = 2

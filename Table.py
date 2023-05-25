@@ -1,9 +1,6 @@
 import pygame
 from pygame.locals import *
 from Player import Player
-from Bot import Bot
-lejoueur = 0
-
 
 class TablePlayer:
     def __init__(self, boardX, boardY, Col, Row):
@@ -437,7 +434,6 @@ class Board:
         self.displayBarriers(self.Hbarriers)
         self.displayBarriers(self.Vbarriers)
         self.displayIntersection()
-        self.displayTable()
 
         self.highlightPlayer(currentPlayer)
         pygame.display.flip()
@@ -448,7 +444,8 @@ if __name__ == "__main__":
     board = Board(7)
 
     while board.play:
-        board.handleEvents()
-        board.newFrame(1)
+        p = Player(1, 3)
+        board.handleEvents(p)
+        board.newFrame(p)
 
     pygame.quit()
