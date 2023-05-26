@@ -49,30 +49,25 @@ class ThreadClient(threading.Thread):
                 print("reccu:", msg)
                 #print(connected[self.idc])
 
-                if msg[0] == 'board':
-                    msg2 = ['turn']
-                    msg2.append(self.nextClient())
-
-                    print(msg2)
+                if msg[0] == 'game_state':
+                    msg[2] = self.nextClient()
                     #print("CONNECTED LIST", connected)
                     for i in range(len(connected)):
-                        # sends the board to the clients
-                        connected[i].send(msg1)
-                        # sends current player turn to the clients
-                        connected[i].send(pickle.dumps(msg2))
-                    return
+                        # sends current state of the game to all connected clients
+                        connected[i].send(pickle.dumps(msg))
+                    continue
                 elif msg[0] == "chat":
-                    return
-                elif msg[0] == "turn":
-                    return
+                    continue
                 elif msg[0] == "?":
-                    return
+                    continue
+                elif msg[0] == "?":
+                    continue
                 elif msg[0] == "":
-                    return
+                    continue
 
                 else:
                     print("unexpected data in header can't interpret packet")
-                    return
+                    continue
 
 
 
@@ -108,7 +103,7 @@ ide = 0
 width = 7
 nbBarrier = 4
 nbPlayer = 2
-nbBots = 2
+nbBots = 0
 mySocket.listen(nbPlayer)
 
 init = [0, width, nbBarrier, nbPlayer, nbBots]

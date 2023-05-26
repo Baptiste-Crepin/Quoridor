@@ -57,8 +57,7 @@ class MultiplayerGame(LocalGame):
         self.board.clearAllHighlight()
         self.highlightPlayer(currentPlayer)
         self.highlightBarrier()
-
-        print("tour fini pour " + str(num))
+        ("tour fini pour " + str(num))
         th.emet()
 
 
