@@ -47,18 +47,34 @@ class ThreadClient(threading.Thread):
                 msg1 = self.connexion.recv(4096)
                 msg = pickle.loads(msg1)
                 print("reccu:", msg)
-                print(connected[self.idc])
+                #print(connected[self.idc])
 
-                msg2 = self.nextClient()
-                print(msg2)
+                if msg[0] == 'board':
+                    msg2 = ['turn']
+                    msg2.append(self.nextClient())
 
-                print("CONNECTED LIST", connected)
+                    print(msg2)
+                    #print("CONNECTED LIST", connected)
+                    for i in range(len(connected)):
+                        # sends the board to the clients
+                        connected[i].send(msg1)
+                        # sends current player turn to the clients
+                        connected[i].send(pickle.dumps(msg2))
+                    return
+                elif msg[0] == "chat":
+                    return
+                elif msg[0] == "turn":
+                    return
+                elif msg[0] == "?":
+                    return
+                elif msg[0] == "":
+                    return
 
-                for i in range(len(connected)):
-                    # sends the board to the clients
-                    connected[i].send(msg1)
-                    # sends current player turn to the clients
-                    connected[i].send(pickle.dumps(msg2))
+                else:
+                    print("unexpected data in header can't interpret packet")
+                    return
+
+
 
 
 

@@ -12,24 +12,32 @@ class Thread_client(threading.Thread):
     def run(self):
         while 1:
             data = self.reco()
-            # print( type(data))
-            if type(data) is list:
+            if data[0] == 'board':
                 print("reciev:", data)
-                self.multiplayerClient.game.setGrid(data)
+                self.multiplayerClient.game.setGrid(data[1])
                 # G.actualizeGame()
                 # G.board.newFrame()
                 # G.nextPlayer
-            else:
-
-                self.multiplayerClient.game.setCurrentPlayerN(data)
-                self.multiplayerClient.game.setCurrentPlayer(self.multiplayerClient.game.getPlayerList()[data])
+            elif data[0] == 'turn':
+                self.multiplayerClient.game.setCurrentPlayerN(data[1])
+                self.multiplayerClient.game.setCurrentPlayer(self.multiplayerClient.game.getPlayerList()[data[1]])
                 print("reciev:", data)
+
+            elif data[0] == 'chat':
+                return
+            elif data[0] == '?':
+                return
+            elif data[0] == '':
+                return
+
 
         # self.connexion.close()
 
     def emet(self):
         gr = self.multiplayerClient.game.getGrid()
-        data = pickle.dumps(gr)
+        msg = ["board"]
+        msg.append(gr)
+        data = pickle.dumps(msg)
         self.connexion.send(data)
         # self.connexion.send(msg.encode("Utf8"))
         # self.connexion.close()
@@ -37,4 +45,5 @@ class Thread_client(threading.Thread):
     def reco(self):
         dump = self.connexion.recv(4096)
         message = pickle.loads(dump)
+        print(message)
         return message

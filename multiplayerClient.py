@@ -86,6 +86,7 @@ if __name__ == "__main__":
         print("Erreur sur la connection")
         sys.exit()
 
+
     msg = connexion.recv(4096)
     msg = pickle.loads(msg)
     print("reccu:", msg)
