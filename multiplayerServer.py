@@ -1,127 +1,124 @@
-# serveur avec Thread pour plusieurs clients
-
-
+# serveur with threads for multiple clients
 import queue
-import socket, sys, threading, pickle
+import socket
+import sys
+import threading
+import pickle
 
-
-
-hostname = socket.gethostname()
-
-host = socket.gethostbyname(hostname)
-# host = 'LocalHost'
-port = 45678
-client_list = []
-i = 0
-# created an unbounded queue
-q = queue.Queue()
-q.put(0)
-q.task_done()
-
-
-# ---------------------------------------------
 class ThreadClient(threading.Thread):
 
-    def __init__(self, c, idd):
+    def __init__(self, connexion, idd, queue, connected, nbBots):
         threading.Thread.__init__(self)
-        self.connexion = c
+        self.connexion = connexion
         self.start()
         self.idc = idd
+        self.queue = queue
+        self.connected = connected
+        self.nbBots = nbBots
 
     def nextClient(self) -> int:
-        current_client = q.get()
+        current_client = self.queue.get()
         print(current_client)
-        if current_client < (len(connected) - 1 + nbBots):
-            current_client += 1
-        else:
-            current_client = 0
-        q.put(current_client)
-        q.task_done()
+        current_client = (current_client + 1) % (len(self.connected) + self.nbBots)
+        self.queue.put(current_client)
+        self.queue.task_done()
         return current_client
+    
+    def handleGameState(self, message:list) -> None:
+        message[2] = self.nextClient()
+        pickeled_message = pickle.dumps(message)
+        for i in range(len(self.connected)):
+            self.connected[i].send(pickeled_message)
 
-    def run(self):
-        # recuperation du message d'un client
-        while 1:
+    def handleChatMessage(self, message:list) -> None:
+        print("chat not implemented yet")
 
+    def handleQuestion(self, message:list) -> None:
+        print("? not implemented yet")
+
+    def handleEmpty(self, message:list) -> None:
+        print("\"\" not implemented yet")
+
+    def run(self) -> None:
+        '''
+        gets the message from one client and sends it to all the clients
+        '''
+        message_handlers = {
+            'game_state': self.handleGameState,
+            'chat': self.handleChatMessage,
+            '?': self.handleQuestion,
+            '': self.handleEmpty,
+        }
+        
+        while True:
             try:
-                msg1 = self.connexion.recv(4096)
-                msg = pickle.loads(msg1)
-                print("reccu:", msg)
-                #print(connected[self.idc])
+                received_message = self.connexion.recv(4096)
+                message = pickle.loads(received_message)
 
-                if msg[0] == 'game_state':
-                    msg[2] = self.nextClient()
-                    #print("CONNECTED LIST", connected)
-                    for i in range(len(connected)):
-                        # sends current state of the game to all connected clients
-                        connected[i].send(pickle.dumps(msg))
-                    continue
-                elif msg[0] == "chat":
-                    continue
-                elif msg[0] == "?":
-                    continue
-                elif msg[0] == "?":
-                    continue
-                elif msg[0] == "":
-                    continue
-
+                message_type = message[0]
+                if message_type in message_handlers:
+                    message_handlers[message_type](message)
                 else:
                     print("unexpected data in header can't interpret packet")
-                    continue
-
-
-
-
 
             except Exception as e:
                 print("connection error:")
                 print(e)
-                # connected.pop(self.idc)
-                print(connected)
+                print(self.connected)
                 raise Exception("Player disconnected while in game")
 
         # self.connexion.close()
 
+def acceptConnexions(mySocket, init, initializedQueue):
+    '''
+    accepts the connexions of the clients and creates a thread for each of them to handle the messages
+    '''
+    nbPlayer = init[3]
+    nbBots = init[4]
+    connected = {}
+    
+    mySocket.listen(nbPlayer)
+    while nbPlayer > len(connected):
+        connexion = mySocket.accept()[0]
 
-# ==================================================
+        connected[init[0]] = connexion
+        ThreadClient(connexion, init[0], initializedQueue, connected, nbBots)
 
-# --- creation du serveur
-mySocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-try:
-    mySocket.bind((host, port))
-except socket.error:
-    print("wrong addr")
-    sys.exit()
-print("")
-print("==== Server on, awaiting messages ====")
+        init_msg = pickle.dumps(init)
+        connexion.send(init_msg)
 
+        print("Client", init[0], "connected, awaiting other players")
+        init[0] += 1
 
-# --- acceptation des connexions
-connected = {}
+def createServer(width, nbBarrier, nbPlayer, nbBots, port=45678):
+    '''
+    creates a server with the given parameters
+    '''
+    ide = 0
+    init = [ide, width, nbBarrier, nbPlayer, nbBots]
+    hostname = socket.gethostname()
+    host = socket.gethostbyname(hostname)
+    
+    initializedQueue = queue.Queue()
+    initializedQueue.put(0)
+    initializedQueue.task_done()
+    
+    # --- server creation
+    mySocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    try:
+        mySocket.bind((host, port))
+    except socket.error as e:
+        print("error whilst launching server")
+        print(e)
+        sys.exit()
+    
+    print(f"\n\n\n{'='*15} Server |{host} : {port}| on {'='*15}\n\n")
 
-ide = 0
-width = 7
-nbBarrier = 4
-nbPlayer = 2
-nbBots = 0
-mySocket.listen(nbPlayer)
+    acceptConnexions(mySocket, init, initializedQueue)
 
-init = [0, width, nbBarrier, nbPlayer, nbBots]
-
-while 1:
-    connexion, adresse = mySocket.accept()
-    print("ide:", ide)
-
-    client_list.append(i)
-
-    connected[ide] = connexion
-    ThreadClient(connexion, ide)
-    print(i)
-    print(init)
-    init[0] = i
-
-    init_msg = pickle.dumps(init)
-    connexion.send(init_msg)
-    i += 1
-
-    ide += 1
+if __name__ == "__main__":
+    width = 7
+    nbBarrier = 4
+    nbPlayer = 2
+    nbBots = 0
+    createServer(width, nbBarrier, nbPlayer, nbBots)

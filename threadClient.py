@@ -9,26 +9,44 @@ class Thread_client(threading.Thread):
         self.multiplayerClient = multiplayerClient
         self.start()
 
-    def run(self):
-        while 1:
-            data = self.reco()
-            if data[0] == 'game_state':
-                print("reciev:", data)
-                self.multiplayerClient.game.setGrid(data[1])
-                # G.actualizeGame()
-                # G.board.newFrame()
-                # G.nextPlayer
-                self.multiplayerClient.game.setCurrentPlayerN(data[2])
-                self.multiplayerClient.game.setCurrentPlayer(self.multiplayerClient.game.getPlayerList()[data[2]])
+    def handleGameState(self, message:list) -> None:
+        self.multiplayerClient.game.setGrid(message[1])
+        self.multiplayerClient.game.setCurrentPlayerN(message[2])
+        self.multiplayerClient.game.setCurrentPlayer(self.multiplayerClient.game.getPlayerList()[message[2]])
+        
+    def handleChatMessage(self, message:list) -> None:
+        print("chat not implemented yet")
+        
+    def handleQuestion(self, message:list) -> None:
+        print("? not implemented yet")
+        
+    def handleEmpty(self, message:list) -> None:
+        print("\"\" not implemented yet")
 
-            elif data[0] == '?':
-                return
-            elif data[0] == 'chat':
-                return
-            elif data[0] == '?':
-                return
-            elif data[0] == '':
-                return
+    def run(self):
+        message_handlers = {
+            'game_state': self.handleGameState,
+            'chat': self.handleChatMessage,
+            '?': self.handleQuestion,
+            '': self.handleEmpty,
+        }
+        
+        while True:
+            try:
+                received_message = self.connexion.recv(4096)
+                message = pickle.loads(received_message)
+
+                message_type = message[0]
+                if message_type in message_handlers:
+                    message_handlers[message_type](message)
+                else:
+                    print("unexpected data in header can't interpret packet")
+
+            except Exception as e:
+                print("connection error:")
+                print(e)
+                print(self.connected)
+                raise Exception("Player disconnected while in game")
 
 
         # self.connexion.close()

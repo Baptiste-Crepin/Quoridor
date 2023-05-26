@@ -11,11 +11,11 @@ from threadClient import Thread_client
 
 
 class MultiplayerGame(LocalGame):
-    def __init__(self, width, nbPlayer, nbBarrier, nbBots=0, num=-1) -> None:
+    def __init__(self, connexion, width, nbBarrier, nbPlayer, nbBots=0, num=-1) -> None:
         super().__init__(width, nbPlayer, nbBarrier, nbBots)
         self.board = Board(self.game.getSquareWidth(), num)
         self.num = num
-        print("NUM", num)
+        self.thread = Thread_client(connexion, self)
 
     def displayPossibleMoves(self, player: Player):
         self.board.clearAllHighlight()
@@ -29,7 +29,7 @@ class MultiplayerGame(LocalGame):
             self.board.newFrame(currentPlayer)
             currentPlayer.randomMoves(self.game)
             print("Bot played")
-            th.emet()
+            self.thread.emet()
             return
         event = self.board.handleEvents(currentPlayer)
         if not event:
@@ -57,26 +57,11 @@ class MultiplayerGame(LocalGame):
         self.board.clearAllHighlight()
         self.highlightPlayer(currentPlayer)
         self.highlightBarrier()
-        ("tour fini pour " + str(num))
-        th.emet()
+        ("tour fini pour " + str(self.num))
+        self.thread.emet()
 
-
-if __name__ == "__main__":
-    # width = int(input('Width'))
-    # nbPlayer = int(input('Nb Player'))
-    # nbBarrier = int(input('Nb barrier'))
-    # width = 5
-    # nbBarrier = 4
-    # nbPlayer = 2
-    # client avec Thread
-
-    # ============================================================
-    hostname = socket.gethostname()
-
-    host = socket.gethostbyname(hostname)
-    # host = '192.168.1.10'
-    port = 45678
-
+def createGame(host, port):
+    # client with thread
     connexion = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     try:
         connexion.connect((host, port))
@@ -85,19 +70,24 @@ if __name__ == "__main__":
         print("Erreur sur la connection")
         sys.exit()
 
+    serverMessage = connexion.recv(4096)
+    startVars = pickle.loads(serverMessage)
+    
+    print("Game infos:", startVars)
+    num = int(startVars[0])
+    width = startVars[1]
+    nbBarrier = startVars[2]
+    nbPlayer = startVars[3]
+    nbBots = startVars[4]
 
-    msg = connexion.recv(4096)
-    msg = pickle.loads(msg)
-    print("reccu:", msg)
-    width = msg[1]
-    nbBarrier = msg[2]
-    nbPlayer = msg[3]
-    nbBots = msg[4]
+    Game = MultiplayerGame(connexion, width, nbBarrier, nbPlayer, nbBots, num)
+    Game.mainLoop()
 
-    num = int(msg[0])
-
-    # =========================================================
-
-    G = MultiplayerGame(width, nbPlayer, nbBarrier, nbBots, num)
-    th = Thread_client(connexion, G)
-    G.mainLoop()
+if __name__ == "__main__":
+    # TODO: remove this when cleaning up for final version
+    # temporary localhost for testing purposes
+    hostname = socket.gethostname()
+    host = socket.gethostbyname(hostname)
+    # host = '192.168.1.10'
+    port = 45678
+    createGame(host, port)
