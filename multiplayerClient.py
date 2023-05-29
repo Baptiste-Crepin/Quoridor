@@ -8,8 +8,44 @@ from Table import Board
 from localGame import LocalGame
 from threadClient import Thread_client
 
+DISCOVERY_MSG = b"SERVER_DISCOVERY_REQUEST"
 
+def discovery():
+    connexion = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    discoSock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    discoSock.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
+    serveurs = discover(discoSock)
+    print("Available servers:")
+    print(serveurs)
+    choix = int(input("pick a server"))
+    try:
+        connexion.connect((serveurs[choix]['ip'], serveurs[choix]['port']))
+        print("Connexion active")
+    except socket.error:
+        print("Erreur sur la connection")
+        sys.exit()
+    return connexion
 
+def discover(discoSock):
+    discoSock.sendto(DISCOVERY_MSG, ('<broadcast>', 5555))
+    discoSock.settimeout(5.0)  # Set a timeout of 5 seconds for waiting for responses
+    result = list()
+    serverList = list()
+
+    try:
+        data, _ = discoSock.recvfrom(1024)
+        try:
+            server_info = pickle.loads(data)
+        except pickle.UnpicklingError:
+            print("Received a non-Python object.")
+
+        serverList.append(server_info)
+        print("Server info:", server_info)
+    except socket.timeout:
+        print('request timed out / no server found')
+    for server in serverList:
+        result.append(server)
+    return result
 class MultiplayerGame(LocalGame):
     def __init__(self, connexion, width, nbBarrier, nbPlayer, nbBots=0, num=-1) -> None:
         super().__init__(width, nbPlayer, nbBarrier, nbBots)
@@ -60,15 +96,7 @@ class MultiplayerGame(LocalGame):
         ("tour fini pour " + str(self.num))
         self.thread.emet()
 
-def createGame(host, port):
-    # client with thread
-    connexion = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    try:
-        connexion.connect((host, port))
-        print("Connexion active")
-    except socket.error:
-        print("Erreur sur la connection")
-        sys.exit()
+def createGame(connexion):
 
     serverMessage = connexion.recv(4096)
     startVars = pickle.loads(serverMessage)
@@ -89,5 +117,9 @@ if __name__ == "__main__":
     hostname = socket.gethostname()
     host = socket.gethostbyname(hostname)
     # host = '192.168.1.10'
-    port = 45678
-    createGame(host, port)
+    #port = 45678
+
+    connexion = discovery()
+
+
+    createGame(connexion)
