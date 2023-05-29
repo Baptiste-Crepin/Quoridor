@@ -12,7 +12,7 @@ dsock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 DISCOVERY_MSG = b"SERVER_DISCOVERY_REQUEST"
 dsock.bind(('0.0.0.0', 5555))  # Bind to all available network interfaces on port 12345
 
-print("server:on    status: awaiting connection")
+
 
 lobbyInfo = {'discoverymessage': DISCOVERY_MSG,
              'ip': server,
@@ -26,9 +26,10 @@ def handle_client_request(data, client_address):
         dsock.sendto(response, client_address)
         print("handeling request")
 
+def discoveryServer():
+    while True:
+        data, addre = dsock.recvfrom(1024)
+        handle_client_request(data, addre)
 
 
 
-while True:
-    data, addre = dsock.recvfrom(1024)
-    handle_client_request(data,addre)
