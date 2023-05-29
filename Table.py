@@ -4,67 +4,62 @@ from Player import Player
 
 
 class TablePlayer:
-    def __init__(self, boardX, boardY, Col, Row):
+    def __init__(self, boardX:int, boardY:int, col:int) -> None:
         self.boardX = boardX
         self.boardY = boardY
-        self.col = Col
-        self.row = Row
+        self.col = col
         self.black = (0, 0, 0)
         self.white = (255, 255, 255)
-        self.brown= (59,39,28)
+        self.brown = (59, 39, 28)
         self.player = Player(0)
         self.highlighted = False
         self.hover = False
 
         self.x = 0
         self.y = 0
-        self.sizeX = 0
-        self.sizeY = 0
+        self.width = self.sizeCase()
+        self.height = self.sizeCase()
+        self.offset = self.offsetCase()
 
-    def numberCase(self):
-        n = self.col
-        return n
-
-    def sizeCaseX(self):
-        self.sizeX = (((self.boardY//2)-10)//self.numberCase())
-        return self.sizeX
-
-    def sizeCaseY(self):
-        self.sizeY = (((self.boardY//2)-10)//self.numberCase())
-        return self.sizeY
+    def sizeCase(self):
+        return (self.boardY // self.col)
+    
+    def offsetCase(self):
+        total_margin = 100
+        offset = self.boardY // (self.width * self.col) + (total_margin//self.col)
+        return offset
 
     def coordX(self, i):
-        self.x = (self.boardX*0.10)*i
+        self.x = i * (self.width)
         return self.x
 
     def coordY(self, j):
-        self.y = (self.boardY*0.10)*j
+        self.y = j * (self.height)
         return self.y
 
     def drawCase(self, surface, i, j, color):
-        x = self.coordX(i)
-        y = self.coordY(j)
-        width = self.sizeCaseX()
-        height = self.sizeCaseY()
-        casePlayer = pygame.draw.rect(
-            surface, color, (x, y, width, height))
-        return casePlayer
+        x = self.coordX(i) + self.offset//2
+        y = self.coordY(j) + self.offset//2
+        width = self.width - self.offset
+        height = self.height - self.offset
+        rectValues = (x, y, width, height)
+
+        return pygame.draw.rect(surface, color, rectValues)
 
     def collides(self, otherCoord):
-        if otherCoord[0] < self.x or otherCoord[0] > self.x + self.sizeX:
+        if otherCoord[0] < self.x or otherCoord[0] > self.x + self.width:
             return False
-        if otherCoord[1] < self.y or otherCoord[1] > self.y + self.sizeY:
+        if otherCoord[1] < self.y or otherCoord[1] > self.y + self.height:
             return False
 
         return True
 
 
 class barrer():
-    def __init__(self,boardX,boardY,col,row):
+    def __init__(self,boardX,boardY,col):
         self.boardX = boardX
         self.boardY = boardY
         self.col = col
-        self.row = row
         self.placed = 0
         self.x = 0
         self.y = 0
@@ -84,7 +79,6 @@ class barrer():
         height = self.sizeY()
         barrier = pygame.draw.rect(
             surface, color, (x, y, width, height)) 
-        
         return barrier
 
     def collides(self, otherCoord):
@@ -95,52 +89,57 @@ class barrer():
 
         return True
 
-class VerticalBarrier(barrer):
-    def __init__(self, boardX, boardY,col,row):
-        super().__init__(boardX,boardY,col,row)
+class HorrizontalBarrier(barrer):
+    def __init__(self, boardX, boardY,col):
+        super().__init__(boardX,boardY,col)
     def sizeX(self):
-        sizeX = 10
-        self.height = sizeX
+        cell=TablePlayer(self.boardX,self.boardY,self.col)
+        sizeX =cell.width-cell.offset 
         return sizeX
 
     def sizeY(self):
-        self.width = (((self.boardY//2)-10)//self.numberCase())
+        cell=TablePlayer(self.boardX,self.boardY,self.col)
+        self.width = cell.offset
         return self.width
 
     def coordX(self, i):
-        x = ((self.boardX-900)//self.numberCase())*i+(self.boardX*0.33)+ \
-            (((self.boardX-900)//self.numberCase())-10)
+        cell=TablePlayer(self.boardX,self.boardY,self.col)
+        x =cell.coordX(i) + cell.offset/2
         self.x = x
         return x
 
     def coordY(self, j):
-        y =  (((self.boardY-330)//self.numberCase()))*j+(self.boardY*0.25)
+        cell=TablePlayer(self.boardX,self.boardY,self.col)
+        y = cell.width *(j+1)-cell.offset/2
         self.y = y
         return y
 
 
 
 
-class HorrizontalBarrier(barrer):
-    def __init__(self, boardX, boardY,col,row):
-        super().__init__(boardX,boardY,col,row)
+class VerticalBarrier(barrer):
+    def __init__(self, boardX, boardY,col):
+        super().__init__(boardX,boardY,col)
 
     def sizeX(self):
-        self.height =(((self.boardY//2)-10)//self.numberCase())
+        cell=TablePlayer(self.boardX,self.boardY,self.col)
+        self.height=cell.offset
         return self.height
 
     def sizeY(self):
-        self.width  = 10
+        cell=TablePlayer(self.boardX,self.boardY,self.col)
+        self.width  = cell.width-cell.offset 
         return  self.width
 
     def coordX(self, i):
-        x = (((self.boardX-900)//self.numberCase()))*i+(self.boardX*0.33)
+        cell=TablePlayer(self.boardX,self.boardY,self.col)
+        x = cell.height *(i+1)-cell.offset/2
         self.x = x
         return x
 
     def coordY(self, j):
-        y = (((self.boardY-330)//self.numberCase()))*j+(self.boardY*0.25)+ \
-        (((self.boardY-330)//self.numberCase())-10)
+        cell=TablePlayer(self.boardX,self.boardY,self.col)
+        y = cell.coordY(j)+cell.offset/2
         self.y = y
         return y
 
@@ -148,29 +147,30 @@ class HorrizontalBarrier(barrer):
 
 
 class Intersection(barrer):
-    def __init__(self, boardX, boardY, col, row):
-        super().__init__(boardX, boardY, col, row)
+    def __init__(self, boardX, boardY, col):
+        super().__init__(boardX, boardY, col)
         self.grey= pygame.Color(217,217,217,68)
 
 
     def coordX(self, i):
-        x = ((self.boardX-900)//self.numberCase())*i+(self.boardX*0.33)+ \
-            (((self.boardX-900)//self.numberCase())-10)
+        cell=TablePlayer(self.boardX,self.boardY,self.col)
+        x = cell.height *(i)-cell.offset/2+cell.sizeCase()
         self.x = x
         return x
 
     def coordY(self, j):
-        y = (((self.boardY-330)//self.numberCase()))*j+(self.boardY*0.25)+ \
-        (((self.boardY-330)//self.numberCase())-10)
-        self.y = y
-        return y
+        cell=TablePlayer(self.boardX,self.boardY,self.col)
+        self.y = cell.width *(j)-cell.offset/2+cell.sizeCase()
+        return self.y
 
     def sizeX(self):
-        self.height = 10
+        cell=TablePlayer(self.boardX,self.boardY,self.col)
+        self.height=cell.offset
         return self.height
 
     def sizeY(self):
-        self.width= 10
+        cell=TablePlayer(self.boardX,self.boardY,self.col)
+        self.width=cell.offset
         return self.width
 
 
@@ -179,9 +179,8 @@ class Intersection(barrer):
 class Board:
     def __init__(self, Width):
         self.col = Width
-        self.row = Width
         self.windowXmax = 1330
-        self.windowYmax = 748
+        self.windowYmax = 750
         self.window = pygame.display.set_mode(
             (self.windowXmax, self.windowYmax))
         self.clicked = False
@@ -201,11 +200,10 @@ class Board:
         rectArray = []
         for i in range(self.col):
             row = []
-            for j in range(self.row):
+            for j in range(self.col):
                 cell = TablePlayer(self.windowXmax,
                                    self.windowYmax,
-                                   self.col,
-                                   self.row)
+                                   self.col)
                 row.append(cell)
             rectArray.append(row)
         return rectArray
@@ -214,12 +212,11 @@ class Board:
         rectArray = []
         for i in range(self.col-1):
             row = []
-            for j in range(self.row):
+            for j in range(self.col):
                 barrier = VerticalBarrier(
                     self.windowXmax,
                     self.windowYmax,
-                    self.col,
-                    self.row)
+                    self.col)
                 row.append(barrier)
             rectArray.append(row)
         return rectArray
@@ -228,11 +225,10 @@ class Board:
         rectArray = []
         for i in range(self.col):
             row = []
-            for j in range(self.row-1):
+            for j in range(self.col-1):
                 barrier = HorrizontalBarrier(self.windowXmax,
                                              self.windowYmax,
-                                             self.col,
-                                             self.row)
+                                             self.col)
                 row.append(barrier)
             rectArray.append(row)
         return rectArray
@@ -241,11 +237,10 @@ class Board:
         rectArray = []
         for i in range(self.col-1):
             row = []
-            for j in range(self.row-1):
+            for j in range(self.col-1):
                 barrier = Intersection(self.windowXmax,
                                        self.windowYmax,
-                                       self.col,
-                                       self.row)
+                                       self.col)
                 row.append(barrier)
             rectArray.append(row)
         return rectArray
@@ -371,7 +366,7 @@ class Board:
                                        ((cell.x + cell.sizeCaseX()//2),
                                         (cell.y + cell.sizeCaseY()//2)),
                                        cell.sizeCaseX()//2-5)
-                    
+
 
     def higlightPlayer(self, player):
         for i, row in enumerate(self.rect):
@@ -446,7 +441,6 @@ class Board:
 if __name__ == "__main__":
     pygame.init()
     board = Board(7)
-
     while board.play:
         board.handleEvents()
         board.newFrame()
