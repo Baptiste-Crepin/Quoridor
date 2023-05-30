@@ -24,7 +24,22 @@ def discovery():
     except socket.error:
         print("Erreur sur la connection")
         sys.exit()
-    return connexion
+    start = False
+    while start == False:
+        serverMessage = connexion.recv(4096)
+        unpickeled_message = pickle.loads(serverMessage)
+
+        print(unpickeled_message)
+        if unpickeled_message == True:
+            print("starting game")
+            createGame(connexion,)
+        else:
+            print("waiting for server start")
+
+
+
+
+
 
 def discover(discoSock):
     discoSock.sendto(DISCOVERY_MSG, ('<broadcast>', 5555))
@@ -114,12 +129,11 @@ def createGame(connexion):
 if __name__ == "__main__":
     # TODO: remove this when cleaning up for final version
     # temporary localhost for testing purposes
-    hostname = socket.gethostname()
-    host = socket.gethostbyname(hostname)
+    #hostname = socket.gethostname()
+    #host = socket.gethostbyname(hostname)
     # host = '192.168.1.10'
     #port = 45678
 
     connexion = discovery()
 
 
-    createGame(connexion)

@@ -5,6 +5,10 @@ import sys
 import threading
 import pickle
 DISCOVERY_MSG = b"SERVER_DISCOVERY_REQUEST"
+start = False
+
+def boutton():
+    return True
 
 class ThreadClient(threading.Thread):
 
@@ -70,7 +74,7 @@ class ThreadClient(threading.Thread):
 
         # self.connexion.close()
 
-def acceptConnexions(mySocket, init, initializedQueue):
+def acceptConnexions(mySocket, init, initializedQueue,):
     '''
     accepts the connexions of the clients and creates a thread for each of them to handle the messages
     '''
@@ -90,6 +94,19 @@ def acceptConnexions(mySocket, init, initializedQueue):
 
         print("Client", init[0], "connected, awaiting other players")
         init[0] += 1
+    message = True
+    pickeled_message = pickle.dumps(message)
+    for i in range(len(connected)):
+        print("sending starter message to client  :", i)
+        connected[i].send(pickeled_message)
+
+
+
+
+
+
+
+
 
 def handle_client_request(data, client_address,dsock,lobbyInfo):
     if data == DISCOVERY_MSG:
