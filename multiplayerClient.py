@@ -26,13 +26,17 @@ def discovery():
         sys.exit()
     start = False
     while start == False:
+
+        serverMessage = connexion.recv(4096)
+        startVars = pickle.loads(serverMessage)
+
         serverMessage = connexion.recv(4096)
         unpickeled_message = pickle.loads(serverMessage)
 
         print(unpickeled_message)
         if unpickeled_message == True:
             print("starting game")
-            createGame(connexion,)
+            createGame(connexion,startVars)
         else:
             print("waiting for server start")
 
@@ -111,10 +115,7 @@ class MultiplayerGame(LocalGame):
         ("tour fini pour " + str(self.num))
         self.thread.emet()
 
-def createGame(connexion):
-
-    serverMessage = connexion.recv(4096)
-    startVars = pickle.loads(serverMessage)
+def createGame(connexion, startVars):
     
     print("Game infos:", startVars)
     num = int(startVars[0])

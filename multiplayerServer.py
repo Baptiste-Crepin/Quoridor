@@ -7,8 +7,12 @@ import pickle
 DISCOVERY_MSG = b"SERVER_DISCOVERY_REQUEST"
 start = False
 
-def boutton():
-    return True
+def boutton(connected):
+    message = True
+    pickeled_message = pickle.dumps(message)
+    for i in range(len(connected)):
+        print("sending starter message to client  :", i)
+        connected[i].send(pickeled_message)
 
 class ThreadClient(threading.Thread):
 
@@ -94,11 +98,7 @@ def acceptConnexions(mySocket, init, initializedQueue,):
 
         print("Client", init[0], "connected, awaiting other players")
         init[0] += 1
-    message = True
-    pickeled_message = pickle.dumps(message)
-    for i in range(len(connected)):
-        print("sending starter message to client  :", i)
-        connected[i].send(pickeled_message)
+    boutton(connected)
 
 
 
