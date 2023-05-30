@@ -44,7 +44,7 @@ class GraphicalGame():
     def placement(self):
         self.board.player = self.game.getCurrentPlayer()
         if isinstance(self.board.player, Bot):
-            self.board.newFrame()
+            self.board.newFrame(self.game.getCurrentPlayer())
             self.board.player.randomMoves(self.game)
             self.game.nextPlayer()
             return
@@ -87,9 +87,9 @@ class GraphicalGame():
                 self.placement()
                 self.actualizeGame()
 
-                self.board.newFrame()
+                self.board.newFrame(self.game.getCurrentPlayer())
             # TODO: Game has ended. display the end screen
-            self.board.newFrame()
+            self.board.newFrame(self.game.getCurrentPlayer())
 
 
 if __name__ == "__main__":

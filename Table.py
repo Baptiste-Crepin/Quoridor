@@ -129,6 +129,46 @@ class Intersection(Barrier):
     def coordY(self, j: int) -> float:
         return self.cellTemplate.width * (j)-self.cellTemplate.offset/2+self.cellTemplate.sizeCase()
 
+class informationPlayer():
+    def __init__(self,surface:pygame.Surface, color:pygame.Color,rect:pygame.Rect,player:Player) -> None:
+        self.surface = surface
+        self.color = color
+        self.white=(255,255,255)
+        self.rect = rect
+        self.player=player
+        
+
+    def barrerCoordX(self)->int:
+        x=self.rect[3]//2+self.rect[1]
+        return x
+    
+    def barrerCoordY(self,i:int)->int:
+        y=((self.rect[2])//self.player.getBarrier()*i+self.rect[0])
+        return y
+
+    def barrerWidth(self)->int:
+        width=20
+        return width
+
+    def barrerHeight(self)->int:
+        height=self.rect[3]//2
+        return height
+    
+
+    def createRectPlayer(self)->None:
+        pygame.draw.rect(self.surface,self.color,self.rect)
+        coordPlayer=(self.rect[0]+self.rect[2]*0.05, self.rect[1]+self.rect[2]*0.05)
+        pygame.draw.circle(self.surface,self.player.getColor(),coordPlayer,self.rect[3]*0.10)
+        for i in range(self.player.getBarrier()):
+            pygame.draw.rect(self.surface,self.white,(self.barrerCoordY(i),self.barrerCoordX()
+                                              ,self.barrerWidth(),self.barrerHeight()))
+        
+
+
+
+
+
+
 
 class Board:
     def __init__(self, Width):
@@ -140,7 +180,7 @@ class Board:
         self.clicked = False
         self.white = (255, 255, 255)
         self.grey = pygame.Color(217, 217, 217, 35)
-
+        self.black = pygame.Color(0,0,0)
         self.rect = self.initializeObjectList(TablePlayer)
         self.Vbarriers = self.initializeObjectList(VerticalBarrier, 1, 0)
         self.Hbarriers = self.initializeObjectList(HorrizontalBarrier, 0, 1)
@@ -325,13 +365,13 @@ class Board:
                 if intersection.hover:
                     intersection.draw(self.window, (255, 0, 0))
 
-    def newFrame(self) -> None:
+    def newFrame(self, currentPlayer:Player) -> None:
         self.clearScreen()
         self.displayTable()
         self.displayBarriers(self.Hbarriers)
         self.displayBarriers(self.Vbarriers)
         self.displayIntersection()
-
+        informationPlayer(self.window, self.black,(1000,100,300,100),currentPlayer).createRectPlayer()
         self.higlightPlayer(self.player)
         pygame.display.flip()
 
