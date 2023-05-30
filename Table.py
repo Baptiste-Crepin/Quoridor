@@ -156,7 +156,7 @@ class informationPlayer():
     
 
     def createRectPlayer(self)->None:
-        pygame.draw.rect(self.surface,self.color,self.rect)
+        pygame.draw.rect(self.surface,self.color,self.rect,border_radius=10)
         coordPlayer=(self.rect[0]+self.rect[2]*0.05, self.rect[1]+self.rect[2]*0.05)
         pygame.draw.circle(self.surface,self.player.getColor(),coordPlayer,self.rect[3]*0.10)
         for i in range(self.player.getBarrier()):
@@ -365,13 +365,40 @@ class Board:
                 if intersection.hover:
                     intersection.draw(self.window, (255, 0, 0))
 
+    def RectNeutral(self, surface:pygame.Surface, color:pygame.Color, rect:pygame.Rect)->None:
+        pygame.draw.rect(surface,color,rect,border_radius=10)
+
+    def displayPlayerInformation(self,currentPlayer:Player)->None:
+        if currentPlayer.getNumber()==1:
+            informationPlayer(self.window, self.black, (750, 50, 550, 100),currentPlayer).createRectPlayer()
+            self.RectNeutral(self.window, self.black,  (750, 170, 550, 50))
+            self.RectNeutral(self.window, self.black,  (750, 240, 550, 50))
+            self.RectNeutral(self.window, self.black,  (750, 310, 550, 50))
+        if currentPlayer.getNumber()==2:
+            informationPlayer(self.window, self.black, (750, 120, 550, 100),currentPlayer).createRectPlayer()
+            self.RectNeutral(self.window, self.black,  (750, 50, 550, 50))
+            self.RectNeutral(self.window, self.black,  (750, 240, 550, 50))
+            self.RectNeutral(self.window, self.black,  (750, 310, 550, 50))
+        if currentPlayer.getNumber()==3:
+            informationPlayer(self.window, self.black, (750, 190, 550, 100),currentPlayer).createRectPlayer()
+            self.RectNeutral(self.window, self.black,  (750, 50, 550, 50))
+            self.RectNeutral(self.window, self.black,  (750, 120, 550, 50))
+            self.RectNeutral(self.window, self.black,  (750, 310, 550, 50))
+        if currentPlayer.getNumber()==4:
+            informationPlayer(self.window, self.black, (750, 260, 550, 100),currentPlayer).createRectPlayer()
+            self.RectNeutral(self.window, self.black,  (750, 50, 550, 50))
+            self.RectNeutral(self.window, self.black,  (750, 120, 550, 50))
+            self.RectNeutral(self.window, self.black,  (750, 190, 550, 50))
+
+
+
     def newFrame(self, currentPlayer:Player) -> None:
         self.clearScreen()
         self.displayTable()
         self.displayBarriers(self.Hbarriers)
         self.displayBarriers(self.Vbarriers)
         self.displayIntersection()
-        informationPlayer(self.window, self.black,(1000,100,300,100),currentPlayer).createRectPlayer()
+        self.displayPlayerInformation(currentPlayer)
         self.higlightPlayer(self.player)
         pygame.display.flip()
 
