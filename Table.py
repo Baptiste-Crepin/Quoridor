@@ -134,6 +134,7 @@ class informationPlayer():
         self.surface = surface
         self.color = color
         self.white=(255,255,255)
+        self.purple = pygame.Color(204,0,204)
         self.rect = rect
         self.player=player
         
@@ -160,7 +161,7 @@ class informationPlayer():
         coordPlayer=(self.rect[0]+self.rect[2]*0.05, self.rect[1]+self.rect[2]*0.05)
         pygame.draw.circle(self.surface,self.player.getColor(),coordPlayer,self.rect[3]*0.10)
         for i in range(self.player.getBarrier()):
-            pygame.draw.rect(self.surface,self.white,(self.barrerCoordY(i),self.barrerCoordX()
+            pygame.draw.rect(self.surface,self.purple,(self.barrerCoordY(i),self.barrerCoordX()
                                               ,self.barrerWidth(),self.barrerHeight()))
         
 
@@ -172,15 +173,20 @@ class informationPlayer():
 
 class Board:
     def __init__(self, Width):
-        self.col = Width
+        self.col = Width        
+
         self.windowXmax = 1330
         self.windowYmax = 750
         self.window = pygame.display.set_mode(
             (self.windowXmax, self.windowYmax))
+        
         self.clicked = False
         self.white = (255, 255, 255)
         self.grey = pygame.Color(217, 217, 217, 35)
         self.black = pygame.Color(0,0,0)
+        self.darkBlue = pygame.Color(0,0,48)
+        self.lightBlue = pygame.Color(90,173,255)
+        self.purple = pygame.Color(204,0,204)
         self.rect = self.initializeObjectList(TablePlayer)
         self.Vbarriers = self.initializeObjectList(VerticalBarrier, 1, 0)
         self.Hbarriers = self.initializeObjectList(HorrizontalBarrier, 0, 1)
@@ -286,8 +292,7 @@ class Board:
                 element.hover = False
 
     def displayTable(self) -> None:
-        backGround = pygame.image.load('pictures/backGround.jpg')
-        self.window.blit(backGround, (0, 0))
+        self.window.fill(self.darkBlue)
         for i, row in enumerate(self.rect):
 
             for j, cell in enumerate(row):
@@ -319,14 +324,14 @@ class Board:
         for i, row in enumerate(barrierList):
             for j, barrier in enumerate(row):
                 if barrier.placed:
-                    barrier.draw(self.window, self.grey)
+                    barrier.draw(self.window, self.purple)
 
                     continue
 
                 # TODO change the color
-                barrier.draw(self.window, (255, 0, 0))
+                barrier.draw(self.window, self.darkBlue)
                 if barrier.hover:
-                    barrier.draw(self.window, (255, 0, 0))
+                    barrier.draw(self.window, self.lightBlue)
 
     def displayIntersection(self) -> None:
         for i, row in enumerate(self.intersection):
@@ -352,13 +357,13 @@ class Board:
                     if i < len(self.Vbarriers)-1 and i < len(self.Hbarriers)-1:
                         if self.Vbarriers[i+1][j].placed:
                             self.intersection[i +
-                                              1][j].draw(self.window, self.grey)
+                                              1][j].draw(self.window, self.lightBlue)
                     if j < len(self.Vbarriers)-1 and j < len(self.Hbarriers)-1:
                         if self.Hbarriers[i][j+1].placed:
                             self.intersection[i][j +
-                                                 1].draw(self.window, self.grey)
+                                                 1].draw(self.window, self.purple)
 
-                    intersection.draw(self.window, self.grey)
+                    intersection.draw(self.window, self.purple)
                     continue
 
                 intersection.draw(self.window, self.grey)
@@ -369,26 +374,27 @@ class Board:
         pygame.draw.rect(surface,color,rect,border_radius=10)
 
     def displayPlayerInformation(self,currentPlayer:Player)->None:
+        pygame.draw.rect(self.window,self.lightBlue,(750,40,570,330),border_radius=10)
         if currentPlayer.getNumber()==1:
-            informationPlayer(self.window, self.black, (750, 50, 550, 100),currentPlayer).createRectPlayer()
-            self.RectNeutral(self.window, self.black,  (750, 170, 550, 50))
-            self.RectNeutral(self.window, self.black,  (750, 240, 550, 50))
-            self.RectNeutral(self.window, self.black,  (750, 310, 550, 50))
+            informationPlayer(self.window, self.black, (760, 50, 550, 100),currentPlayer).createRectPlayer()
+            self.RectNeutral(self.window, self.black,  (760, 170, 550, 50))
+            self.RectNeutral(self.window, self.black,  (760, 240, 550, 50))
+            self.RectNeutral(self.window, self.black,  (760, 310, 550, 50))
         if currentPlayer.getNumber()==2:
-            informationPlayer(self.window, self.black, (750, 120, 550, 100),currentPlayer).createRectPlayer()
-            self.RectNeutral(self.window, self.black,  (750, 50, 550, 50))
-            self.RectNeutral(self.window, self.black,  (750, 240, 550, 50))
-            self.RectNeutral(self.window, self.black,  (750, 310, 550, 50))
+            informationPlayer(self.window, self.black, (760, 120, 550, 100),currentPlayer).createRectPlayer()
+            self.RectNeutral(self.window, self.black,  (760, 50, 550, 50))
+            self.RectNeutral(self.window, self.black,  (760, 240, 550, 50))
+            self.RectNeutral(self.window, self.black,  (760, 310, 550, 50))
         if currentPlayer.getNumber()==3:
-            informationPlayer(self.window, self.black, (750, 190, 550, 100),currentPlayer).createRectPlayer()
-            self.RectNeutral(self.window, self.black,  (750, 50, 550, 50))
-            self.RectNeutral(self.window, self.black,  (750, 120, 550, 50))
-            self.RectNeutral(self.window, self.black,  (750, 310, 550, 50))
+            informationPlayer(self.window, self.black, (760, 190, 550, 100),currentPlayer).createRectPlayer()
+            self.RectNeutral(self.window, self.black,  (760, 50, 550, 50))
+            self.RectNeutral(self.window, self.black,  (760, 120, 550, 50))
+            self.RectNeutral(self.window, self.black,  (760, 310, 550, 50))
         if currentPlayer.getNumber()==4:
-            informationPlayer(self.window, self.black, (750, 260, 550, 100),currentPlayer).createRectPlayer()
-            self.RectNeutral(self.window, self.black,  (750, 50, 550, 50))
-            self.RectNeutral(self.window, self.black,  (750, 120, 550, 50))
-            self.RectNeutral(self.window, self.black,  (750, 190, 550, 50))
+            informationPlayer(self.window, self.black, (760, 260, 550, 100),currentPlayer).createRectPlayer()
+            self.RectNeutral(self.window, self.black,  (760, 50, 550, 50))
+            self.RectNeutral(self.window, self.black,  (760, 120, 550, 50))
+            self.RectNeutral(self.window, self.black,  (760, 190, 550, 50))
 
 
 

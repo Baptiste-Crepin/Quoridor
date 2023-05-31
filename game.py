@@ -55,7 +55,7 @@ class Game():
             n = min
         elif n > int(self.playerBarrier()):
             print(
-                f"The amount of players must exceed {self.playerBarrier()}, it has automatically been increased")
+                f"The amount barriers must exceed {self.playerBarrier()}, it has automatically been increased")
             n = int(self.playerBarrier())
         return n
 

@@ -1,7 +1,9 @@
+import pygame
+from pygame.locals import *
 from game import Game
 from Table import Board
 from Bot import Bot
-
+from endGame import End
 
 class GraphicalGame():
     def __init__(self, width, nbPlayer, nbBarrier, nbBots) -> None:
@@ -80,6 +82,7 @@ class GraphicalGame():
     def mainLoop(self) -> None:
         self.highlightPlayer(self.game.getCurrentPlayer())
         self.highlightBarrier()
+        end=End(self.game.getCurrentPlayer())
         while True:
             while not self.game.checkGameOver():
                 self.displayPossibleMoves()
@@ -89,14 +92,19 @@ class GraphicalGame():
 
                 self.board.newFrame(self.game.getCurrentPlayer())
             # TODO: Game has ended. display the end screen
-            self.board.newFrame(self.game.getCurrentPlayer())
+            while self.game.checkGameOver():
+                end.setWindow()
+                pygame.display.update()
+            pygame.quit()
+
+
 
 
 if __name__ == "__main__":
     # width = int(input('Width'))
     # nbPlayer = int(input('Nb Player'))
     # nbBarrier = int(input('Nb barrier'))
-    width = 7
+    width = 5
     nbBarrier = 10
     nbPlayer = 4
     nbBot = 0
