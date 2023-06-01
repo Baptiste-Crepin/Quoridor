@@ -90,7 +90,7 @@ class GraphicalGame():
                 self.placement()
                 self.actualizeGame()
 
-                self.board.newFrame(self.game.getCurrentPlayer())
+                self.board.newFrame(self.game.getCurrentPlayer(),self.game.getPlayerList())
             # TODO: Game has ended. display the end screen
             while self.game.checkGameOver():
                 end.setWindow()

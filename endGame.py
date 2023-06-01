@@ -21,10 +21,8 @@ class End:
         self.font = pygame.font.Font(None, 36) 
 
     def winnerNumber(self)->int:
-        if self.curentplayer.getNumber()>1:
-            return self.curentplayer.getNumber()-1
-        elif self.curentplayer.getNumber()==1:
-            return 4
+        return self.curentplayer.getNumber()
+
 
     def WinnerColor(self)->pygame.Color:
         return Player(self.winnerNumber()).getColor()

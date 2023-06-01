@@ -6,58 +6,15 @@ from Bot import Bot
 
 class Game():
     def __init__(self, width: int, nbPlayers: int, nbBarrier: int, nbBots: int) -> None:
-        self.__squareWidth = self.validWidth(width)
+        self.__squareWidth = width
         self.__NumberOfBots = nbBots
-        # self.__NumberOfPlayers = self.validNumberOfPlayers(nbPlayers)
         self.__NumberOfPlayers = nbPlayers
-        self.__NumberOfBarriers = self.validateNumberOfBarriers(nbBarrier)
+        self.__NumberOfBarriers = nbBarrier
         self.__PlayerList = self.createPlayerList()
         self.__currentPlayerN = random.randint(0, self.getNumberOfPlayers()-1)
         self.__currentPlayer = self.getPlayerList()[self.getCurrentPlayerN()]
         self.__grid = self.createGrid()
-
         self.initializePawns()
-
-    def validWidth(self, n: int, min: int = 5, max: int = 11) -> int:
-        if n % 2 == 0:
-            print("You mush set an odd width")
-            n += 1
-        if n < min:
-            print(
-                f"The minimal width is {min}, the width has been increased")
-            n = min
-        if n > max:
-            print(
-                f"The maximal width is {max}, the width has been decreased")
-            n = max
-        return n
-
-    def validNumberOfPlayers(self, n: int, min: int = 2, max: int = 4) -> int:
-        if n % 2 == 1:
-            print("You mush set an even amount of players")
-            n -= 1
-        if n < min:
-            print(
-                f"The amount of players must not be greater than {min}, it has automatically been increased")
-            n = min
-        if n > max:
-            print(
-                f"The amount of players must exceed {max}, it has automatically been increased")
-            n = max
-        return n
-
-    def validateNumberOfBarriers(self, n: int, min: int = 4) -> int:
-        if n % 4 == 1:
-            print("You mush set an even amount of barriers")
-        if n < min:
-            print(
-                f"The amount of Barriers must not be greater than {min}, it has automatically been increased")
-            n = min
-        elif n > int(self.playerBarrier()):
-            print(
-                f"The amount barriers must exceed {self.playerBarrier()}, it has automatically been increased")
-            n = int(self.playerBarrier())
-        return n
 
     def getSquareWidth(self) -> int:
         return self.__squareWidth
