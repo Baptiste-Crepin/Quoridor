@@ -14,22 +14,6 @@ class Menu:
         pygame.display.set_caption("Quoridor")
         self.blue=(138,201,244)
         self.white = (255,255,255)
-        
-
-    def createButtonPlay(self)-> None:
-        button=pygame.draw.rect(self.window, self.blue, (50,200,400,120), width=0, border_radius=20)
-        font=pygame.font.SysFont("Extra Bold Italic",60,False,True)
-        text=font.render("PLAY",True,self.white)
-        buttonText= text.get_rect(center=button.center)
-        self.window.blit(text,buttonText)
-
-    def createButtonRules(self)->None:
-        button=pygame.draw.rect(self.window, self.blue, (50,370,400,120), width=0, border_radius=20)
-        font=pygame.font.SysFont("Extra Bold Italic",60,False,True)
-        text=font.render("RULES",True,self.white)
-        buttonText= text.get_rect(center=button.center)
-        self.window.blit(text,buttonText)
-
 
     def Event(self)->None:
         from rules import Rules
