@@ -277,7 +277,7 @@ class Board:
             return False
 
     def quitWindow(self, event) -> None:
-        if event.type == pygame.QUIT or event.type == 32787:
+        if event.type == pygame.QUIT or event.type == pygame.WINDOWCLOSE:
             pygame.quit()
             raise SystemExit
 

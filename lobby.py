@@ -3,36 +3,34 @@ from pygame.locals import *
 from type import Menutype
 from button import Button
 
+
 class Menu:
-    def __init__(self)-> None:
+    def __init__(self) -> None:
         self.windowXmax = 500
         self.windowYmax = 700
-        self.posPlay=(50,200)
-        self.posRules =(50,370)
+        self.posPlay = (50, 200)
+        self.posRules = (50, 370)
         self.window = pygame.display.set_mode(
             (self.windowXmax, self.windowYmax))
         pygame.display.set_caption("Quoridor")
 
-        self.blue=(138,201,244)
-        self.white = (255,255,255)
-        self.play=Button(self.playButtonLogic,50,200,400,120,self.window,self.blue,'Play')
-        
+        self.blue = (138, 201, 244)
+        self.white = (255, 255, 255)
+        self.play = Button(self.playButtonLogic, 50, 200, 400,
+                           120, self.window, self.blue, 'Play')
 
     def soloButtonLogic(self):
-        button = Button(self.SoloButtonLogic, 50, 200, 400, 120, self.window, self.blue, 'Solo')
+        button = Button(self.SoloButtonLogic, 50, 200, 400,
+                        120, self.window, self.blue, 'Solo')
         button.createButton()
         return button
 
     def playButtonLogic(self):
         print("hey")
 
-
-
-
-
     def Event(self):
         for event in pygame.event.get():
-            if event.type == pygame.QUIT:
+            if event.type == pygame.QUIT or event.type == pygame.WINDOWCLOSE:
                 self.getchoise = True
 
             if self.play.buttonLogic(event):
@@ -54,5 +52,3 @@ if __name__ == "__main__":
     while True:
         board.setWindow()
         pygame.display.update()
-
- 
