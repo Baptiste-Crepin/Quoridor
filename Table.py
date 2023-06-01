@@ -144,7 +144,7 @@ class informationPlayer():
         return x
     
     def barrerCoordY(self,i:int)->int:
-        y=((self.rect[2])//self.player.getBarrier()*i+self.rect[0])
+        y=((self.rect[2])//self.player.getBarrier()*i+self.rect[0])+((self.rect[2]//self.player.getBarrier())//2-self.barrerWidth()//2)
         return y
 
     def barrerWidth(self)->int:
@@ -159,15 +159,32 @@ class informationPlayer():
     def createRectPlayer(self)->None:
         pygame.draw.rect(self.surface,self.color,self.rect,border_radius=10)
         coordPlayer=(self.rect[0]+self.rect[2]*0.05, self.rect[1]+self.rect[2]*0.05)
-        pygame.draw.circle(self.surface,self.player.getColor(),coordPlayer,self.rect[3]*0.10)
+        pygame.draw.circle(self.surface,self.player.getColor(),coordPlayer,20)
         for i in range(self.player.getBarrier()):
             pygame.draw.rect(self.surface,self.purple,(self.barrerCoordY(i),self.barrerCoordX()
                                               ,self.barrerWidth(),self.barrerHeight()))
         
 
+class displayInformation():
+    def __init__(self,currentPlayer:Player,playerlist:list[Player], surface:pygame.Surface,color:pygame.Color, rect:pygame.Rect,playerNumber:int) -> None:
+        self.currentPlayer = currentPlayer
+        self.playerList = playerlist
+        self.surface = surface
+        self.color=color
+        self.rect=rect
+        self.playerNumber = playerNumber
 
 
+    def RectNeutral(self, )->None:
+        pygame.draw.rect(self.surface,self.color, self.rect, border_radius=10)
 
+    def playerCircles(self)->None:
+        center=(self.rect[0]+self.rect[2]*0.05, self.rect[1]+self.rect[3]//2)
+        pygame.draw.circle(self.surface,self.playerList[self.playerNumber].getColor(),center,20)
+
+    def displayNeutral(self)->None:
+        self.RectNeutral()
+        self.playerCircles()
 
 
 
@@ -357,11 +374,11 @@ class Board:
                     if i < len(self.Vbarriers)-1 and i < len(self.Hbarriers)-1:
                         if self.Vbarriers[i+1][j].placed:
                             self.intersection[i +
-                                              1][j].draw(self.window, self.lightBlue)
+                                              1][j].draw(self.window, self.grey)
                     if j < len(self.Vbarriers)-1 and j < len(self.Hbarriers)-1:
                         if self.Hbarriers[i][j+1].placed:
                             self.intersection[i][j +
-                                                 1].draw(self.window, self.purple)
+                                                 1].draw(self.window, self.grey)
 
                     intersection.draw(self.window, self.purple)
                     continue
@@ -370,50 +387,50 @@ class Board:
                 if intersection.hover:
                     intersection.draw(self.window, (255, 0, 0))
 
-    def RectNeutral(self, surface:pygame.Surface, color:pygame.Color, rect:pygame.Rect)->None:
-        pygame.draw.rect(surface,color,rect,border_radius=10)
 
-    def displayPlayerInformation(self,currentPlayer:Player)->None:
+    def displayPlayerInformation(self,currentPlayer:Player,playerList:list[Player])->None:
         pygame.draw.rect(self.window,self.lightBlue,(750,40,570,330),border_radius=10)
         if currentPlayer.getNumber()==1:
-            informationPlayer(self.window, self.black, (760, 50, 550, 100),currentPlayer).createRectPlayer()
-            self.RectNeutral(self.window, self.black,  (760, 170, 550, 50))
-            self.RectNeutral(self.window, self.black,  (760, 240, 550, 50))
-            self.RectNeutral(self.window, self.black,  (760, 310, 550, 50))
+            informationPlayer(self.window, self.black, (760, 50, 550, 100),playerList[0]).createRectPlayer()
+            displayInformation(currentPlayer,playerList,self.window,self.black,(760, 170, 550, 50),1).displayNeutral()
+            displayInformation(currentPlayer,playerList,self.window,self.black,(760, 240, 550, 50),2).displayNeutral()
+            displayInformation(currentPlayer,playerList,self.window,self.black,(760, 310, 550, 50),3).displayNeutral()
         if currentPlayer.getNumber()==2:
-            informationPlayer(self.window, self.black, (760, 120, 550, 100),currentPlayer).createRectPlayer()
-            self.RectNeutral(self.window, self.black,  (760, 50, 550, 50))
-            self.RectNeutral(self.window, self.black,  (760, 240, 550, 50))
-            self.RectNeutral(self.window, self.black,  (760, 310, 550, 50))
+            informationPlayer(self.window, self.black, (760, 120, 550, 100),playerList[1]).createRectPlayer()
+            displayInformation(currentPlayer,playerList,self.window,self.black,(760, 50, 550, 50),0).displayNeutral()
+            displayInformation(currentPlayer,playerList,self.window,self.black,(760, 240, 550, 50),2).displayNeutral()
+            displayInformation(currentPlayer,playerList,self.window,self.black,(760, 310, 550, 50),3).displayNeutral()
         if currentPlayer.getNumber()==3:
-            informationPlayer(self.window, self.black, (760, 190, 550, 100),currentPlayer).createRectPlayer()
-            self.RectNeutral(self.window, self.black,  (760, 50, 550, 50))
-            self.RectNeutral(self.window, self.black,  (760, 120, 550, 50))
-            self.RectNeutral(self.window, self.black,  (760, 310, 550, 50))
+            informationPlayer(self.window, self.black, (760, 190, 550, 100),playerList[2]).createRectPlayer()
+            displayInformation(currentPlayer,playerList,self.window,self.black,(760, 120, 550, 50),1).displayNeutral()
+            displayInformation(currentPlayer,playerList,self.window,self.black,(760, 50, 550, 50),0).displayNeutral()
+            displayInformation(currentPlayer,playerList,self.window,self.black,(760, 310, 550, 50),3).displayNeutral()
+
         if currentPlayer.getNumber()==4:
-            informationPlayer(self.window, self.black, (760, 260, 550, 100),currentPlayer).createRectPlayer()
-            self.RectNeutral(self.window, self.black,  (760, 50, 550, 50))
-            self.RectNeutral(self.window, self.black,  (760, 120, 550, 50))
-            self.RectNeutral(self.window, self.black,  (760, 190, 550, 50))
+            informationPlayer(self.window, self.black, (760, 260, 550, 100),playerList[3]).createRectPlayer()
+            displayInformation(currentPlayer,playerList,self.window,self.black,(760, 120, 550, 50),1).displayNeutral()
+            displayInformation(currentPlayer,playerList,self.window,self.black,(760, 190, 550, 50),2).displayNeutral()
+            displayInformation(currentPlayer,playerList,self.window,self.black,(760, 50, 550, 50),0).displayNeutral()
 
 
 
-    def newFrame(self, currentPlayer:Player) -> None:
+    def newFrame(self, currentPlayer:Player,playerList:list[Player]) -> None:
         self.clearScreen()
         self.displayTable()
         self.displayBarriers(self.Hbarriers)
         self.displayBarriers(self.Vbarriers)
         self.displayIntersection()
-        self.displayPlayerInformation(currentPlayer)
+        self.displayPlayerInformation(currentPlayer,playerList)
         self.higlightPlayer(self.player)
         pygame.display.flip()
 
 
 if __name__ == "__main__":
     pygame.init()
+    player = Player(1,4)
     board = Board(5)
     while board.play:
         board.handleEvents()
-        board.newFrame()
+        board.newFrame(player)
 
     pygame.quit()
