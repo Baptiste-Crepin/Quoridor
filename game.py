@@ -194,19 +194,16 @@ class Game():
     def getCell(self, coord: tuple) -> Case:
         return self.getGrid()[coord[0]][coord[1]]
 
+    def getPreviousPlayer(self) -> Player:
+        if self.getCurrentPlayerN() == 0:
+            return self.getPlayerList()[len(self.getPlayerList())-1]
+        return self.getPlayerList()[self.getCurrentPlayerN()-1]
+
     def nextPlayer(self) -> None:
         if self.getCurrentPlayerN() < len(self.getPlayerList())-1:
             self.setCurrentPlayerN(self.getCurrentPlayerN() + 1)
         else:
             self.setCurrentPlayerN(0)
-
-        self.setCurrentPlayer(self.getPlayerList()[self.getCurrentPlayerN()])
-
-    def previousPlayer(self) -> None:
-        if self.getCurrentPlayerN() > 0:
-            self.setCurrentPlayerN(self.getCurrentPlayerN() - 1)
-        else:
-            self.setCurrentPlayerN(len(self.getPlayerList()))
 
         self.setCurrentPlayer(self.getPlayerList()[self.getCurrentPlayerN()])
 

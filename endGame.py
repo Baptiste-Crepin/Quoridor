@@ -20,27 +20,14 @@ class End:
         self.coordQuit=(self.windowXmax//2-220, self.windowYmax//2+150,200,80)
         self.font = pygame.font.Font(None, 36) 
 
-    def winnerNumber(self)->int:
-        if self.curentplayer.getNumber()>1:
-            return self.curentplayer.getNumber()-1
-        elif self.curentplayer.getNumber()==1:
-            return 4
+    def WinnerColor(self) -> pygame.Color:
+        return self.curentplayer.stringColor()
 
-    def WinnerColor(self)->pygame.Color:
-        return Player(self.winnerNumber()).getColor()
-    
-    def Winner(self)->str:
-        if self.winnerNumber()==1:
-            return "Well played Red! You win!"
-        if self.winnerNumber()==2:
-            return "Well played Yellow! You win!"        
-        if self.winnerNumber()==3:
-            return "Well played Green! You win!"
-        if self.winnerNumber()==4:
-            return "Well played Blue! You win!"
-        
-    def displayWinner(self)->None:
-        pygame.draw.circle(self.window,self.WinnerColor(),self.center,100)
+    def Winner(self) -> str:
+        return str(self.WinnerColor()) + " Player won !"
+
+    def displayWinner(self) -> None:
+        pygame.draw.circle(self.window, self.WinnerColor(), self.center, 100)
 
     def createButtonReplay(self):
         button=pygame.draw.rect(self.window, self.blue, self.coordReplay, width=0, border_radius=20)

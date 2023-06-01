@@ -32,6 +32,13 @@ class Player():
     def __repr__(self) -> str:
         return str(self.getNumber())
 
+    def stringColor(self) -> str:
+        colorList = {"#fe001c": "RED",
+                     "#efe743": "YELLOW",
+                     "#639d39": "GREEN",
+                     "#1a6baa": "BLUE"}
+        return colorList[self.getColor()]
+
     def setColorFromNumber(self) -> None:
         RED = "#fe001c"
         YELLOW = "#efe743"

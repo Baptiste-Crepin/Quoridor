@@ -82,7 +82,6 @@ class GraphicalGame():
     def mainLoop(self) -> None:
         self.highlightPlayer(self.game.getCurrentPlayer())
         self.highlightBarrier()
-        end=End(self.game.getCurrentPlayer())
         while True:
             while not self.game.checkGameOver():
                 self.displayPossibleMoves()
@@ -92,6 +91,7 @@ class GraphicalGame():
 
                 self.board.newFrame(self.game.getCurrentPlayer())
             # TODO: Game has ended. display the end screen
+            end = End(self.game.getPreviousPlayer())
             while self.game.checkGameOver():
                 end.setWindow()
                 pygame.display.update()
