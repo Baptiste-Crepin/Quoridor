@@ -1,10 +1,10 @@
 import pygame
 from pygame.locals import *
-
+from button import Button
 
 
 class Menu:
-    def __init__(self):
+    def __init__(self)-> None:
         self.windowXmax = 500
         self.windowYmax = 700
         self.posPlay=(50,200)
@@ -12,19 +12,18 @@ class Menu:
         self.window = pygame.display.set_mode(
             (self.windowXmax, self.windowYmax))
         pygame.display.set_caption("Quoridor")
-        self.choise = False
         self.blue=(138,201,244)
         self.white = (255,255,255)
         
 
-    def createButtonPlay(self):
+    def createButtonPlay(self)-> None:
         button=pygame.draw.rect(self.window, self.blue, (50,200,400,120), width=0, border_radius=20)
         font=pygame.font.SysFont("Extra Bold Italic",60,False,True)
         text=font.render("PLAY",True,self.white)
         buttonText= text.get_rect(center=button.center)
         self.window.blit(text,buttonText)
 
-    def createButtonRules(self):
+    def createButtonRules(self)->None:
         button=pygame.draw.rect(self.window, self.blue, (50,370,400,120), width=0, border_radius=20)
         font=pygame.font.SysFont("Extra Bold Italic",60,False,True)
         text=font.render("RULES",True,self.white)
@@ -32,46 +31,42 @@ class Menu:
         self.window.blit(text,buttonText)
 
 
-    def Event(self):
+    def Event(self)->None:
         from rules import Rules
         from type import Menutype
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
-                self.choise=True
+                pygame.quit()
             elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
                 if pygame.Rect(self.posPlay, (400,120)).collidepoint(event.pos):
                         pygame.init()
                         board = Menutype()
-                        while not self.getChoise():
+                        while True:
                             board.setWindow()
                             pygame.display.update()
-                        pygame.quit()
+                        
                 elif pygame.Rect(self.posRules, (400,120)).collidepoint(event.pos):
                         pygame.init()
                         board = Rules()
-                        while not self.getChoise():
+                        while True:
                             board.setWindow()
                             pygame.display.update()
-                        pygame.quit()
                     
         pygame.display.flip()
 
-    def setWindow(self):
+    def setWindow(self)->None:
         backGround= pygame.image.load('pictures/backGroundMenu3.jpg')
         self.window.blit(backGround,(-80,-300))
-        self.createButtonPlay()
-        self.createButtonRules()
+        Button(self.window, (50,200,400,120), self.blue, "PLAY")
+        Button(self.window, (50,370,400,120), self.blue, "RULES")
         self.Event()
 
-    def getChoise(self):
-        return self.choise
-    
+
 if __name__ == "__main__":
     pygame.init()
     board = Menu()
 
-    while not board.getChoise():
+    while True:
         board.setWindow()
         pygame.display.update()
 
-    pygame.quit() 

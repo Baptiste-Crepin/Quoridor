@@ -1,51 +1,28 @@
 import pygame
 from pygame.locals import *
+from button import Button
 
 
 class SizeGrid:
-    def __init__(self, nbPlayer:int, nbBot:int,method:int):
+    def __init__(self, nbPlayer:int, nbBot:int,method:int)->None:
         self.nbPlayers = nbPlayer
         self.method = method
         self.nbBot = nbBot
         self.windowXmax = 500
         self.windowYmax = 700
-        self.pos1=(150,200)
-        self.pos2 =(150,370)
-        self.pos3 =(300,200)
-        self.pos4 =(300,370)
+        self.pos1=(50,100)
+        self.pos2 =(50,240)
+        self.pos3 =(50,380)
+        self.pos4 =(50,520)
+        self.sizeButton =(400,100)
         self.window = pygame.display.set_mode(
             (self.windowXmax, self.windowYmax))
         pygame.display.set_caption("Quoridor")
-        self.choise = False
         self.blue=(138,201,244)
         self.white = (255,255,255)
         self.black = (0,0,0)
         self.darkerBlue=(0,0,48)
         self.font = pygame.font.Font(None, 36)  
-
-    def createButtonFiveToFive(self):
-        button = pygame.draw.rect(self.window, self.blue, (150,200,70,70), width=0, border_radius=20)
-        text = self.font.render("5x5", True, self.white)
-        buttonText = text.get_rect(center=button.center)
-        self.window.blit(text, buttonText)
-
-    def createButtonSevenToSeven(self):
-        button = pygame.draw.rect(self.window, self.blue, (150,370,70,70), width=0, border_radius=20)
-        text = self.font.render("7x7", True, self.white)
-        buttonText = text.get_rect(center=button.center)
-        self.window.blit(text, buttonText)
-
-    def createButtonNineToNine(self):
-        button = pygame.draw.rect(self.window, self.blue, (300,200,70,70), width=0, border_radius=20)
-        text = self.font.render("9x9", True, self.white)
-        buttonText = text.get_rect(center=button.center)
-        self.window.blit(text, buttonText)
-
-    def createButtonElevenToEleven(self):
-        button = pygame.draw.rect(self.window, self.blue, (300,370,70,70), width=0, border_radius=20)
-        text = self.font.render("11x11", True, self.white)
-        buttonText = text.get_rect(center=button.center)
-        self.window.blit(text, buttonText)
 
     def ButtonBack(self)->object:
         coord=[(5,40),(30,10),(30,20),(70,20),(70,60),(30,60),(30,70)]
@@ -55,6 +32,40 @@ class SizeGrid:
         buttonText= text.get_rect(center=button.center)
         self.window.blit(text,buttonText)
         return button
+
+
+    def Event(self):
+        from barrier import selectBarrier
+        from choicePlayer import NumberPlayer
+        from choiseBot import NumberBots
+
+        sizeFromPos = {self.pos1: 5, self.pos3: 9,
+                       self.pos2: 7, self.pos4: 11}
+
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+            elif not (event.type == pygame.MOUSEBUTTONDOWN and event.button == 1):
+                return
+
+            for pos in sizeFromPos.keys():
+                if pygame.Rect(pos, self.sizeButton).collidepoint(event.pos):
+                    pygame.init()
+                    board = selectBarrier(
+                        self.nbPlayers, self.nbBot, sizeFromPos[pos], self.method)
+                    while True:
+                        board.setWindow()
+                        pygame.display.update()
+
+            if self.ButtonBack().collidepoint(event.pos) and event.button == 1:
+                pygame.init()
+                if self.method == 1:
+                    board = NumberPlayer()
+                else:
+                    board = NumberBots(self.nbPlayers)
+                while True:
+                    board.setWindow()
+                    pygame.display.update()
 
     def setWindow(self):
         backGround= pygame.image.load('pictures/backGroundMenu3.jpg')
@@ -70,106 +81,19 @@ class SizeGrid:
         self.window.blit(contour_surface, contour_rect)
         self.window.blit(text_surface, text_rect)
 
-        self.createButtonFiveToFive()
-        self.createButtonNineToNine()
-        self.createButtonSevenToSeven()
-        self.createButtonElevenToEleven()
+        Button(self.window,(self.pos1,self.sizeButton),self.blue,"5X5")
+        Button(self.window,(self.pos2,self.sizeButton),self.blue,"7X7")
+        Button(self.window,(self.pos3, self.sizeButton),self.blue,"9X9")
+        Button(self.window,(self.pos4, self.sizeButton),self.blue,"11X11")
+
         self.ButtonBack()
         self.Event()
-
-    def getChoise(self):
-        return self.choise
-
-    def Event(self):
-        from barrer import selectBarrer
-        from choicePlayer import NumberPlayer
-        from choiseBot import NumberBots
-
-
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                self.choise = True
-            elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 1 and self.method ==1:
-                if pygame.Rect(self.pos1, (70,70)).collidepoint(event.pos):
-                    pygame.init()
-                    board = selectBarrer(self.nbPlayers,self.nbBot,5,1)
-                    while not self.getChoise():
-                        board.setWindow()
-                        pygame.display.update()
-                    pygame.quit()
-                elif pygame.Rect(self.pos2, (70,70)).collidepoint(event.pos):
-                    pygame.init()
-                    board = selectBarrer(self.nbPlayers,self.nbBot,7,1)
-                    while not self.getChoise():
-                        board.setWindow()
-                        pygame.display.update()
-                    pygame.quit()
-
-                elif pygame.Rect(self.pos3, (70,70)).collidepoint(event.pos):
-                    pygame.init()
-                    board = selectBarrer(self.nbPlayers,self.nbBot,9,1)
-                    while not self.getChoise():
-                        board.setWindow()
-                        pygame.display.update()
-                    pygame.quit()
-                elif pygame.Rect(self.pos4, (70,70)).collidepoint(event.pos):
-                    pygame.init()
-                    board = selectBarrer(self.nbPlayers,self.nbBot,11,1)
-                    while not self.getChoise():
-                        board.setWindow()
-                        pygame.display.update()
-                elif self.ButtonBack().collidepoint(event.pos)and event.button==1 :
-                    pygame.init()
-                    board = NumberPlayer()
-                    while not self.getChoise():
-                        board.setWindow()
-                        pygame.display.update()
-
-            elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 1 and self.method ==2:
-                if pygame.Rect(self.pos1, (70,70)).collidepoint(event.pos):
-                    pygame.init()
-                    board = selectBarrer(self.nbPlayers,self.nbBot,5,2)
-                    while not self.getChoise():
-                        board.setWindow()
-                        pygame.display.update()
-                    pygame.quit()
-                elif pygame.Rect(self.pos2, (70,70)).collidepoint(event.pos):
-                    pygame.init()
-                    board = selectBarrer(self.nbPlayers,self.nbBot,7,2)
-                    while not self.getChoise():
-                        board.setWindow()
-                        pygame.display.update()
-                    pygame.quit()
-
-                elif pygame.Rect(self.pos3, (70,70)).collidepoint(event.pos):
-                    pygame.init()
-                    board = selectBarrer(self.nbPlayers,self.nbBot,9,2)
-                    while not self.getChoise():
-                        board.setWindow()
-                        pygame.display.update()
-                    pygame.quit()
-                elif pygame.Rect(self.pos4, (70,70)).collidepoint(event.pos):
-                    pygame.init()
-                    board = selectBarrer(self.nbPlayers,self.nbBot,11,2)
-                    while not self.getChoise():
-                        board.setWindow()
-                        pygame.display.update()
-                elif self.ButtonBack().collidepoint(event.pos)and event.button==1 :
-                    pygame.init()
-                    board = NumberBots(self.nbPlayers)
-                    while not self.getChoise():
-                        board.setWindow()
-                        pygame.display.update()
-                    pygame.quit()
-
-            pygame.display.flip()
+        pygame.display.flip()
 
 if __name__ == "__main__":
     pygame.init()
-    board = SizeGrid()
+    board = SizeGrid(2,0,1)
 
-    while not board.getChoise():
+    while True:
         board.setWindow()
         pygame.display.update()
-
-    pygame.quit()

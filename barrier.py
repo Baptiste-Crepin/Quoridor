@@ -1,8 +1,11 @@
 import pygame
+import time
 from pygame.locals import *
 from main import GraphicalGame
+from button import Button
 
-class selectBarrer():
+
+class selectBarrier():
     def __init__(self, NumberPlayers:int, NumberBots:int, GridSize:int,method:int) -> None:
         self.windowXmax = 500
         self.windowYmax = 700
@@ -17,20 +20,16 @@ class selectBarrer():
         self.lighterBlue=(138,201,244)
         self.darkerBlue=(0,0,48)
         self.white=(255,255,255)
-        self.choise=False
         self.font = pygame.font.Font(None, 36) 
-        self.barrer=1
-    
-
+        self.barrier=1
 
     def drawFirstCircle(self)->object:
-        circle=pygame.draw.circle(self.window, self.darkerBlue, self.center, 120, width=0)
-        return circle
+        return pygame.draw.circle(self.window, self.darkerBlue, self.center, 120, width=0)
 
     def drawSecondCircle(self)->None:
         circle=pygame.draw.circle(self.window, self.lighterBlue, self.center, 100, width=0)
         font=pygame.font.SysFont("Extra Bold Italic",90,False,True)
-        text=font.render(str(self.barrer),True,self.white)
+        text=font.render(str(self.barrier),True,self.white)
         buttonText= text.get_rect(center=circle.center)
         self.window.blit(text,buttonText)
 
@@ -53,13 +52,6 @@ class selectBarrer():
         self.window.blit(text,buttonText)
         return button
 
-    def drawButonDone(self)->None:
-        button=pygame.draw.rect(self.window, self.lighterBlue, (50,560,400,120), width=0, border_radius=20)
-        font=pygame.font.SysFont("Extra Bold Italic",60,False,True)
-        text=font.render("Done",True,self.white)
-        buttonText= text.get_rect(center=button.center)
-        self.window.blit(text,buttonText)
-
     def Event(self)->None:
         from sizeGrid import SizeGrid
 
@@ -68,43 +60,44 @@ class selectBarrer():
                 pygame.quit()
             elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
                 if self.drawfirstTriangle().collidepoint(event.pos):
-                    if self.barrer>1:
-                        self.barrer -= 1
+                    if self.barrier>1:
+                        self.barrier -= 1
+                        # TODO: Baptiste clean plise 
                 elif self.drawSecondTriangle().collidepoint(event.pos)  :
-                    if self.barrer < 3 and self.GridSize==5:
-                        self.barrer += 1
-                    elif self.barrer < 5 and self.GridSize==7:
-                        self.barrer +=1
-                    elif self.barrer<7 and self.GridSize==9:
-                        self.barrer +=1
-                    elif self.barrer < 10 and self.GridSize==11:
-                        self.barrer +=1
+                    if self.barrier < 3 and self.GridSize==5:
+                        self.barrier += 1
+                    elif self.barrier < 5 and self.GridSize==7:
+                        self.barrier +=1
+                    elif self.barrier<7 and self.GridSize==9:
+                        self.barrier +=1
+                    elif self.barrier < 10 and self.GridSize==11:
+                        self.barrier +=1
                 elif pygame.Rect(50,560,400,120).collidepoint(event.pos):
+                    
                     pygame.init()
-                    board = GraphicalGame(self.GridSize,self.NumberPlayers,self.barrer,self.NumberBots)
-                    while not self.getChoise():
+                    board = GraphicalGame(self.GridSize,self.NumberPlayers,self.barrier,self.NumberBots)
+                    time.sleep(0.2)
+                    while True:
                         board.mainLoop()
                         pygame.display.update()
-                    pygame.quit()
+
 
                 elif self.ButtonBack().collidepoint(event.pos)and event.button==1 :
                     pygame.init()
                     board = SizeGrid(self.NumberPlayers,self.NumberBots,self.method)
-                    while not self.getChoise():
+                    while True:
                         board.setWindow()
                         pygame.display.update()
-                    pygame.quit()
-
-
+                    
 
     def setWindow(self)->None:
         backGround= pygame.image.load('pictures/backGroundMenu3.jpg')
         self.window.blit(backGround,(-80,-300))
 
-        text_surface = self.font.render("Choise the number of barrer", True, self.white)
+        text_surface = self.font.render("Choise the number of barrier", True, self.white)
         text_rect = text_surface.get_rect(center=(self.windowXmax // 2, 50))
 
-        contour_surface = self.font.render("Choise the number of barrer", True, (0, 0, 0))
+        contour_surface = self.font.render("Choise the number of barrier", True, (0, 0, 0))
         contour_rect = contour_surface.get_rect(center=(self.windowXmax // 2, 50))
         contour_rect.move_ip(2, 2)  
         self.window.blit(contour_surface, contour_rect)
@@ -114,27 +107,17 @@ class selectBarrer():
         self.drawSecondCircle()
         self.drawfirstTriangle()
         self.drawSecondTriangle()
-        self.drawButonDone()
+        Button(self.window,(50,560,400,120),self.lighterBlue,"Done")
         self.Event()
         self.ButtonBack()
         pygame.display.flip()
 
 
 
-
-    def getChoise(self):
-        return self.choise
-
-
 if __name__ == "__main__":
     pygame.init()
-    board = selectBarrer(1,1,5)
+    board = selectBarrier(1,1,5)
 
-    while not board.getChoise():
+    while True:
         board.setWindow()
         pygame.display.update()
-
-    pygame.quit()
-
-
-

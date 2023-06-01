@@ -1,5 +1,6 @@
 import pygame
 from pygame.locals import *
+from button import Button
 
 
 class NumberPlayer:
@@ -13,36 +14,15 @@ class NumberPlayer:
         self.window = pygame.display.set_mode(
             (self.windowXmax, self.windowYmax))
         pygame.display.set_caption("Quoridor")
-        self.choise = False
         self.blue=(138,201,244)
         self.white = (255,255,255)
         self.darkerBlue=(0,0,48)
         self.black = (0,0,0)
         self.font = pygame.font.Font(None, 36)  
-
-    def createButtonOne(self):
-        button = pygame.draw.rect(self.window, self.blue, (100,230,100,100), width=0, border_radius=20)
-        text = self.font.render("1", True, self.white)
-        buttonText = text.get_rect(center=button.center)
-        self.window.blit(text, buttonText)
-
-    def createButtonTwo(self):
-        button = pygame.draw.rect(self.window, self.blue, (300,230,100,100), width=0, border_radius=20)
-        text = self.font.render("2", True, self.white)
-        buttonText = text.get_rect(center=button.center)
-        self.window.blit(text, buttonText)
-
-    def createButtonThree(self):
-        button = pygame.draw.rect(self.window, self.blue, (100,420,100,100), width=0, border_radius=20)
-        text = self.font.render("3", True, self.white)
-        buttonText = text.get_rect(center=button.center)
-        self.window.blit(text, buttonText)
-
-    def createButtonFour(self):
-        button = pygame.draw.rect(self.window, self.blue, (300,420,100,100), width=0, border_radius=20)
-        text = self.font.render("4", True, self.white)
-        buttonText = text.get_rect(center=button.center)
-        self.window.blit(text, buttonText)
+        self.Rect1=(100,230,100,100)
+        self.Rect2=(300,230,100,100)
+        self.Rect3=(100,420,100,100)
+        self.Rect4=(300,420,100,100)
 
     def ButtonBack(self)->object:
         coord=[(5,40),(30,10),(30,20),(70,20),(70,60),(30,60),(30,70)]
@@ -52,6 +32,38 @@ class NumberPlayer:
         buttonText= text.get_rect(center=button.center)
         self.window.blit(text,buttonText)
         return button
+
+    def Event(self):
+        from choiseBot import NumberBots
+        from sizeGrid import SizeGrid
+        from type import Menutype
+
+        PlayersFromPos = {self.pos1: [NumberBots, 1], self.pos2: [NumberBots, 2],
+                          self.pos3: [SizeGrid, (3, 1, 1)], self.pos4: [SizeGrid, (4, 0, 1)]}
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+            elif not (event.type == pygame.MOUSEBUTTONDOWN and event.button == 1):
+                return
+
+            for pos in PlayersFromPos.keys():
+                if pygame.Rect(pos, (70, 100)).collidepoint(event.pos):
+                    pygame.init()
+                    if type(PlayersFromPos[pos][1]) == tuple:
+                        board = PlayersFromPos[pos][0](*PlayersFromPos[pos][1])
+                    else:
+                        board = PlayersFromPos[pos][0](PlayersFromPos[pos][1])
+                    while True:
+                        board.setWindow()
+                        pygame.display.update()
+            if self.ButtonBack().collidepoint(event.pos) and event.button == 1:
+                pygame.init()
+                board = Menutype()
+                while True:
+                    board.setWindow()
+                    pygame.display.update()
+
+
 
     def setWindow(self):
         backGround= pygame.image.load('pictures/backGroundMenu3.jpg')
@@ -66,72 +78,21 @@ class NumberPlayer:
 
         self.window.blit(contour_surface, contour_rect)
         self.window.blit(text_surface, text_rect)
-
-        self.createButtonOne()
-        self.createButtonThree()
-        self.createButtonTwo()
-        self.createButtonFour()
+        Button(self.window,self.Rect1,self.blue,"1")
+        Button(self.window,self.Rect2,self.blue,"2")
+        Button(self.window,self.Rect3,self.blue,"3")
+        Button(self.window,self.Rect4,self.blue,"4")
         self.ButtonBack()
-        self.Event()
+        self.Event()    
+        pygame.display.flip()
+        
 
-    def getChoise(self):
-        return self.choise
-
-    def Event(self):
-        from choiseBot import NumberBots
-        from sizeGrid import SizeGrid
-        from type import Menutype
-
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                self.choise = True
-            elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
-                if pygame.Rect(self.pos1, (70,100)).collidepoint(event.pos):
-                    pygame.init()
-                    board = NumberBots(1)
-                    while not self.getChoise():
-                        board.setWindow()
-                        pygame.display.update()
-                    pygame.quit()
-                elif pygame.Rect(self.pos2, (100,100)).collidepoint(event.pos):
-                    pygame.init()
-                    board = NumberBots(2)
-                    while not self.getChoise():
-                        board.setWindow()
-                        pygame.display.update()
-                    pygame.quit()
-
-                elif pygame.Rect(self.pos3, (100,100)).collidepoint(event.pos):
-                    pygame.init()
-                    board = SizeGrid(3,1,1)
-                    while not self.getChoise():
-                            board.setWindow()
-                            pygame.display.update()
-                    pygame.quit()
-
-                elif pygame.Rect(self.pos4, (100,100)).collidepoint(event.pos):
-                    pygame.init()
-                    board = SizeGrid(4,0,1)
-                    while not self.getChoise():
-                            board.setWindow()
-                            pygame.display.update()
-                    pygame.quit()
-                elif self.ButtonBack().collidepoint(event.pos)and event.button==1:
-                    pygame.init()
-                    board = Menutype()
-                    while not self.getChoise():
-                        board.setWindow()
-                        pygame.display.update()
-                    pygame.quit()
-
-            pygame.display.flip()
 
 if __name__ == "__main__":
     pygame.init()
     board = NumberPlayer()
 
-    while not board.getChoise():
+    while True :
         board.setWindow()
         pygame.display.update()
 
-    pygame.quit()

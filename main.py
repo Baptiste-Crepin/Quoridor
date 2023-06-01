@@ -10,6 +10,7 @@ class GraphicalGame():
         self.game = Game(width, nbPlayer, nbBarrier, nbBots)
         self.board = Board(self.game.getSquareWidth())
 
+
     def highlightPlayer(self, player):
         for PossibleMoveCoordo in self.game.possibleMoves(player.getCoordinates()):
             self.board.rect[PossibleMoveCoordo[1]
@@ -46,7 +47,7 @@ class GraphicalGame():
     def placement(self):
         self.board.player = self.game.getCurrentPlayer()
         if isinstance(self.board.player, Bot):
-            self.board.newFrame(self.game.getCurrentPlayer())
+            self.board.newFrame(self.game.getCurrentPlayer(),self.game.getPlayerList())
             self.board.player.randomMoves(self.game)
             self.game.nextPlayer()
             return
@@ -91,7 +92,7 @@ class GraphicalGame():
 
                 self.board.newFrame(self.game.getCurrentPlayer(),self.game.getPlayerList())
             # TODO: Game has ended. display the end screen
-            end = End(self.game.getPreviousPlayer())
+            end = End(self.game.getPreviousPlayer(),self.game.getSquareWidth(),self.game.getNumberOfPlayers(),self.game.getNumberOfBarriers(),self.game.getNumberOfBots())
             while self.game.checkGameOver():
                 end.setWindow()
                 pygame.display.update()

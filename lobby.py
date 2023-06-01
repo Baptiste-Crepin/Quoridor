@@ -12,7 +12,7 @@ class Menu:
         self.window = pygame.display.set_mode(
             (self.windowXmax, self.windowYmax))
         pygame.display.set_caption("Quoridor")
-        self.choise = False
+
         self.blue=(138,201,244)
         self.white = (255,255,255)
         self.play=Button(self.playButtonLogic,50,200,400,120,self.window,self.blue,'Play')
@@ -46,15 +46,13 @@ class Menu:
         self.Event()
         pygame.display.flip()
 
-    def getChoise(self):
-        return self.choise
-    
+
 if __name__ == "__main__":
     pygame.init()
     board = Menu()
 
-    while not board.getChoise():
+    while True:
         board.setWindow()
         pygame.display.update()
 
-    pygame.quit() 
+ 

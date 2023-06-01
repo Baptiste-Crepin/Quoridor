@@ -1,6 +1,6 @@
 import pygame
 from pygame.locals import *
-
+from button import Button
 
 class Menutype:
     def __init__(self):
@@ -11,7 +11,6 @@ class Menutype:
         self.window = pygame.display.set_mode(
             (self.windowXmax, self.windowYmax))
         pygame.display.set_caption("Quoridor")
-        self.choise = False
         self.blue=(138,201,244)
         self.white = (255,255,255)
         self.darkerBlue=(0,0,48)
@@ -42,45 +41,42 @@ class Menutype:
     def setWindow(self):
         backGround= pygame.image.load('pictures/backGroundMenu3.jpg')
         self.window.blit(backGround,(-80,-300))
-        self.createButtonSolo()
-        self.createButtonMulti()
+        Button(self.window, (50,200,400,120), self.blue, "Solo")
+        Button(self.window, (50,370,400,120), self.blue, "Muti")
         self.ButtonBack()
         self.Event()
-
-    def getChoise(self):
-        return self.choise
 
     def Event(self):
         from choicePlayer import NumberPlayer
         from Play import Menu
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
-                self.choise=True
+                pygame.quit()
             elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
                 if pygame.Rect(self.posSolo, (400,120)).collidepoint(event.pos):
                     
                     pygame.init()
                     board = NumberPlayer()
-                    while not self.getChoise():
+                    while True:
                         board.setWindow()
                         pygame.display.update()
-                    pygame.quit()
+                    
                 elif pygame.Rect(self.posMulti, (400,120)).collidepoint(event.pos):
                     pygame.quit()
                 elif self.ButtonBack().collidepoint(event.pos)and event.button==1:
                     pygame.init()
                     board = Menu()
-                    while not self.getChoise():
+                    while True:
                         board.setWindow()
                         pygame.display.update()
-                    pygame.quit()
+                    
             pygame.display.flip()
 
 if __name__ == "__main__":
     pygame.init()
     board = Menutype()
 
-    while not board.getChoise():
+    while True:
         board.setWindow()
         pygame.display.update()
 

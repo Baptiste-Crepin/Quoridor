@@ -3,7 +3,7 @@ from pygame.locals import *
 
 
 class Rules():
-    def __init__(self, ) -> None:
+    def __init__(self) -> None:
         self.windowXmax = 500
         self.windowYmax = 700
         self.window = pygame.display.set_mode(
@@ -13,7 +13,6 @@ class Rules():
         self.lighterBlue=(138,201,244)
         self.darkerBlue=(0,0,48)
         self.white=(255,255,255)
-        self.choise=False
         self.font = pygame.font.Font(None, 36) 
         self.barrer=1
     
@@ -37,35 +36,28 @@ class Rules():
                 if self.ButtonBack().collidepoint(event.pos)and event.button==1:
                     pygame.init()
                     board = Menu()
-                    while not self.getChoise():
+                    while True:
                         board.setWindow()
                         pygame.display.update()
-                    pygame.quit()
+                    
 
 
     def setWindow(self)->None:
         backGround= pygame.image.load('pictures/Rule.png')
-        self.window.blit(backGround,(0,0))
+        self.window.blit(backGround,(-5,-20))
         self.ButtonBack()
         self.Event()
         pygame.display.flip()
-
-
-
-
-    def getChoise(self):
-        return self.choise
-
 
 if __name__ == "__main__":
     pygame.init()
     board = Rules()
 
-    while not board.getChoise():
+    while True:
         board.setWindow()
         pygame.display.update()
 
-    pygame.quit()
+
 
 
 

@@ -2,86 +2,84 @@ import pygame
 from pygame.locals import *
 from Player import Player
 from Play import Menu
+from button import Button
 
 class End:
-    def __init__(self,curentPlayer:Player):
+    def __init__(self,curentPlayer:Player,width:int, nbPlayer:int, nbBarrier:int, nbBots:int):
         self.curentplayer=curentPlayer
+        self.width=width
+        self.nbPlayer=nbPlayer
+        self.nbBarrier=nbBarrier
+        self.nbBots=nbBots
         self.windowXmax = 1330
         self.windowYmax = 750
         self.window = pygame.display.set_mode(
             (self.windowXmax, self.windowYmax))
         pygame.display.set_caption("Quoridor")
-        self.choise = False
         self.blue=(138,201,244)
         self.white = (255,255,255)
         self.darkBlue = pygame.Color(0,0,48)
         self.center=(self.windowXmax//2, self.windowYmax//2)
-        self.coordReplay=(self.windowXmax//2+20, self.windowYmax//2+150,200,80)
-        self.coordQuit=(self.windowXmax//2-220, self.windowYmax//2+150,200,80)
+        self.coordQuit=(self.windowXmax//2-110, self.windowYmax//2+250,200,80)
+        self.coordReplay=(self.windowXmax//2-220, self.windowYmax//2+150,200,80)
+        self.coordLobby=(self.windowXmax//2+20, self.windowYmax//2+150,200,80)
         self.font = pygame.font.Font(None, 36) 
 
-    def WinnerColor(self) -> pygame.Color:
-        return self.curentplayer.stringColor()
-
+        
     def Winner(self) -> str:
-        return str(self.WinnerColor()) + " Player won !"
+        return self.curentplayer.stringColor() + " Player won !"
 
     def displayWinner(self) -> None:
-        pygame.draw.circle(self.window, self.WinnerColor(), self.center, 100)
+        pygame.draw.circle(self.window, self.curentplayer.getColor(), self.center, 100)
 
-    def createButtonReplay(self):
-        button=pygame.draw.rect(self.window, self.blue, self.coordReplay, width=0, border_radius=20)
-        font=pygame.font.SysFont("Extra Bold Italic",40,False,True)
-        text=font.render("REPLAY",True,self.white)
-        buttonText= text.get_rect(center=button.center)
-        self.window.blit(text,buttonText)
 
-    def createButtonQuit(self):
-        button=pygame.draw.rect(self.window, self.blue, self.coordQuit, width=0, border_radius=20)
-        font=pygame.font.SysFont("Extra Bold Italic",40,False,True)
-        text=font.render("QUIT",True,self.white)
-        buttonText= text.get_rect(center=button.center)
-        self.window.blit(text,buttonText)
 
 
     def Event(self):
         for event in pygame.event.get():
+            from main import GraphicalGame
             if event.type == pygame.QUIT:
-                self.choise=True
+                pygame.quit()
             elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
-                if pygame.Rect(self.coordReplay).collidepoint(event.pos):
+                if pygame.Rect(self.coordLobby).collidepoint(event.pos):
                         pygame.init()
                         board = Menu()
-                        while not self.getChoise():
+                        while True:
                             board.setWindow()
+                            pygame.display.update()
+                        pygame.quit()
+                elif pygame.Rect(self.coordReplay).collidepoint(event.pos):
+                        pygame.init()
+                        board = GraphicalGame(self.width,self.nbPlayer,self.nbBarrier,self.nbBots)
+                        while True:
+                            board.mainLoop()
                             pygame.display.update()
                         pygame.quit()
                 elif pygame.Rect(self.coordQuit).collidepoint(event.pos):
                         pygame.quit()
                     
-        pygame.display.flip()
+
 
     def setWindow(self):
         self.window.fill(self.darkBlue)
         text_surface = self.font.render(self.Winner(), True, self.white)
         text_rect = text_surface.get_rect(center=(self.windowXmax // 2, 100))
         self.window.blit(text_surface, text_rect)
-        
-        
         self.displayWinner()
-        self.createButtonReplay()
-        self.createButtonQuit()
+        Button(self.window,self.coordLobby,self.blue,"LOBBY")
+        Button(self.window,self.coordQuit,self.blue,"QUIT")
+        Button(self.window,self.coordReplay,self.blue,"REPLAY")
         self.Event()
+        pygame.display.flip()
 
-    def getChoise(self):
-        return self.choise
+
     
 if __name__ == "__main__":
     pygame.init()
     board = End()
 
-    while not board.getChoise():
+    while True:
         board.setWindow()
         pygame.display.update()
 
-    pygame.quit() 
+

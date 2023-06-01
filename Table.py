@@ -1,6 +1,7 @@
 import pygame
 from pygame.locals import *
 from Player import Player
+from game import Game
 
 
 class TablePlayer:
@@ -166,8 +167,8 @@ class informationPlayer():
         
 
 class displayInformation():
-    def __init__(self,currentPlayer:Player,playerlist:list[Player], surface:pygame.Surface,color:pygame.Color, rect:pygame.Rect,playerNumber:int) -> None:
-        self.currentPlayer = currentPlayer
+    def __init__(self,player:Player,playerlist:list[Player], surface:pygame.Surface,color:pygame.Color, rect:pygame.Rect,playerNumber:int) -> None:
+        self.player = player
         self.playerList = playerlist
         self.surface = surface
         self.color=color
@@ -180,7 +181,7 @@ class displayInformation():
 
     def playerCircles(self)->None:
         center=(self.rect[0]+self.rect[2]*0.05, self.rect[1]+self.rect[3]//2)
-        pygame.draw.circle(self.surface,self.playerList[self.playerNumber].getColor(),center,20)
+        pygame.draw.circle(self.surface,self.player.getColor(),center,20)
 
     def displayNeutral(self)->None:
         self.RectNeutral()
@@ -388,29 +389,25 @@ class Board:
                     intersection.draw(self.window, (255, 0, 0))
 
 
-    def displayPlayerInformation(self,currentPlayer:Player,playerList:list[Player])->None:
-        pygame.draw.rect(self.window,self.lightBlue,(750,40,570,330),border_radius=10)
-        if currentPlayer.getNumber()==1:
-            informationPlayer(self.window, self.black, (760, 50, 550, 100),playerList[0]).createRectPlayer()
-            displayInformation(currentPlayer,playerList,self.window,self.black,(760, 170, 550, 50),1).displayNeutral()
-            displayInformation(currentPlayer,playerList,self.window,self.black,(760, 240, 550, 50),2).displayNeutral()
-            displayInformation(currentPlayer,playerList,self.window,self.black,(760, 310, 550, 50),3).displayNeutral()
-        if currentPlayer.getNumber()==2:
-            informationPlayer(self.window, self.black, (760, 120, 550, 100),playerList[1]).createRectPlayer()
-            displayInformation(currentPlayer,playerList,self.window,self.black,(760, 50, 550, 50),0).displayNeutral()
-            displayInformation(currentPlayer,playerList,self.window,self.black,(760, 240, 550, 50),2).displayNeutral()
-            displayInformation(currentPlayer,playerList,self.window,self.black,(760, 310, 550, 50),3).displayNeutral()
-        if currentPlayer.getNumber()==3:
-            informationPlayer(self.window, self.black, (760, 190, 550, 100),playerList[2]).createRectPlayer()
-            displayInformation(currentPlayer,playerList,self.window,self.black,(760, 120, 550, 50),1).displayNeutral()
-            displayInformation(currentPlayer,playerList,self.window,self.black,(760, 50, 550, 50),0).displayNeutral()
-            displayInformation(currentPlayer,playerList,self.window,self.black,(760, 310, 550, 50),3).displayNeutral()
+    def displayPlayerInformation(self, currentPlayer: Player, playerList: list[Player]) -> None:
+        height=190
+        if len(playerList) == 4:
+            height=330
+        pygame.draw.rect(self.window, self.lightBlue,
+                        (750, 10, 570, height), border_radius=10)
 
-        if currentPlayer.getNumber()==4:
-            informationPlayer(self.window, self.black, (760, 260, 550, 100),playerList[3]).createRectPlayer()
-            displayInformation(currentPlayer,playerList,self.window,self.black,(760, 120, 550, 50),1).displayNeutral()
-            displayInformation(currentPlayer,playerList,self.window,self.black,(760, 190, 550, 50),2).displayNeutral()
-            displayInformation(currentPlayer,playerList,self.window,self.black,(760, 50, 550, 50),0).displayNeutral()
+        for i, player in enumerate(playerList):
+            if player == currentPlayer:
+                informationPlayer(
+                    self.window, self.black, (760, 20 + i * 70, 550, 100), player).createRectPlayer()
+
+            else:
+                offset = 0
+                if player.getNumber() > currentPlayer.getNumber():
+                    offset = 50
+
+                displayInformation(player, playerList, self.window,
+                                   self.black, (760, 20 + offset + i * 70, 550, 50), i).displayNeutral()
 
 
 
