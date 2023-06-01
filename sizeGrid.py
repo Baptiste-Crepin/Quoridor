@@ -18,13 +18,13 @@ class SizeGrid:
         self.window = pygame.display.set_mode(
             (self.windowXmax, self.windowYmax))
         pygame.display.set_caption("Quoridor")
-        self.blue = (138, 201, 244)
-        self.white = (255, 255, 255)
-        self.black = (0, 0, 0)
-        self.darkerBlue = (0, 0, 48)
+        self.blue = pygame.Color(138, 201, 244)
+        self.white = pygame.Color(255, 255, 255)
+        self.black = pygame.Color(0, 0, 0)
+        self.darkerBlue = pygame.Color(0, 0, 48)
         self.font = pygame.font.Font(None, 36)
 
-    def ButtonBack(self) -> object:
+    def ButtonBack(self) -> pygame.Rect:
         coord = [(5, 40), (30, 10), (30, 20), (70, 20),
                  (70, 60), (30, 60), (30, 70)]
         button = pygame.draw.polygon(self.window, self.darkerBlue, coord)
@@ -84,10 +84,14 @@ class SizeGrid:
         self.window.blit(contour_surface, contour_rect)
         self.window.blit(text_surface, text_rect)
 
-        Button(self.window, (self.pos1, self.sizeButton), self.blue, "5X5")
-        Button(self.window, (self.pos2, self.sizeButton), self.blue, "7X7")
-        Button(self.window, (self.pos3, self.sizeButton), self.blue, "9X9")
-        Button(self.window, (self.pos4, self.sizeButton), self.blue, "11X11")
+        Button(self.window, pygame.Rect(
+            self.pos1, self.sizeButton), self.blue, "5X5")
+        Button(self.window, pygame.Rect(
+            self.pos2, self.sizeButton), self.blue, "7X7")
+        Button(self.window, pygame.Rect(
+            self.pos3, self.sizeButton), self.blue, "9X9")
+        Button(self.window, pygame.Rect(
+            self.pos4, self.sizeButton), self.blue, "11X11")
 
         self.ButtonBack()
         self.Event()

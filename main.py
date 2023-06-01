@@ -5,11 +5,11 @@ from Table import Board
 from Bot import Bot
 from endGame import End
 
+
 class GraphicalGame():
     def __init__(self, width, nbPlayer, nbBarrier, nbBots) -> None:
         self.game = Game(width, nbPlayer, nbBarrier, nbBots)
         self.board = Board(self.game.getSquareWidth())
-
 
     def highlightPlayer(self, player):
         for PossibleMoveCoordo in self.game.possibleMoves(player.getCoordinates()):
@@ -47,7 +47,8 @@ class GraphicalGame():
     def placement(self):
         self.board.player = self.game.getCurrentPlayer()
         if isinstance(self.board.player, Bot):
-            self.board.newFrame(self.game.getCurrentPlayer(),self.game.getPlayerList())
+            self.board.newFrame(self.game.getCurrentPlayer(),
+                                self.game.getPlayerList())
             self.board.player.randomMoves(self.game)
             self.game.nextPlayer()
             return
@@ -90,15 +91,15 @@ class GraphicalGame():
                 self.placement()
                 self.actualizeGame()
 
-                self.board.newFrame(self.game.getCurrentPlayer(),self.game.getPlayerList())
+                self.board.newFrame(
+                    self.game.getCurrentPlayer(), self.game.getPlayerList())
             # TODO: Game has ended. display the end screen
-            end = End(self.game.getPreviousPlayer(),self.game.getSquareWidth(),self.game.getNumberOfPlayers(),self.game.getNumberOfBarriers(),self.game.getNumberOfBots())
+            end = End(self.game.getPreviousPlayer(), self.game.getSquareWidth(
+            ), self.game.getNumberOfPlayers(), self.game.getNumberOfBarriers(), self.game.getNumberOfBots())
             while self.game.checkGameOver():
                 end.setWindow()
                 pygame.display.update()
             pygame.quit()
-
-
 
 
 if __name__ == "__main__":

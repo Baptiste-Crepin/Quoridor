@@ -17,16 +17,16 @@ class End:
         self.window = pygame.display.set_mode(
             (self.windowXmax, self.windowYmax))
         pygame.display.set_caption("Quoridor")
-        self.blue = (138, 201, 244)
-        self.white = (255, 255, 255)
+        self.blue = pygame.Color(138, 201, 244)
+        self.white = pygame.Color(255, 255, 255)
         self.darkBlue = pygame.Color(0, 0, 48)
         self.center = (self.windowXmax//2, self.windowYmax//2)
-        self.coordQuit = (self.windowXmax//2-110,
-                          self.windowYmax//2+250, 200, 80)
-        self.coordReplay = (self.windowXmax//2-220,
-                            self.windowYmax//2+150, 200, 80)
-        self.coordLobby = (self.windowXmax//2+20,
-                           self.windowYmax//2+150, 200, 80)
+        self.coordQuit = pygame.Rect(self.windowXmax//2-110,
+                                     self.windowYmax//2+250, 200, 80)
+        self.coordReplay = pygame.Rect(self.windowXmax//2-220,
+                                       self.windowYmax//2+150, 200, 80)
+        self.coordLobby = pygame.Rect(self.windowXmax//2+20,
+                                      self.windowYmax//2+150, 200, 80)
         self.font = pygame.font.Font(None, 36)
 
     def Winner(self) -> str:
@@ -73,7 +73,7 @@ class End:
 
 if __name__ == "__main__":
     pygame.init()
-    board = End()
+    board = End(Player(0, 4), 5, 2, 10, 0)
 
     while True:
         board.setWindow()

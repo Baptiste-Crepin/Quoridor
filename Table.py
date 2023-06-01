@@ -1,7 +1,6 @@
 import pygame
 from pygame.locals import *
 from Player import Player
-from game import Game
 
 
 class TablePlayer:
@@ -130,81 +129,81 @@ class Intersection(Barrier):
     def coordY(self, j: int) -> float:
         return self.cellTemplate.width * (j)-self.cellTemplate.offset/2+self.cellTemplate.sizeCase()
 
+
 class informationPlayer():
-    def __init__(self,surface:pygame.Surface, color:pygame.Color,rect:pygame.Rect,player:Player) -> None:
+    def __init__(self, surface: pygame.Surface, color: pygame.Color, rect: pygame.Rect, player: Player) -> None:
         self.surface = surface
         self.color = color
-        self.white=(255,255,255)
-        self.purple = pygame.Color(204,0,204)
+        self.white = (255, 255, 255)
+        self.purple = pygame.Color(204, 0, 204)
         self.rect = rect
-        self.player=player
-        
+        self.player = player
 
-    def barrerCoordX(self)->int:
-        x=self.rect[3]//2+self.rect[1]
+    def barrerCoordX(self) -> int:
+        x = self.rect[3]//2+self.rect[1]
         return x
-    
-    def barrerCoordY(self,i:int)->int:
-        y=((self.rect[2])//self.player.getBarrier()*i+self.rect[0])+((self.rect[2]//self.player.getBarrier())//2-self.barrerWidth()//2)
+
+    def barrerCoordY(self, i: int) -> int:
+        y = ((self.rect[2])//self.player.getBarrier()*i+self.rect[0]) + \
+            ((self.rect[2]//self.player.getBarrier())//2-self.barrerWidth()//2)
         return y
 
-    def barrerWidth(self)->int:
-        width=20
+    def barrerWidth(self) -> int:
+        width = 20
         return width
 
-    def barrerHeight(self)->int:
-        height=self.rect[3]//2
+    def barrerHeight(self) -> int:
+        height = self.rect[3]//2
         return height
-    
 
-    def createRectPlayer(self)->None:
-        pygame.draw.rect(self.surface,self.color,self.rect,border_radius=10)
-        coordPlayer=(self.rect[0]+self.rect[2]*0.05, self.rect[1]+self.rect[2]*0.05)
-        pygame.draw.circle(self.surface,self.player.getColor(),coordPlayer,20)
+    def createRectPlayer(self) -> None:
+        pygame.draw.rect(self.surface, self.color, self.rect, border_radius=10)
+        coordPlayer = (self.rect[0]+self.rect[2]*0.05,
+                       self.rect[1]+self.rect[2]*0.05)
+        pygame.draw.circle(
+            self.surface, self.player.getColor(), coordPlayer, 20)
         for i in range(self.player.getBarrier()):
-            pygame.draw.rect(self.surface,self.purple,(self.barrerCoordY(i),self.barrerCoordX()
-                                              ,self.barrerWidth(),self.barrerHeight()))
-        
+            pygame.draw.rect(self.surface, self.purple, (self.barrerCoordY(
+                i), self.barrerCoordX(), self.barrerWidth(), self.barrerHeight()))
+
 
 class displayInformation():
-    def __init__(self,player:Player,playerlist:list[Player], surface:pygame.Surface,color:pygame.Color, rect:pygame.Rect,playerNumber:int) -> None:
+    def __init__(self, player: Player, playerlist: list[Player], surface: pygame.Surface, color: pygame.Color, rect: pygame.Rect, playerNumber: int) -> None:
         self.player = player
         self.playerList = playerlist
         self.surface = surface
-        self.color=color
-        self.rect=rect
+        self.color = color
+        self.rect = rect
         self.playerNumber = playerNumber
 
+    def RectNeutral(self, ) -> None:
+        pygame.draw.rect(self.surface, self.color, self.rect, border_radius=10)
 
-    def RectNeutral(self, )->None:
-        pygame.draw.rect(self.surface,self.color, self.rect, border_radius=10)
+    def playerCircles(self) -> None:
+        center = (self.rect[0]+self.rect[2]*0.05, self.rect[1]+self.rect[3]//2)
+        pygame.draw.circle(self.surface, self.player.getColor(), center, 20)
 
-    def playerCircles(self)->None:
-        center=(self.rect[0]+self.rect[2]*0.05, self.rect[1]+self.rect[3]//2)
-        pygame.draw.circle(self.surface,self.player.getColor(),center,20)
-
-    def displayNeutral(self)->None:
+    def displayNeutral(self) -> None:
         self.RectNeutral()
         self.playerCircles()
 
 
-
 class Board:
     def __init__(self, Width):
-        self.col = Width        
+        self.col = Width
 
         self.windowXmax = 1330
         self.windowYmax = 750
         self.window = pygame.display.set_mode(
             (self.windowXmax, self.windowYmax))
-        
+
         self.clicked = False
         self.white = (255, 255, 255)
         self.grey = pygame.Color(217, 217, 217, 35)
-        self.black = pygame.Color(0,0,0)
-        self.darkBlue = pygame.Color(0,0,48)
-        self.lightBlue = pygame.Color(90,173,255)
-        self.purple = pygame.Color(204,0,204)
+        self.black = pygame.Color(0, 0, 0)
+        self.darkBlue = pygame.Color(0, 0, 48)
+        self.lightBlue = pygame.Color(90, 173, 255)
+        self.purple = pygame.Color(204, 0, 204)
         self.rect = self.initializeObjectList(TablePlayer)
         self.Vbarriers = self.initializeObjectList(VerticalBarrier, 1, 0)
         self.Hbarriers = self.initializeObjectList(HorrizontalBarrier, 0, 1)
@@ -215,7 +214,7 @@ class Board:
         pygame.display.set_caption("plateau")
         self.play = True
 
-    def initializeObjectList(self, objectType: object, offsetRow: int = 0, offsetCol: int = 0) -> list[list[object]]:
+    def initializeObjectList(self, objectType: type[Barrier | TablePlayer], offsetRow: int = 0, offsetCol: int = 0) -> list[list[T]]:
         return [[objectType(self.windowXmax, self.windowYmax, self.col, i, j)
                 for j in range(self.col - offsetCol)]
                 for i in range(self.col - offsetRow)]
@@ -230,7 +229,7 @@ class Board:
                     return True
                 self.clearHover(self.rect)
 
-    def hoverBarriers(self, barrierList: list[list[Barrier]], offsetRow: int, offsetCol: int) -> None | bool:
+    def hoverBarriers(self, barrierList: list[list[Barrier]], offsetRow: int, offsetCol: int) -> bool:
         for i, row in enumerate(barrierList):
             for j, barrier in enumerate(row):
                 if barrier.collides(pygame.mouse.get_pos()):
@@ -243,8 +242,9 @@ class Board:
                     continue
 
                 self.clearHover(barrierList)
+        return False
 
-    def interactObject(self, listeObject: list[object], pos: tuple[int, int]) -> None | tuple[str, int, int]:
+    def interactObject(self, listeObject: list[list[Barrier | TablePlayer]], pos: tuple[int, int]) -> None | tuple[str, int, int]:
         for i, row in enumerate(listeObject):
             for j, element in enumerate(row):
                 colli = element.collides(pos)
@@ -260,7 +260,7 @@ class Board:
         self.hoverCells(self.rect)
         return
 
-    def mouseLogic(self, event: pygame.event) -> None | tuple[str, int, int] | bool:
+    def mouseLogic(self) -> None | tuple[str, int, int]:
         self.hoverLogic()
 
         if pygame.mouse.get_pressed()[0] == 1 and not self.clicked:
@@ -274,17 +274,16 @@ class Board:
 
         if pygame.mouse.get_pressed()[0] == 0 and self.clicked:
             self.clicked = False
-            return False
 
     def quitWindow(self, event) -> None:
         if event.type == pygame.QUIT or event.type == pygame.WINDOWCLOSE:
             pygame.quit()
             raise SystemExit
 
-    def handleEvents(self) -> None | tuple[str, int, int] | bool:
+    def handleEvents(self) -> None | tuple[str, int, int]:
         for event in pygame.event.get():
             self.quitWindow(event)
-            return self.mouseLogic(event)
+            return self.mouseLogic()
 
     def clearScreen(self) -> None:
         self.window.fill((240, 240, 240))
@@ -304,7 +303,7 @@ class Board:
         self.clearPossiblePlacement(self.Vbarriers)
         self.clearPossiblePlacement(self.Hbarriers)
 
-    def clearHover(self, objectList: list[list[object]]) -> None:
+    def clearHover(self, objectList: list[list[Barrier | TablePlayer]]) -> None:
         for row in objectList:
             for element in row:
                 element.hover = False
@@ -386,20 +385,19 @@ class Board:
 
                 intersection.draw(self.window, self.grey)
                 if intersection.hover:
-                    intersection.draw(self.window, (255, 0, 0))
-
+                    intersection.draw(self.window, pygame.Color(255, 0, 0))
 
     def displayPlayerInformation(self, currentPlayer: Player, playerList: list[Player]) -> None:
-        height=190
+        height = 190
         if len(playerList) == 4:
-            height=330
+            height = 330
         pygame.draw.rect(self.window, self.lightBlue,
-                        (750, 10, 570, height), border_radius=10)
+                         (750, 10, 570, height), border_radius=10)
 
         for i, player in enumerate(playerList):
             if player == currentPlayer:
                 informationPlayer(
-                    self.window, self.black, (760, 20 + i * 70, 550, 100), player).createRectPlayer()
+                    self.window, self.black, pygame.Rect(760, 20 + i * 70, 550, 100), player).createRectPlayer()
 
             else:
                 offset = 0
@@ -407,27 +405,26 @@ class Board:
                     offset = 50
 
                 displayInformation(player, playerList, self.window,
-                                   self.black, (760, 20 + offset + i * 70, 550, 50), i).displayNeutral()
+                                   self.black, pygame.Rect(760, 20 + offset + i * 70, 550, 50), i).displayNeutral()
 
-
-
-    def newFrame(self, currentPlayer:Player,playerList:list[Player]) -> None:
+    def newFrame(self, currentPlayer: Player, playerList: list[Player]) -> None:
         self.clearScreen()
         self.displayTable()
         self.displayBarriers(self.Hbarriers)
         self.displayBarriers(self.Vbarriers)
         self.displayIntersection()
-        self.displayPlayerInformation(currentPlayer,playerList)
+        self.displayPlayerInformation(currentPlayer, playerList)
         self.higlightPlayer(self.player)
         pygame.display.flip()
 
 
 if __name__ == "__main__":
     pygame.init()
-    player = Player(1,4)
+    player1 = Player(1, 4)
+    player2 = Player(2, 4)
     board = Board(5)
     while board.play:
         board.handleEvents()
-        board.newFrame(player)
+        board.newFrame(player1, [player1, player2])
 
     pygame.quit()

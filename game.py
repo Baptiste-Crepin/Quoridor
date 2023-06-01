@@ -1,6 +1,6 @@
 import random
 from Player import Player
-from Case import Case
+from cell import Cell
 from Bot import Bot
 
 
@@ -19,7 +19,7 @@ class Game():
     def getSquareWidth(self) -> int:
         return self.__squareWidth
 
-    def getGrid(self) -> list[list[Case]]:
+    def getGrid(self) -> list[list[Cell]]:
         return self.__grid
 
     def getNumberOfPlayers(self) -> int:
@@ -31,7 +31,7 @@ class Game():
     def getNumberOfBarriers(self) -> int:
         return self.__NumberOfBarriers
 
-    def getPlayerList(self) -> int:
+    def getPlayerList(self) -> list[Player]:
         return self.__PlayerList
 
     def getCurrentPlayerN(self) -> int:
@@ -39,9 +39,6 @@ class Game():
 
     def getCurrentPlayer(self) -> Player:
         return self.__currentPlayer
-
-    def getNumberOfBots(self):
-        return self.__NumberOfBots
 
     def setSquareWidth(self, value: int) -> None:
         self.__squareWidth = value
@@ -64,22 +61,19 @@ class Game():
     def setCurrentPlayer(self, value: Player) -> None:
         self.__currentPlayer = value
 
-    def setNumberOfBarriers(self, value: int) -> None:
-        if len(self.getPlayerList()) == 2:
-            numberOfBarriers = value//2
-            return numberOfBarriers
-        elif len(self.getPlayerList()) == 4:
-            numberOfBarriers = value//4
-            return numberOfBarriers
+    # def setNumberOfBarriers(self, value: int) -> None:
+    #     if len(self.getPlayerList()) == 2:
+    #         numberOfBarriers = value//2
+    #         return numberOfBarriers
+    #     elif len(self.getPlayerList()) == 4:
+    #         numberOfBarriers = value//4
+    #         return numberOfBarriers
 
-    def setNumberOfBots(self, value: int):
-        self.__NumberOfBots = value
-
-    def createGrid(self) -> list[list[Case]]:
-        return [[Case(0, (y, x), Player(0, self.getNumberOfBarriers())) for x in range(self.getSquareWidth())]
+    def createGrid(self) -> list[list[Cell]]:
+        return [[Cell((y, x), Player(0, self.getNumberOfBarriers())) for x in range(self.getSquareWidth())]
                 for y in range(self.getSquareWidth())]
 
-    def placePlayer(self, player: Player, coordinates: tuple) -> None:
+    def placePlayer(self, player: Player, coordinates: tuple[int, int]) -> None:
         self.getGrid()[coordinates[0]][coordinates[1]].setPlayer(player)
         player.setCoordinates((coordinates[0], coordinates[1]))
 
@@ -114,15 +108,15 @@ class Game():
                 for c, cell in enumerate(row):
                     if i == 0:
                         print(cell, end="")
-                        if cell.getWalls()["Right"] == 0:
-                            print(" ", end="")
-                        else:
+                        if cell.getWalls()["Right"]:
                             print("|", end="")
-                    elif i == 1:
-                        if self.getGrid()[r][c].getWalls()["Down"] == 0:
-                            print("  ", end="")
                         else:
+                            print(" ", end="")
+                    elif i == 1:
+                        if self.getGrid()[r][c].getWalls()["Down"]:
                             print("- ", end="")
+                        else:
+                            print("  ", end="")
                 print()
 
     def inGrid(self, coord: tuple) -> bool:
@@ -131,7 +125,7 @@ class Game():
                     coord[0] >= self.getSquareWidth() or
                     coord[1] >= self.getSquareWidth())
 
-    def getNeighbours(self, coord: tuple) -> list[Case]:
+    def getNeighbours(self, coord: tuple) -> list[Cell]:
         neighbours = []
 
         if coord[0]-1 >= 0:
@@ -148,7 +142,7 @@ class Game():
     def numberOfNeighbours(self, coord: tuple) -> int:
         return len(self.getNeighbours(coord))
 
-    def getCell(self, coord: tuple) -> Case:
+    def getCell(self, coord: tuple) -> Cell:
         return self.getGrid()[coord[0]][coord[1]]
 
     def getPreviousPlayer(self) -> Player:
@@ -206,7 +200,7 @@ class Game():
 
         return dirArray[LeftElement], dirArray[RightElement]
 
-    def getDirection(self, currentCoordo: tuple, nextCoordo: tuple, reverse: bool = False) -> str:
+    def getDirection(self, currentCoordo: tuple[int, int], nextCoordo: tuple[int, int], reverse: bool = False) -> str:
         if reverse:
             nextCoordo, currentCoordo = currentCoordo, nextCoordo
 
@@ -216,37 +210,38 @@ class Game():
             return "Left"
         if nextCoordo[0] - currentCoordo[0] >= 1:
             return "Down"
-        if nextCoordo[1] - currentCoordo[1] >= 1:
-            return "Right"
+        return "Right"
 
     def isValidWall(self, direction: str) -> bool:
         return direction == "Right" or direction == "Down"
 
-    def getCoordoFromDirection(self, currentCoordo: tuple, nextCoordo: tuple, secondMove: int = None, jump: bool = False) -> tuple:
+    def getCoordoFromDirection(self, currentCoordo: tuple[int, int], nextCoordo: tuple[int, int], secondMove: int | None = None, jump: bool = False) -> tuple:
 
-        jump = 2 if jump else 1
+        jumpOffset = 1
+        if jump:
+            jumpOffset = 2
 
         if secondMove == 0:
-            secondMove = "Left"
+            secondMoveKey = "Left"
         if secondMove == 1:
-            secondMove = "Right"
+            secondMoveKey = "Right"
 
         moveMap = {
-            ("Up", None): (currentCoordo[0]-jump, currentCoordo[1]),
-            ("Up", "Left"): (currentCoordo[0]-jump, currentCoordo[1]-jump),
-            ("Up", "Right"): (currentCoordo[0]-jump, currentCoordo[1]+jump),
-            ("Left", None): (currentCoordo[0], currentCoordo[1]-jump),
-            ("Left", "Left"): (currentCoordo[0]+jump, currentCoordo[1]-jump),
-            ("Left", "Right"): (currentCoordo[0]-jump, currentCoordo[1]-jump),
-            ("Down", None): (currentCoordo[0]+jump, currentCoordo[1]),
-            ("Down", "Left"): (currentCoordo[0]+jump, currentCoordo[1]+jump),
-            ("Down", "Right"): (currentCoordo[0]+jump, currentCoordo[1]-jump),
-            ("Right", None): (currentCoordo[0], currentCoordo[1]+jump),
-            ("Right", "Left"): (currentCoordo[0]-jump, currentCoordo[1]+jump),
-            ("Right", "Right"): (currentCoordo[0]+jump, currentCoordo[1]+jump),
+            ("Up", None): (currentCoordo[0]-jumpOffset, currentCoordo[1]),
+            ("Up", "Left"): (currentCoordo[0]-jumpOffset, currentCoordo[1]-jumpOffset),
+            ("Up", "Right"): (currentCoordo[0]-jumpOffset, currentCoordo[1]+jumpOffset),
+            ("Left", None): (currentCoordo[0], currentCoordo[1]-jumpOffset),
+            ("Left", "Left"): (currentCoordo[0]+jumpOffset, currentCoordo[1]-jumpOffset),
+            ("Left", "Right"): (currentCoordo[0]-jumpOffset, currentCoordo[1]-jumpOffset),
+            ("Down", None): (currentCoordo[0]+jumpOffset, currentCoordo[1]),
+            ("Down", "Left"): (currentCoordo[0]+jumpOffset, currentCoordo[1]+jumpOffset),
+            ("Down", "Right"): (currentCoordo[0]+jumpOffset, currentCoordo[1]-jumpOffset),
+            ("Right", None): (currentCoordo[0], currentCoordo[1]+jumpOffset),
+            ("Right", "Left"): (currentCoordo[0]-jumpOffset, currentCoordo[1]+jumpOffset),
+            ("Right", "Right"): (currentCoordo[0]+jumpOffset, currentCoordo[1]+jumpOffset),
         }
 
-        return moveMap[(self.getDirection(currentCoordo, nextCoordo), secondMove)]
+        return moveMap[(self.getDirection(currentCoordo, nextCoordo), secondMoveKey)]
 
     def wallColide(self, currentCoordo: tuple, NextCoordo: tuple, jump: bool = False) -> bool:
         CurrentCell = self.getCell(currentCoordo)
@@ -316,8 +311,7 @@ class Game():
     def ignoreSideBarrier(self, coordo: tuple, direction: str) -> bool:
         if direction == 'Right':
             return coordo[1] == self.getSquareWidth()
-        if direction == 'Down':
-            return coordo[0] == self.getSquareWidth()
+        return coordo[0] == self.getSquareWidth()
 
     def cancelBarrierPlacement(self, coordo: tuple, direction: str) -> None:
         '''Cancel the placement of a barrier'''
@@ -326,14 +320,15 @@ class Game():
         walls[direction] = 0
         self.getGrid()[coordo[0]][coordo[1]].setWalls(walls)
 
-    def setNeighbourWalls(self, coordo: tuple, direction: str, place=True) -> bool:
+    def setNeighbourWalls(self, coordo: tuple[int, int], direction: str, place=True) -> bool:
 
         if (direction == 'Right'):
+            # right neighbour
             if coordo[0] >= len(self.getGrid())-1:
                 return False
             neighbourCoordo = (coordo[0]+1, coordo[1])
-
-        if (direction == 'Down'):
+        else:
+            # down neighbour
             if coordo[1] >= len(self.getGrid())-1:
                 return False
             neighbourCoordo = (coordo[0], coordo[1]+1)
@@ -346,16 +341,16 @@ class Game():
         return self.placeWholeBarrier((neighbourCoordo[0], neighbourCoordo[1]),
                                       direction, self.getCurrentPlayer(), place=place)
 
-    def cancelNeighbourBarriers(self, coordo: tuple, direction: str) -> bool:
+    def cancelNeighbourBarriers(self, coordo: tuple[int, int], direction: str) -> None:
 
         if (direction == 'Right'):
             if coordo[0] >= len(self.getGrid())-1:
-                return False
+                return
             neighbourCoordo = (coordo[0]+1, coordo[1])
-
-        if (direction == 'Down'):
+        else:
+            # down neighbour
             if coordo[1] >= len(self.getGrid())-1:
-                return False
+                return
             neighbourCoordo = (coordo[0], coordo[1]+1)
 
         if self.detectBarrier(neighbourCoordo, direction):
@@ -406,8 +401,7 @@ class Game():
         '''Return the line that the player must reach to win'''
         if self.winningSide(player) == "Down" or self.winningSide(player) == "Right":
             return self.getSquareWidth()-1
-        if self.winningSide(player) == "Up" or self.winningSide(player) == "Left":
-            return 0
+        return 0
 
     def stuck(self) -> bool:
         '''Check any player is stuck'''
@@ -421,12 +415,6 @@ class Game():
             self.resetVisited()
 
         return False
-
-    def resetVisited(self) -> None:
-        '''Reset the visited attribute of all cells to False'''
-        for j in range(self.nbRows):
-            for i in range(self.nbColumns):
-                self.cells[i][j].setVisited(False)
 
     def stuckNeighbour(self, player: Player, coordo: tuple) -> bool:
         if self.winningSide(player) == "Up" or self.winningSide(player) == "Down":
@@ -458,8 +446,8 @@ class Game():
             for cell in row:
                 cell.setVisited(False)
 
-    def maxBarrier(key: int) -> int:
-        numberMax = {5: '8', 7: '12', 9: '20', 11: '40'}
+    def maxBarrier(self, key: int) -> int:
+        numberMax = {5: 8, 7: 12, 9: 20, 11: 40}
         return numberMax[key]
 
     def playerBarrier(self) -> int:
@@ -469,8 +457,7 @@ class Game():
             return 12
         if self.getSquareWidth() == 9:
             return 20
-        if self.getSquareWidth() == 11:
-            return 40
+        return 40
 
     def possibleMoves(self, playerCoord: tuple) -> list[tuple]:
         '''Return a list of possible moves for the player
@@ -593,7 +580,7 @@ def initializeGame() -> Game:
         "Select the size of the square you want to create, minimum 5, maximum 11. \nOnly odd numbers")
     nbPlayer = intInput("How many players ? \nminimum 2, maximum 4")
     nbBarrier = intInput(
-        "How many Barriers? \nminimum 4, maximum "+Game.maxBarrier(width))
+        "How many Barriers? \nminimum 4, maximum " + Game.maxBarrier(width))
     bots = intInput("how many bots do you want to play against?")
 
     return Game(width, nbPlayer, nbBarrier, bots)

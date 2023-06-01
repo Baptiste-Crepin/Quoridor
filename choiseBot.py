@@ -14,15 +14,15 @@ class NumberBots():
             (self.windowXmax, self.windowYmax))
         pygame.display.set_caption("Quoridor")
 
-        self.blue = (138, 201, 244)
-        self.darkerBlue = (0, 0, 48)
-        self.white = (255, 255, 255)
-        self.black = (0, 0, 0)
+        self.blue = pygame.Color(138, 201, 244)
+        self.darkerBlue = pygame.Color(0, 0, 48)
+        self.white = pygame.Color(255, 255, 255)
+        self.black = pygame.Color(0, 0, 0)
         self.font = pygame.font.Font(None, 36)
         self.firstRect = (50, 200, 400, 70)
         self.secondRect = (50, 370, 400, 70)
 
-    def ButtonBack(self) -> object:
+    def ButtonBack(self) -> pygame.Rect:
         coord = [(5, 40), (30, 10), (30, 20), (70, 20),
                  (70, 60), (30, 60), (30, 70)]
         button = pygame.draw.polygon(self.window, self.darkerBlue, coord)
@@ -80,8 +80,8 @@ class NumberBots():
             self.window.blit(contour_surface, contour_rect)
             self.window.blit(text_surface, text_rect)
 
-            Button(self.window, self.firstRect, self.blue, "1")
-            Button(self.window, self.secondRect, self.blue, "3")
+            Button(self.window, pygame.Rect(self.firstRect), self.blue, "1")
+            Button(self.window, pygame.Rect(self.secondRect), self.blue, "3")
             self.ButtonBack()
             self.Event(1)
 
@@ -99,8 +99,8 @@ class NumberBots():
 
             self.window.blit(contour_surface, contour_rect)
             self.window.blit(text_surface, text_rect)
-            Button(self.window, self.firstRect, self.blue, "Yes")
-            Button(self.window, self.secondRect, self.blue, "No")
+            Button(self.window, pygame.Rect(self.firstRect), self.blue, "Yes")
+            Button(self.window, pygame.Rect(self.secondRect), self.blue, "No")
             self.ButtonBack()
             self.Event(2)
 

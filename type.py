@@ -12,9 +12,11 @@ class Menutype:
         self.window = pygame.display.set_mode(
             (self.windowXmax, self.windowYmax))
         pygame.display.set_caption("Quoridor")
-        self.blue = (138, 201, 244)
-        self.white = (255, 255, 255)
-        self.darkerBlue = (0, 0, 48)
+        self.blue = pygame.Color(138, 201, 244)
+        self.white = pygame.Color(255, 255, 255)
+        self.darkerBlue = pygame.Color(0, 0, 48)
+        self.soloButton = pygame.Rect(50, 200, 400, 120)
+        self.multiButton = pygame.Rect(50, 370, 400, 120)
 
     def createButtonSolo(self):
         button = pygame.draw.rect(
@@ -32,7 +34,7 @@ class Menutype:
         buttonText = text.get_rect(center=button.center)
         self.window.blit(text, buttonText)
 
-    def ButtonBack(self) -> object:
+    def ButtonBack(self) -> pygame.Rect:
         coord = [(5, 40), (30, 10), (30, 20), (70, 20),
                  (70, 60), (30, 60), (30, 70)]
         button = pygame.draw.polygon(self.window, self.darkerBlue, coord)
@@ -45,8 +47,8 @@ class Menutype:
     def setWindow(self):
         backGround = pygame.image.load('pictures/backGroundMenu3.jpg')
         self.window.blit(backGround, (-80, -300))
-        Button(self.window, (50, 200, 400, 120), self.blue, "Solo")
-        Button(self.window, (50, 370, 400, 120), self.blue, "Muti")
+        Button(self.window, self.soloButton, self.blue, "Solo")
+        Button(self.window, self.multiButton, self.blue, "Muti")
         self.ButtonBack()
         self.Event()
 

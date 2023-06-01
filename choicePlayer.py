@@ -14,17 +14,17 @@ class NumberPlayer:
         self.window = pygame.display.set_mode(
             (self.windowXmax, self.windowYmax))
         pygame.display.set_caption("Quoridor")
-        self.blue = (138, 201, 244)
-        self.white = (255, 255, 255)
-        self.darkerBlue = (0, 0, 48)
-        self.black = (0, 0, 0)
+        self.blue = pygame.Color(138, 201, 244)
+        self.white = pygame.Color(255, 255, 255)
+        self.darkerBlue = pygame.Color(0, 0, 48)
+        self.black = pygame.Color(0, 0, 0)
         self.font = pygame.font.Font(None, 36)
-        self.Rect1 = (100, 230, 100, 100)
-        self.Rect2 = (300, 230, 100, 100)
-        self.Rect3 = (100, 420, 100, 100)
-        self.Rect4 = (300, 420, 100, 100)
+        self.Rect1 = pygame.Rect(100, 230, 100, 100)
+        self.Rect2 = pygame.Rect(300, 230, 100, 100)
+        self.Rect3 = pygame.Rect(100, 420, 100, 100)
+        self.Rect4 = pygame.Rect(300, 420, 100, 100)
 
-    def ButtonBack(self) -> object:
+    def ButtonBack(self) -> pygame.Rect:
         coord = [(5, 40), (30, 10), (30, 20), (70, 20),
                  (70, 60), (30, 60), (30, 70)]
         button = pygame.draw.polygon(self.window, self.darkerBlue, coord)

@@ -17,7 +17,7 @@ class selectBarrier():
             (self.windowXmax, self.windowYmax))
         pygame.display.set_caption("Quoridor")
         self.center = (self.windowXmax//2, self.windowYmax//2)
-        self.lighterBlue = (138, 201, 244)
+        self.lighterBlue = pygame.Color(138, 201, 244)
         self.darkerBlue = (0, 0, 48)
         self.white = (255, 255, 255)
         self.font = pygame.font.Font(None, 36)
@@ -34,17 +34,15 @@ class selectBarrier():
         buttonText = text.get_rect(center=circle.center)
         self.window.blit(text, buttonText)
 
-    def drawfirstTriangle(self) -> object:
+    def drawfirstTriangle(self) -> pygame.Rect:
         Triangle_point = [(295, 365), (285, 355), (305, 355)]
-        triangle = pygame.draw.polygon(self.window, self.white, Triangle_point)
-        return triangle
+        return pygame.draw.polygon(self.window, self.white, Triangle_point)
 
-    def drawSecondTriangle(self) -> object:
+    def drawSecondTriangle(self) -> pygame.Rect:
         Triangle_point = [(295, 335), (285, 345), (305, 345)]
-        triangle = pygame.draw.polygon(self.window, self.white, Triangle_point)
-        return triangle
+        return pygame.draw.polygon(self.window, self.white, Triangle_point)
 
-    def ButtonBack(self) -> object:
+    def ButtonBack(self) -> pygame.Rect:
         coord = [(5, 40), (30, 10), (30, 20), (70, 20),
                  (70, 60), (30, 60), (30, 70)]
         button = pygame.draw.polygon(self.window, self.darkerBlue, coord)
@@ -112,7 +110,9 @@ class selectBarrier():
         self.drawSecondCircle()
         self.drawfirstTriangle()
         self.drawSecondTriangle()
-        Button(self.window, (50, 560, 400, 120), self.lighterBlue, "Done")
+
+        Button(self.window, pygame.Rect(
+            50, 560, 400, 120), self.lighterBlue, "Done")
         self.Event()
         self.ButtonBack()
         pygame.display.flip()
@@ -120,7 +120,7 @@ class selectBarrier():
 
 if __name__ == "__main__":
     pygame.init()
-    board = selectBarrier(1, 1, 5)
+    board = selectBarrier(1, 1, 5, 0)
 
     while True:
         board.setWindow()

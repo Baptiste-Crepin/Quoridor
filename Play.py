@@ -12,8 +12,10 @@ class Menu:
         self.window = pygame.display.set_mode(
             (self.windowXmax, self.windowYmax))
         pygame.display.set_caption("Quoridor")
-        self.blue = (138, 201, 244)
-        self.white = (255, 255, 255)
+        self.blue = pygame.Color(138, 201, 244)
+        self.white = pygame.Color(255, 255, 255)
+        self.playButton = pygame.Rect(50, 200, 400, 120)
+        self.rulesButton = pygame.Rect(50, 370, 400, 120)
 
     def Event(self) -> None:
         from rules import Rules
@@ -42,8 +44,8 @@ class Menu:
     def setWindow(self) -> None:
         backGround = pygame.image.load('pictures/backGroundMenu3.jpg')
         self.window.blit(backGround, (-80, -300))
-        Button(self.window, (50, 200, 400, 120), self.blue, "PLAY")
-        Button(self.window, (50, 370, 400, 120), self.blue, "RULES")
+        Button(self.window, self.playButton, self.blue, "PLAY")
+        Button(self.window, self.rulesButton, self.blue, "RULES")
         self.Event()
 
 
