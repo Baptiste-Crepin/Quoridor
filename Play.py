@@ -1,5 +1,5 @@
 import pygame
-from button import Button
+from graphical.widgets.button import Button
 
 
 class Menu:
@@ -17,8 +17,8 @@ class Menu:
         self.rulesButton = pygame.Rect(50, 370, 400, 120)
 
     def Event(self) -> None:
-        from rules import Rules
-        from type import Menutype
+        from graphical.menus.rules import Rules
+        from graphical.menus.type import Menutype
         for event in pygame.event.get():
             if event.type == pygame.QUIT or event.type == pygame.WINDOWCLOSE:
                 pygame.quit()
@@ -40,7 +40,7 @@ class Menu:
         pygame.display.flip()
 
     def setWindow(self) -> None:
-        backGround = pygame.image.load('pictures/backGroundMenu3.jpg')
+        backGround = pygame.image.load('./pictures/backGroundMenu3.jpg')
         self.window.blit(backGround, (-80, -300))
         Button(self.window, self.playButton, self.blue, "PLAY")
         Button(self.window, self.rulesButton, self.blue, "RULES")

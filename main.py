@@ -1,6 +1,6 @@
 import pygame
 from game import Game
-from graphical.board import Board
+from graphical.menus.board import Board
 from Bot import Bot
 from endGame import End
 
@@ -50,11 +50,13 @@ class GraphicalGame():
                                 self.game.getPlayerList())
             randomMove = player.randomMoves(self.game.possibleBarrierPlacement(
                 player), self.game.possibleMoves(player.getCoordinates()))
-            if randomMove[0] == "move":
-                self.game.movePlayer(player, randomMove[1])
-            else:
-                print(randomMove[1][1])
-                self.game.placeWall(randomMove[1], randomMove[1][1], player)
+            if isinstance(randomMove[1], int):
+                self.game.movePlayer(player, randomMove)
+            elif isinstance(randomMove[0], tuple) and isinstance(randomMove[1], str):
+                coordo = randomMove[0]
+                direction = randomMove[1]
+                self.game.placeWall(coordo, direction, player)
+
             self.game.nextPlayer()
             return
 

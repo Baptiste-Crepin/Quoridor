@@ -1,7 +1,7 @@
 import pygame
 import time
 from main import GraphicalGame
-from button import Button
+from graphical.widgets.button import Button
 
 
 class selectBarrier():
@@ -52,7 +52,7 @@ class selectBarrier():
         return button
 
     def Event(self) -> None:
-        from sizeGrid import SizeGrid
+        from graphical.menus.sizeGrid import SizeGrid
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT or event.type == pygame.WINDOWCLOSE:

@@ -1,5 +1,4 @@
 import pygame
-from pygame.locals import *
 
 
 class Rules():
@@ -16,7 +15,7 @@ class Rules():
         self.font = pygame.font.Font(None, 36)
         self.barrer = 1
 
-    def ButtonBack(self) -> object:
+    def ButtonBack(self) -> pygame.Rect:
         coord = [(5, 40), (30, 10), (30, 20), (70, 20),
                  (70, 60), (30, 60), (30, 70)]
         button = pygame.draw.polygon(self.window, self.darkerBlue, coord)

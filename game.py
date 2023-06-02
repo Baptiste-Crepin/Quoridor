@@ -221,28 +221,36 @@ class Game():
         if jump:
             jumpOffset = 2
 
-        secondMoveKey = None
+        moveMap = {
+            "Up": {
+                "": (currentCoordo[0]-jumpOffset, currentCoordo[1]),
+                "Left": (currentCoordo[0]-jumpOffset, currentCoordo[1]-jumpOffset),
+                "Right": (currentCoordo[0]-jumpOffset, currentCoordo[1]+jumpOffset)
+            },
+            "Left": {
+                "": (currentCoordo[0], currentCoordo[1]-jumpOffset),
+                "Left": (currentCoordo[0]+jumpOffset, currentCoordo[1]-jumpOffset),
+                "Right": (currentCoordo[0]-jumpOffset, currentCoordo[1]-jumpOffset)
+            },
+            "Down": {
+                "": (currentCoordo[0]+jumpOffset, currentCoordo[1]),
+                "Left": (currentCoordo[0]+jumpOffset, currentCoordo[1]+jumpOffset),
+                "Right": (currentCoordo[0]+jumpOffset, currentCoordo[1]-jumpOffset)
+            },
+            "Right": {
+                "": (currentCoordo[0], currentCoordo[1]+jumpOffset),
+                "Left": (currentCoordo[0]-jumpOffset, currentCoordo[1]+jumpOffset),
+                "Right": (currentCoordo[0]+jumpOffset, currentCoordo[1]+jumpOffset)
+            }
+        }
+
+        secondMoveKey = ""
         if secondMove == 0:
             secondMoveKey = "Left"
         if secondMove == 1:
             secondMoveKey = "Right"
-
-        moveMap = {
-            ("Up", None): (currentCoordo[0]-jumpOffset, currentCoordo[1]),
-            ("Up", "Left"): (currentCoordo[0]-jumpOffset, currentCoordo[1]-jumpOffset),
-            ("Up", "Right"): (currentCoordo[0]-jumpOffset, currentCoordo[1]+jumpOffset),
-            ("Left", None): (currentCoordo[0], currentCoordo[1]-jumpOffset),
-            ("Left", "Left"): (currentCoordo[0]+jumpOffset, currentCoordo[1]-jumpOffset),
-            ("Left", "Right"): (currentCoordo[0]-jumpOffset, currentCoordo[1]-jumpOffset),
-            ("Down", None): (currentCoordo[0]+jumpOffset, currentCoordo[1]),
-            ("Down", "Left"): (currentCoordo[0]+jumpOffset, currentCoordo[1]+jumpOffset),
-            ("Down", "Right"): (currentCoordo[0]+jumpOffset, currentCoordo[1]-jumpOffset),
-            ("Right", None): (currentCoordo[0], currentCoordo[1]+jumpOffset),
-            ("Right", "Left"): (currentCoordo[0]-jumpOffset, currentCoordo[1]+jumpOffset),
-            ("Right", "Right"): (currentCoordo[0]+jumpOffset, currentCoordo[1]+jumpOffset),
-        }
-
-        return moveMap[(self.getDirection(currentCoordo, nextCoordo), secondMoveKey)]
+        direction1 = self.getDirection(currentCoordo, nextCoordo)
+        return moveMap[direction1][secondMoveKey]
 
     def wallColide(self, currentCoordo: tuple, NextCoordo: tuple, jump: bool = False) -> bool:
         CurrentCell = self.getCell(currentCoordo)
@@ -268,7 +276,7 @@ class Game():
                     return True
         return False
 
-    def placeWholeBarrier(self, coordo: tuple, direction: str, player: Player, place=True) -> bool:
+    def placeWholeBarrier(self, coordo: tuple[int, int], direction: str, player: Player, place=True) -> bool:
         if not self.placeBarrier(coordo, direction, player, place=place):
             return False
         return True
@@ -284,12 +292,12 @@ class Game():
 
         if place:
             celWalls = self.getGrid()[coordo[0]][coordo[1]].getWalls()
-            celWalls[direction] = 1
+            celWalls[direction] = True
             self.getGrid()[coordo[0]][coordo[1]].setWalls(celWalls)
 
         return True
 
-    def placeWall(self, coordo: tuple, direction: str, player: Player, place=True, ignorePlayerBarriers=False) -> bool:
+    def placeWall(self, coordo: tuple[int, int], direction: str, player: Player, place=True, ignorePlayerBarriers=False) -> bool:
         '''Place a wall on the grid
 
         a wall is considered to be a group of two barriers side by side'''
@@ -539,7 +547,7 @@ class Game():
                     self.cancelNeighbourBarriers((i, j), direction)
         return result
 
-    def movePlayer(self, player: Player, coordo: tuple) -> None:
+    def movePlayer(self, player: Player, coordo: tuple[int, int]) -> None:
         '''moves the player to the given coordinates'''
         self.placePlayer(Player(0), player.getCoordinates())
         self.placePlayer(player, coordo)
@@ -596,14 +604,14 @@ def play() -> None:
         print(player)
 
         if isinstance(player, Bot):
-            randomMove = player.randomMoves(currentGame.possibleBarrierPlacement(currentGame.getCurrentPlayer(
-            )), currentGame.possibleMoves(currentGame.getCurrentPlayer().getCoordinates()))
-            if randomMove[0] == "move":
-                currentGame.movePlayer(player, randomMove[1])
-            else:
-                print(randomMove[1])
-                currentGame.placeWall(
-                    randomMove[1][0], randomMove[1][1], player)
+            randomMove = player.randomMoves(currentGame.possibleBarrierPlacement(
+                player), currentGame.possibleMoves(player.getCoordinates()))
+            if isinstance(randomMove[1], int):
+                currentGame.movePlayer(player, randomMove)
+            elif isinstance(randomMove[0], tuple) and isinstance(randomMove[1], str):
+                coordo = randomMove[0]
+                direction = randomMove[1]
+                currentGame.placeWall(coordo, direction, player)
 
         else:
             choise = Game.yesNoInput(

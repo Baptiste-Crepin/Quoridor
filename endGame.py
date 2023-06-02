@@ -1,7 +1,7 @@
 import pygame
 from player import Player
 from Play import Menu
-from button import Button
+from graphical.widgets.button import Button
 
 
 class End:
@@ -14,7 +14,7 @@ class End:
         self.windowXmax = 1330
         self.windowYmax = 750
         self.window = pygame.display.set_mode(
-            (self.windowXmax, self.windowYmax))
+            size=(self.windowXmax, self.windowYmax))
         pygame.display.set_caption("Quoridor")
         self.blue = pygame.Color(138, 201, 244)
         self.white = pygame.Color(255, 255, 255)

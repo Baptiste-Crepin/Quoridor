@@ -1,5 +1,5 @@
 import pygame
-from button import Button
+from graphical.widgets.button import Button
 
 
 class SizeGrid:
@@ -15,7 +15,7 @@ class SizeGrid:
         self.pos4 = (50, 520)
         self.sizeButton = (400, 100)
         self.window = pygame.display.set_mode(
-            (self.windowXmax, self.windowYmax))
+            size=(self.windowXmax, self.windowYmax))
         pygame.display.set_caption("Quoridor")
         self.blue = pygame.Color(138, 201, 244)
         self.white = pygame.Color(255, 255, 255)
@@ -35,8 +35,8 @@ class SizeGrid:
 
     def Event(self):
         from barrier import selectBarrier
-        from choicePlayer import NumberPlayer
-        from choiseBot import NumberBots
+        from graphical.menus.choicePlayer import NumberPlayer
+        from graphical.menus.choiseBot import NumberBots
 
         sizeFromPos = {self.pos1: 5, self.pos3: 9,
                        self.pos2: 7, self.pos4: 11}

@@ -1,7 +1,6 @@
 import pygame
-from pygame.locals import *
-from type import Menutype
-from button import Button
+from graphical.menus.type import Menutype
+from graphical.widgets.button import Button
 
 
 class Menu:

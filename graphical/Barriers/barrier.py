@@ -1,4 +1,4 @@
-from graphical.tablePlayer import TablePlayer
+from graphical.menus.tablePlayer import TablePlayer
 import pygame
 
 

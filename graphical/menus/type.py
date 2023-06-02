@@ -1,5 +1,5 @@
 import pygame
-from button import Button
+from graphical.widgets.button import Button
 
 
 class Menutype:
@@ -44,7 +44,7 @@ class Menutype:
         return button
 
     def setWindow(self):
-        backGround = pygame.image.load('pictures/backGroundMenu3.jpg')
+        backGround = pygame.image.load('./pictures/backGroundMenu3.jpg')
         self.window.blit(backGround, (-80, -300))
         Button(self.window, self.soloButton, self.blue, "Solo")
         Button(self.window, self.multiButton, self.blue, "Muti")
@@ -52,7 +52,8 @@ class Menutype:
         self.Event()
 
     def Event(self):
-        from choicePlayer import NumberPlayer
+        from graphical.menus.choicePlayer import NumberPlayer
+
         from Play import Menu
         for event in pygame.event.get():
             if event.type == pygame.QUIT or event.type == pygame.WINDOWCLOSE:

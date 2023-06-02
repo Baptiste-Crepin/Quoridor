@@ -1,5 +1,5 @@
 import pygame
-from button import Button
+from graphical.widgets.button import Button
 
 
 class NumberPlayer:
@@ -34,9 +34,9 @@ class NumberPlayer:
         return button
 
     def Event(self):
-        from choiseBot import NumberBots
-        from sizeGrid import SizeGrid
-        from type import Menutype
+        from graphical.menus.choiseBot import NumberBots
+        from graphical.menus.sizeGrid import SizeGrid
+        from graphical.menus.type import Menutype
 
         PlayersFromPos = {self.pos1: [NumberBots, 1], self.pos2: [NumberBots, 2],
                           self.pos3: [SizeGrid, (3, 1, 1)], self.pos4: [SizeGrid, (4, 0, 1)]}
@@ -64,7 +64,7 @@ class NumberPlayer:
                     pygame.display.update()
 
     def setWindow(self):
-        backGround = pygame.image.load('pictures/backGroundMenu3.jpg')
+        backGround = pygame.image.load('./pictures/backGroundMenu3.jpg')
         self.window.blit(backGround, (-80, -300))
 
         text_surface = self.font.render("How many players?", True, self.white)

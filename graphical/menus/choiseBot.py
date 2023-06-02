@@ -1,5 +1,5 @@
 import pygame
-from button import Button
+from graphical.widgets.button import Button
 
 
 class NumberBots():
@@ -32,8 +32,8 @@ class NumberBots():
         return button
 
     def Event(self, method: int) -> None:
-        from sizeGrid import SizeGrid
-        from choicePlayer import NumberPlayer
+        from graphical.menus.sizeGrid import SizeGrid
+        from graphical.menus.choicePlayer import NumberPlayer
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT or event.type == pygame.WINDOWCLOSE:
