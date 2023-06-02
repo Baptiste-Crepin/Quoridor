@@ -312,7 +312,7 @@ class Game():
                 return False
             jumpCell = self.getCell(jumpCoordo)
             if self.isValidWall(self.getDirection(currentCoordo, jumpCoordo)):
-                if (CurrentCell.getWalls()[self.getDirection(currentCoordo, jumpCoordo)]):
+                if (jumpCell.getWalls()[self.getDirection(currentCoordo, jumpCoordo)]):
                     return True
             if self.isValidWall(self.getDirection(currentCoordo, jumpCoordo, True)):
                 if (jumpCell.getWalls()[self.getDirection(currentCoordo, jumpCoordo, True)]):
