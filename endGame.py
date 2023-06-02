@@ -1,6 +1,5 @@
 import pygame
-from pygame.locals import *
-from Player import Player
+from player import Player
 from Play import Menu
 from button import Button
 

@@ -1,5 +1,4 @@
 import pygame
-from pygame.locals import *
 from button import Button
 
 
@@ -21,7 +20,6 @@ class Menu:
         from rules import Rules
         from type import Menutype
         for event in pygame.event.get():
-            print(event, pygame.QUIT, event.type == pygame.QUIT)
             if event.type == pygame.QUIT or event.type == pygame.WINDOWCLOSE:
                 pygame.quit()
             elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:

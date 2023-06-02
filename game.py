@@ -1,5 +1,5 @@
 import random
-from Player import Player
+from player import Player
 from cell import Cell
 from Bot import Bot
 
@@ -37,7 +37,7 @@ class Game():
     def getCurrentPlayerN(self) -> int:
         return self.__currentPlayerN
 
-    def getCurrentPlayer(self) -> Player:
+    def getCurrentPlayer(self) -> Player | Bot:
         return self.__currentPlayer
 
     def setSquareWidth(self, value: int) -> None:
@@ -58,7 +58,7 @@ class Game():
     def setCurrentPlayerN(self, value: int) -> None:
         self.__currentPlayerN = value
 
-    def setCurrentPlayer(self, value: Player) -> None:
+    def setCurrentPlayer(self, value: Player | Bot) -> None:
         self.__currentPlayer = value
 
     # def setNumberOfBarriers(self, value: int) -> None:
@@ -221,6 +221,7 @@ class Game():
         if jump:
             jumpOffset = 2
 
+        secondMoveKey = None
         if secondMove == 0:
             secondMoveKey = "Left"
         if secondMove == 1:
@@ -270,11 +271,9 @@ class Game():
     def placeWholeBarrier(self, coordo: tuple, direction: str, player: Player, place=True) -> bool:
         if not self.placeBarrier(coordo, direction, player, place=place):
             return False
-        # if not self.setOpositeWall(coordo, direction, place=place):
-        #     return False
         return True
 
-    def placeBarrier(self, coordo: tuple, direction: str, player: Player, place=True) -> bool:
+    def placeBarrier(self, coordo: tuple[int, int], direction: str, player: Player, place=True) -> bool:
 
         if self.detectBarrier(coordo, direction):
             return False
@@ -305,7 +304,7 @@ class Game():
             player.setBarrier(player.getBarrier()-1)
         return True
 
-    def detectBarrier(self, coordo: tuple, direction: str) -> bool:
+    def detectBarrier(self, coordo: tuple[int, int], direction: str) -> bool:
         return self.getGrid()[coordo[0]][coordo[1]].getWalls()[direction] == 1
 
     def ignoreSideBarrier(self, coordo: tuple, direction: str) -> bool:
@@ -446,7 +445,8 @@ class Game():
             for cell in row:
                 cell.setVisited(False)
 
-    def maxBarrier(self, key: int) -> int:
+    @staticmethod
+    def maxBarrier(key: int) -> int:
         numberMax = {5: 8, 7: 12, 9: 20, 11: 40}
         return numberMax[key]
 
@@ -459,7 +459,7 @@ class Game():
             return 20
         return 40
 
-    def possibleMoves(self, playerCoord: tuple) -> list[tuple]:
+    def possibleMoves(self, playerCoord: tuple) -> list[tuple[int, int]]:
         '''Return a list of possible moves for the player
         '''
 
@@ -544,81 +544,89 @@ class Game():
         self.placePlayer(Player(0), player.getCoordinates())
         self.placePlayer(player, coordo)
 
-    def directionInput(self) -> str | None:
+    def directionInput(self) -> str:
         '''Return the direction input by the user or False if the input is invalid'''
         directions = list(self.getGrid()[0][0].getWalls().keys())
-        inp = input("Direction |Right or Down|").capitalize()
-        if inp in directions:
-            return inp
-        return
+        while True:
+            inp = input("Direction |Right or Down|").capitalize()
+            if inp in directions:
+                return inp
 
+    @staticmethod
+    def intInput(message: str) -> int:
+        '''Return an integer inputed by the user'''
+        try:
+            return int(input("\n" + message + ":  "))
+        except ValueError:
+            return Game.intInput("\nIncorect Value, please enter a number")
 
-def intInput(message: str) -> int:
-    '''Return an integer inputed by the user'''
-    try:
-        return int(input("\n" + message + ":  "))
-    except ValueError:
-        return intInput("\nIncorect Value, please enter a number")
+    @staticmethod
+    def yesNoInput(message: str, inp1: str, inp2: str) -> bool:
+        """Return a boolean inputed by the user
 
-
-def yesNoInput(message: str, inp1: str, inp2: str) -> bool:
-    """Return a boolean inputed by the user
-
-    True if the user inputed the first string, false if the user inputed the second string
-    """
-    while True:
-        inp = input('\n {}  : ({}/{})'.format(message, inp1[0], inp2[0]))
-        if inp.lower() == inp1[0].lower():
-            return True
-        if inp.lower() == inp2[0].lower():
-            return False
+        True if the user inputed the first string, false if the user inputed the second string
+        """
+        while True:
+            inp = input('\n {}  : ({}/{})'.format(message, inp1[0], inp2[0]))
+            if inp.lower() == inp1[0].lower():
+                return True
+            if inp.lower() == inp2[0].lower():
+                return False
 
 
 def initializeGame() -> Game:
     '''Initialize the game'''
-    width = intInput(
+    width = Game.intInput(
         "Select the size of the square you want to create, minimum 5, maximum 11. \nOnly odd numbers")
-    nbPlayer = intInput("How many players ? \nminimum 2, maximum 4")
-    nbBarrier = intInput(
-        "How many Barriers? \nminimum 4, maximum " + Game.maxBarrier(width))
-    bots = intInput("how many bots do you want to play against?")
+    nbPlayer = Game.intInput("How many players ? \nminimum 2, maximum 4")
+    nbBarrier = Game.intInput(
+        "How many Barriers? \nminimum 4, maximum " + str(Game.maxBarrier(key=width)))
+    bots = Game.intInput("how many bots do you want to play against?")
 
     return Game(width, nbPlayer, nbBarrier, bots)
 
 
 def play() -> None:
     '''Main function of the game'''
-    Game = initializeGame()
-    Game.display()
+    currentGame = initializeGame()
+    currentGame.display()
 
-    while not Game.checkGameOver():
-        player = Game.getCurrentPlayer()
+    while not currentGame.checkGameOver():
+        player = currentGame.getCurrentPlayer()
         print(player)
 
         if isinstance(player, Bot):
-            player.randomMoves(Game)
-        else:
-            choise = yesNoInput(
-                'to place barrier enter "p"\n to play enter "m"', "p", "m")
-            coordo = (intInput("row")-1, intInput("Col")-1)
-            if choise:
-                direction = Game.directionInput()
-                while not direction:
-                    direction = Game.directionInput()
+            randomMove = player.randomMoves(currentGame.possibleBarrierPlacement(currentGame.getCurrentPlayer(
+            )), currentGame.possibleMoves(currentGame.getCurrentPlayer().getCoordinates()))
+            if randomMove[0] == "move":
+                currentGame.movePlayer(player, randomMove[1])
+            else:
+                print(randomMove[1])
+                currentGame.placeWall(
+                    randomMove[1][0], randomMove[1][1], player)
 
-                while not Game.placeWall(coordo, direction, player):
-                    coordo = (intInput("row")-1, intInput("Col")-1)
+        else:
+            choise = Game.yesNoInput(
+                'to place barrier enter "p"\n to play enter "m"', "p", "m")
+            coordo = (Game.intInput("row")-1, Game.intInput("Col")-1)
+            if choise:
+                direction = currentGame.directionInput()
+                while not direction:
+                    direction = currentGame.directionInput()
+
+                while not currentGame.placeWall(coordo, direction, player):
+                    coordo = (Game.intInput("row")-1, Game.intInput("Col")-1)
                     while direction == False:
-                        direction = Game.directionInput()
+                        direction = currentGame.directionInput()
 
                 player.setBarrier(player.getBarrier()-1)
             else:
-                while coordo not in Game.possibleMoves(player.getCoordinates()):
-                    coordo = (intInput("row")-1, intInput("Col")-1)
-                Game.movePlayer(player, coordo)
+                while coordo not in currentGame.possibleMoves(player.getCoordinates()):
+                    coordo = (Game.intInput("row")-1, Game.intInput("Col")-1)
+                currentGame.movePlayer(player, coordo)
 
-        Game.display()
-        Game.nextPlayer()
+        currentGame.display()
+        currentGame.nextPlayer()
 
 
 if __name__ == "__main__":

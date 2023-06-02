@@ -1,6 +1,5 @@
 import pygame
 import time
-from pygame.locals import *
 from main import GraphicalGame
 from button import Button
 

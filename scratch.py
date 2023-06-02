@@ -1,5 +1,5 @@
 from game import Game
-from Table import Board
+from graphical.board import Board
 import socket, sys, threading
 
 
