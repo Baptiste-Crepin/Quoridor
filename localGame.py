@@ -7,7 +7,8 @@ from Player import Player
 class LocalGame():
     def __init__(self, width, nbPlayer, nbBarrier, nbBots) -> None:
         self.game = Game(width, nbPlayer, nbBarrier, nbBots)
-        self.board = Board (self.game.getSquareWidth())
+        self.board = Board(self.game.getSquareWidth())
+        self.newTurn = True
 
     def highlightPlayer(self, player):
         for PossibleMoveCoordo in self.game.possibleMoves(player.getCoordinates()):
@@ -24,7 +25,10 @@ class LocalGame():
                 self.board.Hbarriers[possibleBarrierCoordo[1]
                                      ][possibleBarrierCoordo[0]].possiblePlacement = True
 
-    def displayPossibleMoves(self, player:Player):
+    def displayPossibleMoves(self, player: Player):
+        if not self.newTurn:
+            return
+        self.newTurn = False
         if not isinstance(player, Bot):
             self.highlightPlayer(player)
             self.highlightBarrier()
@@ -47,6 +51,7 @@ class LocalGame():
             self.board.newFrame(currentPlayer)
             currentPlayer.randomMoves(self.game)
             self.game.nextPlayer()
+            self.newTurn = True
             return
 
         event = self.board.handleEvents(currentPlayer)
@@ -75,6 +80,7 @@ class LocalGame():
 
         self.board.clearAllHighlight()
         self.game.nextPlayer()
+        self.newTurn = True
 
     def mainLoop(self) -> None:
         self.highlightPlayer(self.game.getCurrentPlayer())
