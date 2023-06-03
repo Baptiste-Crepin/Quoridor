@@ -13,6 +13,8 @@ class choiseServer(Menu):
         self.serverList = self.searchServer.discover()
         print(self.serverList)
         self.serverPosition = 0
+        self.serverPositions = []
+        self.refresh = pygame.Rect(900, 50, 300, 100)
 
     def coordYServer(self, i: int) -> int:
         return 220*i+70+self.serverPosition
@@ -21,6 +23,7 @@ class choiseServer(Menu):
         return 220*len(self.serverList)+20
 
     def displayServer(self) -> None:
+        self.serverPositions = []
         pygame.draw.rect(self.window, self.lighterBlue,
                          (50, 50+self.serverPosition, 640, self.heightServerRect()), border_radius=5)
 
@@ -42,6 +45,9 @@ class choiseServer(Menu):
                     pygame.draw.circle(self.window, Player(j+1).getColor(),
                                        (70*j+dico[self.serverList[i]["players"]], self.coordYServer(i)+160), 25, 5)
 
+            self.serverPositions.append(pygame.Rect(
+                70, self.coordYServer(i), 600, 200))
+
     def Event(self):
         for event in pygame.event.get():
             if event.type == pygame.QUIT or event.type == pygame.WINDOWCLOSE:
@@ -52,12 +58,19 @@ class choiseServer(Menu):
                     self.serverPosition -= 50
                 elif event.y > 0 and self.serverPosition < 0:
                     self.serverPosition += 50
+            elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
+                if self.refresh.collidepoint(event.pos):
+                    self.serverList = self.searchServer.discover()
+                for i, server in enumerate(self.serverPositions):
+                    if server.collidepoint(event.pos):
+                        self.searchServer.connect(
+                            self.serverList[i]["ip"], self.serverList[i]["port"])
+                        self.searchServer.waitForGameLaunch()
 
     def setWindow(self) -> None:
         self.window.fill(self.darkBlue, rect=None, special_flags=0)
         self.displayServer()
-        Button(self.window, pygame.Rect(
-            900, 50, 300, 100), self.lighterBlue, "Refresh")
+        Button(self.window, self.refresh, self.lighterBlue, "Refresh")
 
         self.Event()
         pygame.display.flip()
