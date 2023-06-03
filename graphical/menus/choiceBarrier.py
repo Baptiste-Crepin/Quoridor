@@ -3,17 +3,18 @@ import time
 from localGame import LocalGame
 from graphical.widgets.button import Button
 from graphical.widgets.menu import Menu
+from graphical.menus.selectServerName import ServerName
 
 
 class selectBarrier(Menu):
 
-    def __init__(self, NumberPlayers: int, NumberBots: int, GridSize: int, method: int) -> None:
+    def __init__(self, NumberPlayers: int, NumberBots: int, GridSize: int, method: int, multi: bool = False) -> None:
         super().__init__()
         self.NumberPlayers = NumberPlayers
         self.NumberBots = NumberBots
         self.GridSize = GridSize
         self.method = method
-
+        self.multi = multi
         self.barrier = 1
         self.circleWidth = 100
 
@@ -84,8 +85,12 @@ class selectBarrier(Menu):
                         self.upTriangleColor = self.lighterBlue
                 elif self.doneButton.collidepoint(event.pos):
                     pygame.init()
-                    board = LocalGame(
-                        self.GridSize, self.NumberPlayers, self.barrier, self.NumberBots)
+                    if not self.multi:
+                        board = LocalGame(
+                            self.GridSize, self.NumberPlayers, self.barrier, self.NumberBots)
+                    else:
+                        board = ServerName(
+                            self.GridSize, self.NumberPlayers, self.barrier, self.NumberBots)
                     time.sleep(0.2)
                     while True:
                         board.mainLoop()

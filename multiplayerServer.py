@@ -123,7 +123,7 @@ def discoveryServer(dsock, lobbyInfo):
         handle_client_request(data, addre, dsock, lobbyInfo)
 
 
-def createServer(width, nbBarrier, nbPlayer, nbBots, port=45678):
+def createServer(width, nbBarrier, nbPlayer, nbBots, name, port=45678):
     '''
     creates a server with the given parameters
     '''
@@ -136,7 +136,7 @@ def createServer(width, nbBarrier, nbPlayer, nbBots, port=45678):
     lobbyInfo = {'discoverymessage': DISCOVERY_MSG,
                  'ip': host,
                  'port': port,
-                 'lobbyName': "lobby de toto",
+                 'lobbyName': name,
                  'players': nbPlayer,
                  'remining': 1
                  }
@@ -169,4 +169,4 @@ if __name__ == "__main__":
     nbBarrier = 4
     nbPlayer = 2
     nbBots = 0
-    createServer(width, nbBarrier, nbPlayer, nbBots)
+    createServer(width, nbBarrier, nbPlayer, nbBots, "titi")

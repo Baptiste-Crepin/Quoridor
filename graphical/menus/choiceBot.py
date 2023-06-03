@@ -4,9 +4,10 @@ from graphical.widgets.menu import Menu
 
 
 class NumberBots(Menu):
-    def __init__(self, nbPlayers: int) -> None:
+    def __init__(self, nbPlayers: int, multi: bool = False) -> None:
         super().__init__()
         self.nbPlayers = nbPlayers
+        self.multi = multi
 
         self.pos1 = (self.buttonX, 200)
         self.pos2 = (self.buttonX, 370)
@@ -45,14 +46,14 @@ class NumberBots(Menu):
                 if pygame.Rect(pos).collidepoint(event.pos):
                     pygame.init()
                     board = SizeGrid(self.nbPlayers,
-                                     nbBotsFromPos[pos], method)
+                                     nbBotsFromPos[pos], method, self.multi)
                     while True:
                         board.setWindow()
                         pygame.display.update()
 
             if self.ButtonBack().collidepoint(event.pos) and event.button == 1:
                 pygame.init()
-                board = NumberPlayer()
+                board = NumberPlayer(self.multi)
                 while True:
                     board.setWindow()
                     pygame.display.update()

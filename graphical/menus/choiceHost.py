@@ -1,6 +1,7 @@
 import pygame
 from graphical.widgets.button import Button
 from graphical.widgets.menu import Menu
+from graphical.menus.choicePlayer import NumberPlayer
 
 
 class ChoiseHost(Menu):
@@ -34,14 +35,17 @@ class ChoiseHost(Menu):
 
     def Event(self):
         from graphical.menus.type import Menutype
-        from graphical.menus.choiseServer import choiseServer
+        from graphical.menus.choiceServer import choiseServer
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT or event.type == pygame.WINDOWCLOSE:
                 raise SystemExit
             elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
                 if pygame.Rect(self.posHost, self.buttonSize).collidepoint(event.pos):
-                    raise SystemExit
+                    board = NumberPlayer(True)
+                    while True:
+                        board.setWindow()
+                        pygame.display.update()
 
                 elif pygame.Rect(self.posJoin, self.buttonSize).collidepoint(event.pos):
                     board = choiseServer()

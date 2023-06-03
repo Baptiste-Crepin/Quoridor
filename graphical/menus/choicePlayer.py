@@ -37,8 +37,8 @@ class NumberPlayer(Menu):
         from graphical.menus.sizeGrid import SizeGrid
         from graphical.menus.type import Menutype
 
-        PlayersFromPos = {self.pos1: [NumberBots, 1], self.pos2: [NumberBots, 2],
-                          self.pos3: [SizeGrid, (3, 1, 1)], self.pos4: [SizeGrid, (4, 0, 1)]}
+        PlayersFromPos = {self.pos1: [NumberBots, (1, self.multi)], self.pos2: [NumberBots, (2, self.multi)],
+                          self.pos3: [SizeGrid, (3, 1, 1, self.multi)], self.pos4: [SizeGrid, (4, 0, 1, self.multi)]}
         for event in pygame.event.get():
             if event.type == pygame.QUIT or event.type == pygame.WINDOWCLOSE:
                 raise SystemExit

@@ -1,24 +1,20 @@
 import pygame
 from graphical.widgets.input import Input
 from graphical.widgets.button import Button
+from graphical.widgets.menu import Menu
 
 
-class Menu:
-    def __init__(self) -> None:
-        self.windowWidth = 500
-        self.windowYmax = 700
+class ServerName(Menu):
+    def __init__(self, width: int, nbPlayer: int, nbBarrier: int, nbBot: int) -> None:
+        super().__init__()
+        self.width = width
+        self.nbPlayer = nbPlayer
+        self.nbBarrier = nbBarrier
+        self.nbBot = nbBot
+
         self.posPlay = (50, 200)
         self.posRules = (50, 370)
-        self.window = pygame.display.set_mode(
-            (self.windowWidth, self.windowYmax))
-        pygame.display.set_caption("Quoridor")
-
-        self.white = pygame.Color(255, 255, 255)
-        self.grey = pygame.Color(217, 217, 217, 35)
-        self.black = pygame.Color(0, 0, 0)
-        self.darkBlue = pygame.Color(0, 0, 48)
-        self.lightBlue = pygame.Color(90, 173, 255)
-        self.purple = pygame.Color(204, 0, 204)
+        # self.purple = pygame.Color(204, 0, 204)
         self.input = Input(self.window, pygame.Rect(
             140, 325, 220, 50), self.white)
 
@@ -28,7 +24,7 @@ class Menu:
                 pygame.quit()
             self.input.Event(event)
 
-    def setWindow(self):
+    def mainLoop(self):
         self.window.fill(self.darkBlue, rect=None, special_flags=0)
         font = pygame.font.SysFont(
             "Extra Bold Italic", 60, False, True)
@@ -41,16 +37,7 @@ class Menu:
         self.window.blit(secondtext, (150, 270))
 
         Button(self.window, pygame.Rect(
-            175, 400, 150, 50), self.lightBlue, "send", 40, 10)
+            175, 400, 150, 50), self.lighterBlue, "send", 40, 10)
 
         self.Event()
         pygame.display.flip()
-
-
-if __name__ == "__main__":
-    pygame.init()
-    board = Menu()
-
-    while True:
-        board.setWindow()
-        pygame.display.update()

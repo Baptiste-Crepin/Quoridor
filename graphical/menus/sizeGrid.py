@@ -4,11 +4,12 @@ from graphical.widgets.menu import Menu
 
 
 class SizeGrid(Menu):
-    def __init__(self, nbPlayer: int, nbBot: int, method: int) -> None:
+    def __init__(self, nbPlayer: int, nbBot: int, method: int, multi: bool = False) -> None:
         super().__init__()
         self.nbPlayers = nbPlayer
         self.method = method
         self.nbBot = nbBot
+        self.multi = multi
 
         self.pos1 = (self.buttonX - (self.buttonWidth*0.7), 250)
         self.pos2 = (self.buttonX + (self.buttonWidth*0.7), 250)
@@ -43,7 +44,7 @@ class SizeGrid(Menu):
                 if pygame.Rect(pos, self.buttonSize).collidepoint(event.pos):
                     pygame.init()
                     board = selectBarrier(
-                        self.nbPlayers, self.nbBot, sizeFromPos[pos], self.method)
+                        self.nbPlayers, self.nbBot, sizeFromPos[pos], self.method, self.multi)
                     while True:
                         board.setWindow()
                         pygame.display.update()
@@ -51,9 +52,9 @@ class SizeGrid(Menu):
             if self.ButtonBack().collidepoint(event.pos) and event.button == 1:
                 pygame.init()
                 if self.method == 1:
-                    board = NumberPlayer()
+                    board = NumberPlayer(self.multi)
                 else:
-                    board = NumberBots(self.nbPlayers)
+                    board = NumberBots(self.nbPlayers, self.multi)
                 while True:
                     board.setWindow()
                     pygame.display.update()

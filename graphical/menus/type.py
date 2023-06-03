@@ -1,7 +1,7 @@
 import pygame
 from graphical.widgets.button import Button
 from graphical.widgets.menu import Menu
-from graphical.menus.choiseHost import ChoiseHost
+from graphical.menus.choiceHost import ChoiseHost
 
 
 class Menutype(Menu):
