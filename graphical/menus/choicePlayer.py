@@ -34,7 +34,7 @@ class NumberPlayer:
         return button
 
     def Event(self):
-        from graphical.menus.choiseBot import NumberBots
+        from graphical.menus.choiceBot import NumberBots
         from graphical.menus.sizeGrid import SizeGrid
         from graphical.menus.type import Menutype
 

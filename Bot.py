@@ -1,4 +1,4 @@
-from player import Player
+from Player1 import Player
 import random
 import time
 
@@ -20,5 +20,3 @@ class Bot(Player):
             return self.randomInArray(possibleMoves)
         else:
             return self.randomInArray(possibleBarrierPlacement)
-        
-

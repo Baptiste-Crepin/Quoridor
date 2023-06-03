@@ -6,6 +6,7 @@
       "request": "launch",
       "module": "Quoridor",
       "justMyCode": true
+      ,"args": ["-m","Quoridor.Play"]
     }
   ]
 }

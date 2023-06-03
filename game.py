@@ -1,5 +1,5 @@
 import random
-from player import Player
+from Player1 import Player
 from cell import Cell
 from Bot import Bot
 

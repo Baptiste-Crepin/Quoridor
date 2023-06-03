@@ -34,9 +34,9 @@ class SizeGrid:
         return button
 
     def Event(self):
-        from barrier import selectBarrier
+        from graphical.menus.choiceBarrier import selectBarrier
         from graphical.menus.choicePlayer import NumberPlayer
-        from graphical.menus.choiseBot import NumberBots
+        from graphical.menus.choiceBot import NumberBots
 
         sizeFromPos = {self.pos1: 5, self.pos3: 9,
                        self.pos2: 7, self.pos4: 11}

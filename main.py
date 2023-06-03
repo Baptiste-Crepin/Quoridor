@@ -2,7 +2,7 @@ import pygame
 from game import Game
 from graphical.menus.board import Board
 from Bot import Bot
-from endGame import End
+from graphical.menus.endGame import End
 
 
 class GraphicalGame():

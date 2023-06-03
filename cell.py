@@ -1,4 +1,4 @@
-from player import Player
+from Player1 import Player
 
 
 class Cell():

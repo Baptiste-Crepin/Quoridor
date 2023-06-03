@@ -1,5 +1,5 @@
 import pygame
-from player import Player
+from Player1 import Player
 from Play import Menu
 from graphical.widgets.button import Button
 
