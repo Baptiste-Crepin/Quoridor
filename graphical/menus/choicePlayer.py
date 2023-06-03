@@ -4,8 +4,9 @@ from graphical.widgets.menu import Menu
 
 
 class NumberPlayer(Menu):
-    def __init__(self):
+    def __init__(self, multi: bool = False):
         super().__init__()
+        self.multi = multi
 
         self.pos1 = (self.buttonX - (self.buttonWidth*0.7), 250)
         self.pos2 = (self.buttonX + (self.buttonWidth*0.7), 250)

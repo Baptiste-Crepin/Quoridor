@@ -3,68 +3,70 @@ import socket
 import sys
 
 from Bot import Bot
-from Player import Player
-from Table import Board
+from player import Player
+from graphical.menus.board import Board
 from localGame import LocalGame
 from threadClient import Thread_client
 
 DISCOVERY_MSG = b"SERVER_DISCOVERY_REQUEST"
 
-def discovery():
-    connexion = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    discoSock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-    discoSock.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
-    serveurs = discover(discoSock)
-    print("Available servers:")
-    print(serveurs)
-    choix = int(input("pick a server"))
-    try:
-        connexion.connect((serveurs[choix]['ip'], serveurs[choix]['port']))
-        print("Connexion active")
-    except socket.error:
-        print("Erreur sur la connection")
-        sys.exit()
-    start = False
-    while start == False:
 
-        serverMessage = connexion.recv(4096)
-        startVars = pickle.loads(serverMessage)
+class SearchServer():
+    def __init__(self) -> None:
+        self.connexion = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        self.discoSock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        self.discoSock.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
 
-        serverMessage = connexion.recv(4096)
-        unpickeled_message = pickle.loads(serverMessage)
+    def discover(self):
+        self.discoSock.sendto(DISCOVERY_MSG, ('<broadcast>', 5555))
+        # Set a timeout of 5 seconds for waiting for responses
+        self.discoSock.settimeout(5.0)
+        result = list()
+        serverList = list()
 
-        print(unpickeled_message)
-        if unpickeled_message == True:
-            print("starting game")
-            createGame(connexion,startVars)
-        else:
-            print("waiting for server start")
-
-
-
-
-
-
-def discover(discoSock):
-    discoSock.sendto(DISCOVERY_MSG, ('<broadcast>', 5555))
-    discoSock.settimeout(5.0)  # Set a timeout of 5 seconds for waiting for responses
-    result = list()
-    serverList = list()
-
-    try:
-        data, _ = discoSock.recvfrom(1024)
         try:
-            server_info = pickle.loads(data)
-        except pickle.UnpicklingError:
-            print("Received a non-Python object.")
+            data, _ = self.discoSock.recvfrom(1024)
+            try:
+                server_info = pickle.loads(data)
+                serverList.append(server_info)
+                print("Server info:", server_info)
+            except pickle.UnpicklingError:
+                print("Received a non-Python object.")
 
-        serverList.append(server_info)
-        print("Server info:", server_info)
-    except socket.timeout:
-        print('request timed out / no server found')
-    for server in serverList:
-        result.append(server)
-    return result
+        except socket.timeout:
+            print('request timed out / no server found')
+        for server in serverList:
+            result.append(server)
+        return result
+
+    def discovery(self):
+        serveurs = self.discover()
+        print("Available servers:")
+        print(serveurs)
+        choix = int(input("pick a server"))
+        try:
+            connexion.connect((serveurs[choix]['ip'], serveurs[choix]['port']))
+            print("Connexion active")
+        except socket.error:
+            print("Erreur sur la connection")
+            sys.exit()
+        start = False
+        while start == False:
+
+            serverMessage = connexion.recv(4096)
+            startVars = pickle.loads(serverMessage)
+
+            serverMessage = connexion.recv(4096)
+            unpickeled_message = pickle.loads(serverMessage)
+
+            print(unpickeled_message)
+            if unpickeled_message == True:
+                print("starting game")
+                createGame(connexion, startVars)
+            else:
+                print("waiting for server start")
+
+
 class MultiplayerGame(LocalGame):
     def __init__(self, connexion, width, nbBarrier, nbPlayer, nbBots=0, num=-1) -> None:
         super().__init__(width, nbPlayer, nbBarrier, nbBots)
@@ -102,7 +104,8 @@ class MultiplayerGame(LocalGame):
         if action == 'VerticalBarrier':
             if (clickCoordo, 'Right') not in self.game.possibleBarrierPlacement(currentPlayer):
                 return
-            self.game.placeWall(clickCoordo, 'Right', currentPlayer, place=True)
+            self.game.placeWall(clickCoordo, 'Right',
+                                currentPlayer, place=True)
 
         if action == 'HorrizontalBarrier':
             if (clickCoordo, 'Down') not in self.game.possibleBarrierPlacement(currentPlayer):
@@ -115,8 +118,9 @@ class MultiplayerGame(LocalGame):
         ("tour fini pour " + str(self.num))
         self.thread.emet()
 
+
 def createGame(connexion, startVars):
-    
+
     print("Game infos:", startVars)
     num = int(startVars[0])
     width = startVars[1]
@@ -127,14 +131,13 @@ def createGame(connexion, startVars):
     Game = MultiplayerGame(connexion, width, nbBarrier, nbPlayer, nbBots, num)
     Game.mainLoop()
 
+
 if __name__ == "__main__":
     # TODO: remove this when cleaning up for final version
     # temporary localhost for testing purposes
-    #hostname = socket.gethostname()
-    #host = socket.gethostbyname(hostname)
+    # hostname = socket.gethostname()
+    # host = socket.gethostbyname(hostname)
     # host = '192.168.1.10'
-    #port = 45678
+    # port = 45678
 
     connexion = discovery()
-
-

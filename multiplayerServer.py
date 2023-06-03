@@ -7,12 +7,14 @@ import pickle
 DISCOVERY_MSG = b"SERVER_DISCOVERY_REQUEST"
 start = False
 
+
 def boutton(connected):
     message = True
     pickeled_message = pickle.dumps(message)
     for i in range(len(connected)):
         print("sending starter message to client  :", i)
         connected[i].send(pickeled_message)
+
 
 class ThreadClient(threading.Thread):
 
@@ -25,27 +27,31 @@ class ThreadClient(threading.Thread):
         self.connected = connected
         self.nbBots = nbBots
 
+    def getConnected(self):
+        return self.connected
+
     def nextClient(self) -> int:
         current_client = self.queue.get()
         print(current_client)
-        current_client = (current_client + 1) % (len(self.connected) + self.nbBots)
+        current_client = (
+            current_client + 1) % (len(self.connected) + self.nbBots)
         self.queue.put(current_client)
         self.queue.task_done()
         return current_client
-    
-    def handleGameState(self, message:list) -> None:
+
+    def handleGameState(self, message: list) -> None:
         message[2] = self.nextClient()
         pickeled_message = pickle.dumps(message)
         for i in range(len(self.connected)):
             self.connected[i].send(pickeled_message)
 
-    def handleChatMessage(self, message:list) -> None:
+    def handleChatMessage(self, message: list) -> None:
         print("chat not implemented yet")
 
-    def handleQuestion(self, message:list) -> None:
+    def handleQuestion(self, message: list) -> None:
         print("? not implemented yet")
 
-    def handleEmpty(self, message:list) -> None:
+    def handleEmpty(self, message: list) -> None:
         print("\"\" not implemented yet")
 
     def run(self) -> None:
@@ -58,7 +64,7 @@ class ThreadClient(threading.Thread):
             '?': self.handleQuestion,
             '': self.handleEmpty,
         }
-        
+
         while True:
             try:
                 received_message = self.connexion.recv(4096)
@@ -78,6 +84,7 @@ class ThreadClient(threading.Thread):
 
         # self.connexion.close()
 
+
 def acceptConnexions(mySocket, init, initializedQueue,):
     '''
     accepts the connexions of the clients and creates a thread for each of them to handle the messages
@@ -85,7 +92,7 @@ def acceptConnexions(mySocket, init, initializedQueue,):
     nbPlayer = init[3]
     nbBots = init[4]
     connected = {}
-    
+
     mySocket.listen(nbPlayer)
     while nbPlayer > len(connected):
         connexion = mySocket.accept()[0]
@@ -101,24 +108,20 @@ def acceptConnexions(mySocket, init, initializedQueue,):
     boutton(connected)
 
 
-
-
-
-
-
-
-
-def handle_client_request(data, client_address,dsock,lobbyInfo):
+def handle_client_request(data, client_address, dsock, lobbyInfo):
     if data == DISCOVERY_MSG:
         print("incomming discovery packet from:", client_address)
-        response = pickle.dumps(lobbyInfo)  # Convert the server IP address to binary format
+        # Convert the server IP address to binary format
+        response = pickle.dumps(lobbyInfo)
         dsock.sendto(response, client_address)
         print("handeling request")
+
 
 def discoveryServer(dsock, lobbyInfo):
     while True:
         data, addre = dsock.recvfrom(1024)
         handle_client_request(data, addre, dsock, lobbyInfo)
+
 
 def createServer(width, nbBarrier, nbPlayer, nbBots, port=45678):
     '''
@@ -133,13 +136,15 @@ def createServer(width, nbBarrier, nbPlayer, nbBots, port=45678):
     lobbyInfo = {'discoverymessage': DISCOVERY_MSG,
                  'ip': host,
                  'port': port,
-                 'lobbyName': "lobby de toto"
+                 'lobbyName': "lobby de toto",
+                 'players': nbPlayer,
+                 'remining': 1
                  }
-    
+
     initializedQueue = queue.Queue()
     initializedQueue.put(0)
     initializedQueue.task_done()
-    
+
     # --- server creation
     serverSocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     discoSock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -150,12 +155,14 @@ def createServer(width, nbBarrier, nbPlayer, nbBots, port=45678):
         print("error whilst launching server")
         print(e)
         sys.exit()
-    
+
     print(f"\n\n\n{'='*15} Server |{host} : {port}| on {'='*15}\n\n")
-    discothread = threading.Thread(target=discoveryServer, args=(discoSock, lobbyInfo))
+    discothread = threading.Thread(
+        target=discoveryServer, args=(discoSock, lobbyInfo))
     discothread.start()
 
     acceptConnexions(serverSocket, init, initializedQueue)
+
 
 if __name__ == "__main__":
     width = 7

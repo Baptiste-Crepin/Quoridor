@@ -1,15 +1,14 @@
 import pygame
 from graphical.widgets.button import Button
 from graphical.widgets.menu import Menu
-from graphical.menus.choiseHost import ChoiseHost
 
 
-class Menutype(Menu):
+class ChoiseHost(Menu):
     def __init__(self):
         super().__init__()
 
-        self.posSolo = (self.buttonX, 200)
-        self.posMulti = (self.buttonX, 370)
+        self.posHost = (self.buttonX, 200)
+        self.posJoin = (self.buttonX, 370)
 
         self.soloButton = pygame.Rect(
             self.buttonX, 200, self.buttonWidth, self.buttonHeight)
@@ -28,35 +27,31 @@ class Menutype(Menu):
 
     def setWindow(self):
         self.window.fill(self.backGround)
-        Button(self.window, self.soloButton, self.blue, "Solo")
-        Button(self.window, self.multiButton, self.blue, "Muti")
+        Button(self.window, self.soloButton, self.blue, "Host")
+        Button(self.window, self.multiButton, self.blue, "Join")
         self.ButtonBack()
         self.Event()
 
     def Event(self):
-        from graphical.menus.choicePlayer import NumberPlayer
+        from graphical.menus.type import Menutype
+        from graphical.menus.choiseServer import choiseServer
 
-        from Play import Play
         for event in pygame.event.get():
             if event.type == pygame.QUIT or event.type == pygame.WINDOWCLOSE:
                 raise SystemExit
             elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
-                if pygame.Rect(self.posSolo, self.buttonSize).collidepoint(event.pos):
+                if pygame.Rect(self.posHost, self.buttonSize).collidepoint(event.pos):
+                    raise SystemExit
 
-                    # pygame.init()
-                    board = NumberPlayer()
+                elif pygame.Rect(self.posJoin, self.buttonSize).collidepoint(event.pos):
+                    board = choiseServer()
                     while True:
                         board.setWindow()
                         pygame.display.update()
 
-                elif pygame.Rect(self.posMulti, self.buttonSize).collidepoint(event.pos):
-                    board = ChoiseHost()
-                    while True:
-                        board.setWindow()
-                        pygame.display.update()
                 elif self.ButtonBack().collidepoint(event.pos) and event.button == 1:
                     # pygame.init()
-                    board = Play()
+                    board = Menutype()
                     while True:
                         board.setWindow()
                         pygame.display.update()
@@ -66,7 +61,7 @@ class Menutype(Menu):
 
 if __name__ == "__main__":
     pygame.init()
-    board = Menutype()
+    board = ChoiseHost()
 
     while True:
         board.setWindow()

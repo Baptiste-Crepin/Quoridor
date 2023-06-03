@@ -2,28 +2,16 @@ import pygame
 from graphical.widgets.button import Button
 from graphical.widgets.menu import Menu
 from player import Player
+from multiplayerClient import SearchServer
 
 
 class choiseServer(Menu):
     def __init__(self) -> None:
         super().__init__()
         self.server = []
-        self.serverList = [
-            {"serverName": "toto", "ip": "193.98.55",
-                "port": 332, "players": 2, "remining": 1},
-            {"serverName": "titi", "ip": "193.98.55",
-                "port": 332, "players": 4, "remining": 3},
-            {"serverName": "on s'en fou", "ip": "193.98.55",
-                "port": 332, "players": 2, "remining": 1},
-            {"serverName": "titi", "ip": "193.98.55",
-                "port": 332, "players": 4, "remining": 3},
-            {"serverName": "titi", "ip": "193.98.55",
-                "port": 332, "players": 4, "remining": 3},
-            {"serverName": "titi", "ip": "193.98.55",
-                "port": 332, "players": 4, "remining": 3},
-            {"serverName": "tutu", "ip": "193.98.55",
-                "port": 332, "players": 4, "remining": 2},
-        ]
+        self.searchServer = SearchServer()
+        self.serverList = self.searchServer.discover()
+        print(self.serverList)
         self.serverPosition = 0
 
     def coordYServer(self, i: int) -> int:
@@ -43,11 +31,9 @@ class choiseServer(Menu):
             font = pygame.font.SysFont(
                 "Extra Bold Italic", 60, False, True)
             serverName = font.render(
-                self.serverList[i]["serverName"], True, self.white)
-            # textSlot = "Slots remining : "+str(self.serverList[i]["player"])
-            # reminingSlots = font.render(textSlot, True, self.white)
+                self.serverList[i]["lobbyName"], True, self.white)
             self.window.blit(serverName, (70, self.coordYServer(i)+10))
-            # self.window.blit(reminingSlots, (230, self.coordYServer(i)+80))
+
             for j in range(self.serverList[i]["players"]):
                 if j < self.serverList[i]["players"]-self.serverList[i]["remining"]:
                     pygame.draw.circle(self.window, Player(j+1).getColor(),
@@ -67,7 +53,7 @@ class choiseServer(Menu):
                 elif event.y > 0 and self.serverPosition < 0:
                     self.serverPosition += 50
 
-    def setwindow(self) -> None:
+    def setWindow(self) -> None:
         self.window.fill(self.darkBlue, rect=None, special_flags=0)
         self.displayServer()
         Button(self.window, pygame.Rect(
@@ -82,4 +68,4 @@ if __name__ == "__main__":
 
     board = choiseServer()
     while True:
-        board.setwindow()  # type: ignore
+        board.setWindow()
