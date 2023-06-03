@@ -1,4 +1,3 @@
-
 import pygame
 from typing import TypeVar
 
@@ -134,17 +133,21 @@ class Board:
                 element.hover = False
 
     def displayTable(self) -> None:
-        # self.window.fill((33, 73, 109))
         for i, row in enumerate(self.rect):
-
             for j, cell in enumerate(row):
                 cell.drawCase(self.window, self.white)
 
+    def displayHighlightedCells(self):
+        for i, row in enumerate(self.rect):
+            for j, cell in enumerate(row):
                 if cell.highlighted:
                     cell.drawCase(self.window, pygame.Color(255, 204, 255))
                 if cell.hover:
                     cell.drawCase(self.window, pygame.Color(255, 0, 0))
 
+    def displayPlayers(self) -> None:
+        for i, row in enumerate(self.rect):
+            for j, cell in enumerate(row):
                 if cell.player.getNumber() != 0:
                     pygame.draw.circle(self.window,
                                        cell.player.getColor(),
@@ -212,6 +215,56 @@ class Board:
                 if intersection.hover:
                     intersection.draw(self.window, pygame.Color(255, 0, 0))
 
+    def displayPlayerGoal(self, playerList: list[Player]) -> None:
+        for player in playerList:
+            for i in range(len(self.rect)-2):
+                goalLineMap = {1: (i+1, len(self.rect)-1), 2: (i+1, 0),
+                               3: (len(self.rect)-1, i+1), 4: (0, i+1)}
+                start = goalLineMap[player.getNumber()]
+                self.rect[start[0]][start[1]].drawCase(
+                    self.window, player.getColor())
+
+            goalCornerMap = {1: ((0, len(self.rect)-1), (len(self.rect)-1, len(self.rect)-1)),
+                             2: ((0, 0), (len(self.rect)-1, 0)),
+                             3: ((len(self.rect)-1, len(self.rect)-1, 0), (len(self.rect)-1, 0)),
+                             4: ((0, 0), (0, len(self.rect)-1))}
+            for j in range(2):
+                start = goalCornerMap[player.getNumber()]
+
+                x = self.rect[start[j][0]][start[j][1]].x + \
+                    self.rect[start[j][0]][start[j][1]].offsetCase()//2
+                y = self.rect[start[j][0]][start[j][1]].y + \
+                    self.rect[start[j][0]][start[j][1]].offsetCase()//2
+                width = self.rect[start[j][0]][start[j][1]].width - + \
+                    self.rect[start[j][0]][start[j][1]].offsetCase()
+
+                sizeArrow = width
+                upLeft = (x, y)
+                upRight = (x + sizeArrow, y)
+                downLeft = (x, y + sizeArrow)
+                downRight = (x + sizeArrow, y + sizeArrow)
+
+                dir_mapping = {
+                    1: {
+                        0: [downLeft, upRight, downRight],
+                        1: [downLeft, upLeft, downRight]},
+                    2: {
+                        0: [upLeft, upRight, downRight],
+                        1: [downLeft, upLeft, upRight]},
+                    3: {
+                        0: [upLeft, upRight, downRight],
+                        1: [downLeft, downRight, upRight]},
+                    4: {
+                        0: [upLeft, downLeft, downRight],
+                        1: [downLeft, upLeft, upRight]
+                    }
+                }
+
+                Triangle_point = dir_mapping[player.getNumber()][j]
+
+                pygame.draw.polygon(
+                    self.window, player.getColor(), Triangle_point)
+
     def displayPlayerInformation(self, currentPlayer: Player, playerList: list[Player]) -> None:
         height = 190
         if len(playerList) == 4:
@@ -235,6 +288,9 @@ class Board:
     def newFrame(self, currentPlayer: Player, playerList: list[Player]) -> None:
         self.clearScreen()
         self.displayTable()
+        self.displayPlayerGoal(playerList)
+        self.displayHighlightedCells()
+        self.displayPlayers()
         self.displayBarriers(self.Hbarriers)
         self.displayBarriers(self.Vbarriers)
         self.displayIntersection()
