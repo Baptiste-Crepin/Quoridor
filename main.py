@@ -106,13 +106,10 @@ class GraphicalGame():
             while self.game.checkGameOver():
                 end.setWindow()
                 pygame.display.update()
-            pygame.quit()
+            raise SystemExit
 
 
 if __name__ == "__main__":
-    # width = int(input('Width'))
-    # nbPlayer = int(input('Nb Player'))
-    # nbBarrier = int(input('Nb barrier'))
     width = 5
     nbBarrier = 10
     nbPlayer = 4

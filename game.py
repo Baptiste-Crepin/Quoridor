@@ -1,5 +1,5 @@
 import random
-from Player1 import Player
+from player import Player
 from cell import Cell
 from Bot import Bot
 
@@ -60,14 +60,6 @@ class Game():
 
     def setCurrentPlayer(self, value: Player | Bot) -> None:
         self.__currentPlayer = value
-
-    # def setNumberOfBarriers(self, value: int) -> None:
-    #     if len(self.getPlayerList()) == 2:
-    #         numberOfBarriers = value//2
-    #         return numberOfBarriers
-    #     elif len(self.getPlayerList()) == 4:
-    #         numberOfBarriers = value//4
-    #         return numberOfBarriers
 
     def createGrid(self) -> list[list[Cell]]:
         return [[Cell((y, x), Player(0, self.getNumberOfBarriers())) for x in range(self.getSquareWidth())]
@@ -470,7 +462,6 @@ class Game():
     def possibleMoves(self, playerCoord: tuple) -> list[tuple[int, int]]:
         '''Return a list of possible moves for the player
         '''
-
         result = []
         for neighbour in self.getNeighbours(playerCoord):
             neighbourCoordo = neighbour.getCoordinates()

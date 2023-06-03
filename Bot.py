@@ -1,4 +1,4 @@
-from Player1 import Player
+from player import Player
 import random
 import time
 

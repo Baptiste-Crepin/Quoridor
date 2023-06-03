@@ -5,12 +5,12 @@ from graphical.widgets.button import Button
 
 class Menu:
     def __init__(self) -> None:
-        self.windowXmax = 500
+        self.windowWidth = 500
         self.windowYmax = 700
         self.posPlay = (50, 200)
         self.posRules = (50, 370)
         self.window = pygame.display.set_mode(
-            (self.windowXmax, self.windowYmax))
+            (self.windowWidth, self.windowYmax))
         pygame.display.set_caption("Quoridor")
 
         self.white = pygame.Color(255, 255, 255)

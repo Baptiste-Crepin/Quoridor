@@ -1,32 +1,30 @@
 import pygame
-from Player1 import Player
-from Play import Menu
+from player import Player
+from Play import Play
 from graphical.widgets.button import Button
+from graphical.widgets.menu import Menu
 
 
-class End:
+class End(Menu):
     def __init__(self, curentPlayer: Player, width: int, nbPlayer: int, nbBarrier: int, nbBots: int):
+        super().__init__()
         self.curentplayer = curentPlayer
         self.width = width
         self.nbPlayer = nbPlayer
         self.nbBarrier = nbBarrier
         self.nbBots = nbBots
-        self.windowXmax = 1330
-        self.windowYmax = 750
+        self.windowWidth = 1330
+        self.windowHeight = 750
         self.window = pygame.display.set_mode(
-            size=(self.windowXmax, self.windowYmax))
-        pygame.display.set_caption("Quoridor")
-        self.blue = pygame.Color(138, 201, 244)
-        self.white = pygame.Color(255, 255, 255)
-        self.darkBlue = pygame.Color(0, 0, 48)
-        self.center = (self.windowXmax//2, self.windowYmax//2)
-        self.coordQuit = pygame.Rect(self.windowXmax//2-110,
-                                     self.windowYmax//2+250, 200, 80)
-        self.coordReplay = pygame.Rect(self.windowXmax//2-220,
-                                       self.windowYmax//2+150, 200, 80)
-        self.coordLobby = pygame.Rect(self.windowXmax//2+20,
-                                      self.windowYmax//2+150, 200, 80)
-        self.font = pygame.font.Font(None, 36)
+            size=(self.windowWidth, self.windowHeight))
+        self.center = (self.windowWidth//2, self.windowHeight//2)
+
+        self.coordQuit = pygame.Rect(self.windowWidth//2-110,
+                                     self.windowHeight//2+250, 200, 80)
+        self.coordReplay = pygame.Rect(self.windowWidth//2-220,
+                                       self.windowHeight//2+150, 200, 80)
+        self.coordLobby = pygame.Rect(self.windowWidth//2+20,
+                                      self.windowHeight//2+150, 200, 80)
 
     def Winner(self) -> str:
         return self.curentplayer.stringColor() + " Player won !"
@@ -39,11 +37,11 @@ class End:
         for event in pygame.event.get():
             from main import GraphicalGame
             if event.type == pygame.QUIT or event.type == pygame.WINDOWCLOSE:
-                pygame.quit()
+                raise SystemExit
             elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
                 if pygame.Rect(self.coordLobby).collidepoint(event.pos):
                     pygame.init()
-                    board = Menu()
+                    board = Play()
                     while True:
                         board.setWindow()
                         pygame.display.update()
@@ -55,12 +53,12 @@ class End:
                         board.mainLoop()
                         pygame.display.update()
                 elif pygame.Rect(self.coordQuit).collidepoint(event.pos):
-                    pygame.quit()
+                    raise SystemExit
 
     def setWindow(self):
-        self.window.fill(self.darkBlue)
+        self.window.fill(self.backGround)
         text_surface = self.font.render(self.Winner(), True, self.white)
-        text_rect = text_surface.get_rect(center=(self.windowXmax // 2, 100))
+        text_rect = text_surface.get_rect(center=(self.windowWidth // 2, 100))
         self.window.blit(text_surface, text_rect)
         self.displayWinner()
         Button(self.window, self.coordLobby, self.blue, "LOBBY")

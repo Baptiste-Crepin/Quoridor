@@ -1,30 +1,25 @@
 import pygame
 from graphical.widgets.button import Button
+from graphical.widgets.menu import Menu
 
 
-class NumberBots():
+class NumberBots(Menu):
     def __init__(self, nbPlayers: int) -> None:
+        super().__init__()
         self.nbPlayers = nbPlayers
-        self.windowXmax = 500
-        self.windowYmax = 700
-        self.pos1 = (50, 200)
-        self.pos2 = (50, 370)
-        self.window = pygame.display.set_mode(
-            (self.windowXmax, self.windowYmax))
-        pygame.display.set_caption("Quoridor")
 
-        self.blue = pygame.Color(138, 201, 244)
-        self.darkerBlue = pygame.Color(0, 0, 48)
-        self.white = pygame.Color(255, 255, 255)
-        self.black = pygame.Color(0, 0, 0)
-        self.font = pygame.font.Font(None, 36)
-        self.firstRect = (50, 200, 400, 70)
-        self.secondRect = (50, 370, 400, 70)
+        self.pos1 = (self.buttonX, 200)
+        self.pos2 = (self.buttonX, 370)
+
+        self.firstRect = (self.buttonX, 200,
+                          self.buttonWidth, self.buttonHeight)
+        self.secondRect = (self.buttonX, 370,
+                           self.buttonWidth, self.buttonHeight)
 
     def ButtonBack(self) -> pygame.Rect:
         coord = [(5, 40), (30, 10), (30, 20), (70, 20),
                  (70, 60), (30, 60), (30, 70)]
-        button = pygame.draw.polygon(self.window, self.darkerBlue, coord)
+        button = pygame.draw.polygon(self.window, self.darkBlue, coord)
         font = pygame.font.SysFont("Extra Bold Italic", 20, False, True)
         text = font.render("Back", True, self.white)
         buttonText = text.get_rect(center=button.center)
@@ -37,7 +32,7 @@ class NumberBots():
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT or event.type == pygame.WINDOWCLOSE:
-                pygame.quit()
+                raise SystemExit
             if not (event.type == pygame.MOUSEBUTTONDOWN and event.button == 1):
                 return
 
@@ -63,17 +58,16 @@ class NumberBots():
                     pygame.display.update()
 
     def setWindow(self) -> None:
-        backGround = pygame.image.load('pictures/backGroundMenu3.jpg')
-        self.window.blit(backGround, (-80, -300))
+        self.window.fill(self.backGround)
         if self.nbPlayers == 1:
             text_surface = self.font.render("How many bots?", True, self.white)
             text_rect = text_surface.get_rect(
-                center=(self.windowXmax // 2, 50))
+                center=(self.windowWidth // 2, 50))
 
             contour_surface = self.font.render(
                 "How many bots?", True, (0, 0, 0))
             contour_rect = contour_surface.get_rect(
-                center=(self.windowXmax // 2, 50))
+                center=(self.windowWidth // 2, 50))
             contour_rect.move_ip(2, 2)
 
             self.window.blit(contour_surface, contour_rect)
@@ -88,12 +82,12 @@ class NumberBots():
             text_surface = self.font.render(
                 "Do you want to play with bots?", True, self.white)
             text_rect = text_surface.get_rect(
-                center=(self.windowXmax // 2, 50))
+                center=(self.windowWidth // 2, 50))
 
             contour_surface = self.font.render(
                 "Do you want to play with bots?", True, (0, 0, 0))
             contour_rect = contour_surface.get_rect(
-                center=(self.windowXmax // 2, 50))
+                center=(self.windowWidth // 2, 50))
             contour_rect.move_ip(2, 2)
 
             self.window.blit(contour_surface, contour_rect)

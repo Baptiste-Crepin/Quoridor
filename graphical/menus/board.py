@@ -2,14 +2,14 @@
 import pygame
 from typing import TypeVar
 
-from Player1 import Player
-from graphical.Barriers.barrier import Barrier
-from graphical.Barriers.horizontalBarrier import HorrizontalBarrier
+from player import Player
+from graphical.barriers.barrier import Barrier
+from graphical.barriers.horizontalBarrier import HorrizontalBarrier
 from graphical.widgets.informationPlayer import informationPlayer
 from graphical.widgets.displayInformation import displayInformation
 from graphical.menus.tablePlayer import TablePlayer
-from graphical.Barriers.verticalBarrier import VerticalBarrier
-from graphical.Barriers.intersection import Intersection
+from graphical.barriers.verticalBarrier import VerticalBarrier
+from graphical.barriers.intersection import Intersection
 
 
 class Board:
@@ -18,10 +18,10 @@ class Board:
     def __init__(self, Width):
         self.col = Width
 
-        self.windowXmax = 1330
-        self.windowYmax = 750
+        self.windowWidth = 1330
+        self.windowHeight = 750
         self.window = pygame.display.set_mode(
-            (self.windowXmax, self.windowYmax))
+            (self.windowWidth, self.windowHeight))
 
         self.clicked = False
         self.white = pygame.Color(255, 255, 255)
@@ -41,7 +41,7 @@ class Board:
         self.play = True
 
     def initializeObjectList(self, objectType: type[BarrierOrCell], offsetRow: int = 0, offsetCol: int = 0) -> list[list[BarrierOrCell]]:
-        return [[objectType(self.windowXmax, self.windowYmax, self.col, i, j)
+        return [[objectType(self.windowWidth, self.windowHeight, self.col, i, j)
                 for j in range(self.col - offsetCol)]
                 for i in range(self.col - offsetRow)]
 
@@ -103,7 +103,6 @@ class Board:
 
     def quitWindow(self, event) -> None:
         if event.type == pygame.QUIT or event.type == pygame.WINDOWCLOSE:
-            pygame.quit()
             raise SystemExit
 
     def handleEvents(self) -> None | tuple[str, int, int]:
@@ -112,7 +111,7 @@ class Board:
             return self.mouseLogic()
 
     def clearScreen(self) -> None:
-        self.window.fill((240, 240, 240))
+        self.window.fill(self.darkBlue)
 
     def clearHighlight(self, objectList: list[list[TablePlayer]]) -> None:
         for row in objectList:
@@ -135,7 +134,7 @@ class Board:
                 element.hover = False
 
     def displayTable(self) -> None:
-        self.window.fill(self.darkBlue)
+        # self.window.fill((33, 73, 109))
         for i, row in enumerate(self.rect):
 
             for j, cell in enumerate(row):
@@ -252,5 +251,3 @@ if __name__ == "__main__":
     while board.play:
         board.handleEvents()
         board.newFrame(player1, [player1, player2])
-
-    pygame.quit()

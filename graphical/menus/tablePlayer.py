@@ -1,9 +1,10 @@
 import pygame
-from Player1 import Player
+from player import Player
 
 
-class TablePlayer:
+class TablePlayer():
     def __init__(self, boardX: int, boardY: int, col: int, i: int = 0, j: int = 0) -> None:
+        super().__init__()
         self.boardX = boardX
         self.boardY = boardY
         self.col = col
