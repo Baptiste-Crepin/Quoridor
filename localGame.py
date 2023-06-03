@@ -122,8 +122,9 @@ class LocalGame():
 
 if __name__ == "__main__":
 
-    width = 5
+    width = 11
     nbBarrier = 4
     nbPlayer = 2
     nbBot = 2
     G = LocalGame(width, nbPlayer, nbBarrier, nbBot)
+    G.mainLoop()
