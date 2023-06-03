@@ -4,6 +4,15 @@ import socket
 import sys
 import threading
 import pickle
+DISCOVERY_MSG = b"SERVER_DISCOVERY_REQUEST"
+start = False
+
+def boutton(connected):
+    message = True
+    pickeled_message = pickle.dumps(message)
+    for i in range(len(connected)):
+        print("sending starter message to client  :", i)
+        connected[i].send(pickeled_message)
 
 class ThreadClient(threading.Thread):
 
@@ -69,7 +78,7 @@ class ThreadClient(threading.Thread):
 
         # self.connexion.close()
 
-def acceptConnexions(mySocket, init, initializedQueue):
+def acceptConnexions(mySocket, init, initializedQueue,):
     '''
     accepts the connexions of the clients and creates a thread for each of them to handle the messages
     '''
@@ -89,32 +98,64 @@ def acceptConnexions(mySocket, init, initializedQueue):
 
         print("Client", init[0], "connected, awaiting other players")
         init[0] += 1
+    boutton(connected)
+
+
+
+
+
+
+
+
+
+def handle_client_request(data, client_address,dsock,lobbyInfo):
+    if data == DISCOVERY_MSG:
+        print("incomming discovery packet from:", client_address)
+        response = pickle.dumps(lobbyInfo)  # Convert the server IP address to binary format
+        dsock.sendto(response, client_address)
+        print("handeling request")
+
+def discoveryServer(dsock, lobbyInfo):
+    while True:
+        data, addre = dsock.recvfrom(1024)
+        handle_client_request(data, addre, dsock, lobbyInfo)
 
 def createServer(width, nbBarrier, nbPlayer, nbBots, port=45678):
     '''
     creates a server with the given parameters
     '''
+
     ide = 0
     init = [ide, width, nbBarrier, nbPlayer, nbBots]
+
     hostname = socket.gethostname()
     host = socket.gethostbyname(hostname)
+    lobbyInfo = {'discoverymessage': DISCOVERY_MSG,
+                 'ip': host,
+                 'port': port,
+                 'lobbyName': "lobby de toto"
+                 }
     
     initializedQueue = queue.Queue()
     initializedQueue.put(0)
     initializedQueue.task_done()
     
     # --- server creation
-    mySocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    serverSocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    discoSock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     try:
-        mySocket.bind((host, port))
+        serverSocket.bind((host, port))
+        discoSock.bind(('0.0.0.0', 5555))
     except socket.error as e:
         print("error whilst launching server")
         print(e)
         sys.exit()
     
     print(f"\n\n\n{'='*15} Server |{host} : {port}| on {'='*15}\n\n")
+    discothread = threading.Thread(target=discoveryServer, args=(discoSock, lobbyInfo))
+    discothread.start()
 
-    acceptConnexions(mySocket, init, initializedQueue)
+    acceptConnexions(serverSocket, init, initializedQueue)
 
 if __name__ == "__main__":
     width = 7
