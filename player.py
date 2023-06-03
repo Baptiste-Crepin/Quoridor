@@ -3,7 +3,7 @@ class Player():
         self.__number = number
         self.__barrier = barrer
         self.__color = self.setColorFromNumber()
-        self.__coordinates = None
+        self.__coordinates = (0, 0)
 
     def getNumber(self) -> int:
         return self.__number
@@ -14,7 +14,7 @@ class Player():
     def getColor(self) -> str:
         return self.__color
 
-    def getCoordinates(self) -> int:
+    def getCoordinates(self) -> tuple[int, int]:
         return self.__coordinates
 
     def setNumber(self, value: int) -> None:
@@ -26,13 +26,20 @@ class Player():
     def setColor(self, value: str) -> None:
         self.__color = value
 
-    def setCoordinates(self, value: int) -> None:
+    def setCoordinates(self, value: tuple[int, int]) -> None:
         self.__coordinates = value
 
     def __repr__(self) -> str:
         return str(self.getNumber())
 
-    def setColorFromNumber(self) -> None:
+    def stringColor(self) -> str:
+        colorList = {"#fe001c": "RED",
+                     "#efe743": "YELLOW",
+                     "#639d39": "GREEN",
+                     "#1a6baa": "BLUE"}
+        return colorList[self.getColor()]
+
+    def setColorFromNumber(self) -> str:
         RED = "#fe001c"
         YELLOW = "#efe743"
         GREEN = "#639d39"

@@ -1,7 +1,9 @@
+import pygame
 from game import Game
-from Table import Board
+from graphical.menus.board import Board
 from Bot import Bot
-from Player import Player
+from player import Player
+from graphical.menus.endGame import End
 
 
 class LocalGame():
@@ -48,13 +50,28 @@ class LocalGame():
 
     def placement(self, currentPlayer: Player):
         if isinstance(currentPlayer, Bot):
-            self.board.newFrame(currentPlayer)
-            currentPlayer.randomMoves(self.game)
+            self.board.newFrame(currentPlayer, self.game.getPlayerList())
+            currentPlayer.randomMoves(self.game.possibleBarrierPlacement(
+                currentPlayer), self.game.possibleMoves(currentPlayer.getCoordinates()))
+
+        player = self.game.getCurrentPlayer()
+        if isinstance(player, Bot):
+            self.board.newFrame(self.game.getCurrentPlayer(),
+                                self.game.getPlayerList())
+            randomMove = player.randomMoves(self.game.possibleBarrierPlacement(
+                player), self.game.possibleMoves(player.getCoordinates()))
+            if isinstance(randomMove[1], int):
+                self.game.movePlayer(player, randomMove)
+            elif isinstance(randomMove[0], tuple) and isinstance(randomMove[1], str):
+                coordo = randomMove[0]
+                direction = randomMove[1]
+                self.game.placeWall(coordo, direction, player)
+
             self.game.nextPlayer()
             self.newTurn = True
             return
 
-        event = self.board.handleEvents(currentPlayer)
+        event = self.board.handleEvents()
         if not event:
             return
 
@@ -92,18 +109,21 @@ class LocalGame():
                 self.placement(self.game.getCurrentPlayer())
                 self.actualizeGame()
 
-                self.board.newFrame(self.game.getCurrentPlayer())
+                self.board.newFrame(
+                    self.game.getCurrentPlayer(), self.game.getPlayerList())
             # TODO: Game has ended. display the end screen
-            self.board.newFrame(self.game.getCurrentPlayer())
+            end = End(self.game.getPreviousPlayer(), self.game.getSquareWidth(
+            ), self.game.getNumberOfPlayers(), self.game.getNumberOfBarriers(), self.game.getNumberOfBots())
+            while self.game.checkGameOver():
+                end.setWindow()
+                pygame.display.update()
+            raise SystemExit
 
 
 if __name__ == "__main__":
-    # width = int(input('Width'))
-    # nbPlayer = int(input('Nb Player'))
-    # nbBarrier = int(input('Nb barrier'))
+
     width = 5
     nbBarrier = 4
     nbPlayer = 2
     nbBot = 2
     G = LocalGame(width, nbPlayer, nbBarrier, nbBot)
-    G.mainLoop()
