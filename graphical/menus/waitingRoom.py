@@ -1,28 +1,50 @@
 import pygame
 from graphical.widgets.button import Button
 from graphical.widgets.menu import Menu
+from player import Player
 from multiplayerServer import createServer
 from multiplayerServer import acceptConnexions
 
 
 class WaitingRoom(Menu):
-    def __init__(self, width: int, nbPlayer: int, nbBarrier: int, nbBot: int, serverName: str) -> None:
+    def __init__(self, width: int, nbPlayer: int, nbBarrier: int, nbBot: int, serverName: str, Host: bool) -> None:
         super().__init__()
         self.width = width
         self.nbPlayer = nbPlayer
         self.nbBarrier = nbBarrier
         self.nbBot = nbBot
         self.serverName = serverName
-        self.server = createServer(
-            width, nbBarrier, nbPlayer, nbBot, serverName)
-        # self.clientList = acceptConnexions(self.server.clientList)
-        self.serverPosition = 0
+        self.host = Host
+        # self.server = createServer(
+        #     width, nbBarrier, nbPlayer, nbBot, serverName)
+        self.clientList = ["zrberve", "erbhb", "eubri"]
 
     def displayPlayer(self) -> None:
-        pygame.draw.rect(self.window, self.lighterBlue,
-                         (50, 50, 640, 650), border_radius=5)
+        for i in range(4):
+            if len(self.clientList)-1 >= i:
+                pygame.draw.circle(self.window, Player(i+1).getColor(
+                ), ((self.windowWidth//5)*i+self.windowWidth//5, self.windowHeight//3), 70)
+                font = pygame.font.SysFont(
+                    "Extra Bold Italic", 60, False, True)
+                player = font.render(
+                    "player "+str(i+1), True, self.white)
+                self.window.blit(
+                    player, ((self.windowWidth//5)*i+self.windowWidth//7, self.windowHeight//3+80))
+            elif len(self.clientList)-1 < i:
+                pygame.draw.circle(self.window, Player(i+1).getColor(
+                ), ((self.windowWidth//5)*i+self.windowWidth//5, self.windowHeight//3), 70, 10)
+                font = pygame.font.SysFont(
+                    "Extra Bold Italic", 60, False, True)
+                wait = font.render(
+                    "waiting for", True, self.white)
+                player = font.render(
+                    "player "+str(i+1), True, self.white)
+                self.window.blit(
+                    wait, ((self.windowWidth//5)*i+self.windowWidth//8, self.windowHeight//3+80))
+                self.window.blit(
+                    player, ((self.windowWidth//5)*i+self.windowWidth//7, self.windowHeight//3+130))
 
-    def Event(self):
+    def Event(self) -> None:
         for event in pygame.event.get():
             if event.type == pygame.QUIT or event.type == pygame.WINDOWCLOSE:
                 pygame.quit()
@@ -30,8 +52,19 @@ class WaitingRoom(Menu):
     def setWindow(self) -> None:
         self.window.fill(self.darkBlue, rect=None, special_flags=0)
         self.displayPlayer()
-        Button(self.window, pygame.Rect(
-            900, 50, 300, 100), self.lighterBlue, "Refresh")
+        if self.host:
+            Button(self.window, pygame.Rect(
+                self.windowWidth//2-150, self.windowHeight*0.60, 300, 80), self.lighterBlue, "Start")
+            Button(self.window, pygame.Rect(
+                self.windowWidth//2-150, self.windowHeight*0.75, 300, 80), self.lighterBlue, "Refresh")
 
         self.Event()
         pygame.display.flip()
+
+
+if __name__ == "__main__":
+    pygame.init()
+
+    board = WaitingRoom(5, 4, 4, 0, "toto", True)
+    while True:
+        board.setWindow()
