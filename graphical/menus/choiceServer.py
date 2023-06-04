@@ -8,7 +8,6 @@ from multiplayerClient import SearchServer
 class choiseServer(Menu):
     def __init__(self) -> None:
         super().__init__()
-        self.server = []
         self.searchServer = SearchServer()
         self.serverList = self.searchServer.discover()
         print(self.serverList)
@@ -24,9 +23,16 @@ class choiseServer(Menu):
 
     def displayServer(self) -> None:
         self.serverPositions = []
+        if len(self.serverList) == 0:
+            font = pygame.font.SysFont(
+                "Extra Bold Italic", 60, False, True)
+            serverName = font.render(
+                "No server found", True, self.white)
+            self.window.blit(serverName, (70, 70+self.serverPosition))
+            return
+
         pygame.draw.rect(self.window, self.lighterBlue,
                          (50, 50+self.serverPosition, 640, self.heightServerRect()), border_radius=5)
-
         for i in range(len(self.serverList)):
             dico = {2: 630, 4: 420}
             pygame.draw.rect(self.window, self.black, (70, self.coordYServer(i), 600, 200),
