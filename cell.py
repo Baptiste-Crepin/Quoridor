@@ -3,13 +3,13 @@ from player import Player
 
 class Cell():
 
-    def __init__(self, coordinates: tuple, player: Player) -> None:
+    def __init__(self, coordinates: tuple[int, int], player: Player) -> None:
         self.__coordinates = coordinates
         self.__player = player
         self.__walls = {"Down": False, "Right": False}
         self.__visited = False
 
-    def getCoordinates(self) -> tuple:
+    def getCoordinates(self) -> tuple[int, int]:
         return self.__coordinates
 
     def getPlayer(self) -> Player:
@@ -21,7 +21,7 @@ class Cell():
     def getVisited(self) -> bool:
         return self.__visited
 
-    def setCoordinates(self, value: tuple) -> None:
+    def setCoordinates(self, value: tuple[int, int]) -> None:
         self.__coordinates = value
 
     def setPlayer(self, value: Player) -> None:

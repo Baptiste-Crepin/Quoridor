@@ -7,27 +7,31 @@ from graphical.menus.endGame import End
 
 
 class LocalGame():
-    def __init__(self, width, nbPlayer, nbBarrier, nbBots) -> None:
+    """This class is the main class of the game. It handles the game logic and the graphical interface."""
+
+    def __init__(self, width: int, nbPlayer: int, nbBarrier: int, nbBots: int) -> None:
+        """Initializes the game"""
         self.game = Game(width, nbPlayer, nbBarrier, nbBots)
         self.board = Board(self.game.getSquareWidth())
         self.newTurn = True
 
-    def highlightPlayer(self, player):
-        for PossibleMoveCoordo in self.game.possibleMoves(player.getCoordinates()):
-            self.board.rect[PossibleMoveCoordo[1]
-                            ][PossibleMoveCoordo[0]].highlighted = True
+    def highlightPlayer(self, player: Player):
+        """Highlights the possible moves of a player"""
+        for PossibleMoveCoord in self.game.possibleMoves(player.getCoordinates()):
+            self.board.rect[PossibleMoveCoord[1]
+                            ][PossibleMoveCoord[0]].highlighted = True
 
     def highlightBarrier(self):
-        for (possibleBarrierCoordo, direction) in self.game.possibleBarrierPlacement(self.game.getCurrentPlayer()):
+        """Highlights the possible placements of a barrier"""
+        for (possibleBarrierCoord, direction) in self.game.possibleBarrierPlacement(self.game.getCurrentPlayer()):
             if direction == 'Right':
-                self.board.Vbarriers[possibleBarrierCoordo[1]
-                                     ][possibleBarrierCoordo[0]].possiblePlacement = True
-
-            if direction == 'Down':
-                self.board.Hbarriers[possibleBarrierCoordo[1]
-                                     ][possibleBarrierCoordo[0]].possiblePlacement = True
+                self.board.verticalBarriers[possibleBarrierCoord[1]
+                                            ][possibleBarrierCoord[0]].possiblePlacement = True
+            self.board.horizontalBarriers[possibleBarrierCoord[1]
+                                          ][possibleBarrierCoord[0]].possiblePlacement = True
 
     def displayPossibleMoves(self, player: Player):
+        """Displays the possible moves of a player at the beginning of his turn"""
         if not self.newTurn:
             return
         self.newTurn = False
@@ -36,92 +40,106 @@ class LocalGame():
             self.highlightBarrier()
 
     def actualizeGame(self):
+        """Updates the game with the current state of the board"""
         for i, row in enumerate(self.game.getGrid()):
             for j, cell in enumerate(row):
 
                 self.board.rect[j][i].player = cell.getPlayer()
 
                 if i < len(self.game.getGrid())-1:
-                    self.board.Hbarriers[j][i].placed = cell.getWalls()['Down']
+                    self.board.horizontalBarriers[j][i].placed = cell.getWalls()[
+                        'Down']
 
                 if j < len(row)-1:
-                    self.board.Vbarriers[j][i].placed = cell.getWalls()[
+                    self.board.verticalBarriers[j][i].placed = cell.getWalls()[
                         'Right']
 
     def placement(self, currentPlayer: Player):
-        if isinstance(currentPlayer, Bot):
-            self.board.newFrame(currentPlayer, self.game.getPlayerList())
-            currentPlayer.randomMoves(self.game.possibleBarrierPlacement(
-                currentPlayer), self.game.possibleMoves(currentPlayer.getCoordinates()))
-
+        """Handles the placement of a barrier or a player"""
         player = self.game.getCurrentPlayer()
         if isinstance(player, Bot):
-            self.board.newFrame(self.game.getCurrentPlayer(),
-                                self.game.getPlayerList())
-            randomMove = player.randomMoves(self.game.possibleBarrierPlacement(
-                player), self.game.possibleMoves(player.getCoordinates()))
-            if isinstance(randomMove[1], int):
-                self.game.movePlayer(player, randomMove)
-            elif isinstance(randomMove[0], tuple) and isinstance(randomMove[1], str):
-                coordo = randomMove[0]
-                direction = randomMove[1]
-                self.game.placeWall(coordo, direction, player)
-
-            self.game.nextPlayer()
-            self.newTurn = True
-            return
-
+            return self.botMovement(player)
+        # if the player doesn't click on the board, we don't do anything
         event = self.board.handleEvents()
         if not event:
             return
 
         (action, x, y) = event
-        clickCoordo = (x, y)
+        clickCoord = (x, y)
 
         if action == 'TablePlayer':
-            if clickCoordo not in self.game.possibleMoves(currentPlayer.getCoordinates()):
+            # if the player clicks on a cell that is not a possible move, we don't do anything
+            if clickCoord not in self.game.possibleMoves(currentPlayer.getCoordinates()):
                 return
+
+            # if the player clicks on a cell that is a possible move, we move the player
             self.board.clearHover(self.board.rect)
-            self.game.movePlayer(currentPlayer, clickCoordo)
+            self.game.movePlayer(currentPlayer, clickCoord)
 
         if action == 'VerticalBarrier':
-            if (clickCoordo, 'Right') not in self.game.possibleBarrierPlacement(currentPlayer):
+            # if the player clicks on a barrier that is not a possible placement, we don't do anything
+            if (clickCoord, 'Right') not in self.game.possibleBarrierPlacement(currentPlayer):
                 return
-            self.game.placeWall(clickCoordo, 'Right',
+
+            # if the player clicks on a barrier that is a possible placement, we place the barrier
+            self.game.placeWall(clickCoord, 'Right',
                                 currentPlayer, place=True)
 
-        if action == 'HorrizontalBarrier':
-            if (clickCoordo, 'Down') not in self.game.possibleBarrierPlacement(currentPlayer):
+        if action == 'HorizontalBarrier':
+            # if the player clicks on a barrier that is not a possible placement, we don't do anything
+            if (clickCoord, 'Down') not in self.game.possibleBarrierPlacement(currentPlayer):
                 return
-            self.game.placeWall(clickCoordo, 'Down', currentPlayer)
 
+            # if the player clicks on a barrier that is a possible placement, we place the barrier
+            self.game.placeWall(clickCoord, 'Down', currentPlayer)
+
+        # a legal move has been made, we clear the highlights and change the player
         self.board.clearAllHighlight()
         self.game.nextPlayer()
         self.newTurn = True
 
+    def botMovement(self, player: Bot):
+        # Logic for the bot to play
+        self.board.newFrame(player, self.game.getPlayerList())
+        randomAction = player.randomAction(
+            self.game.possibleBarrierPlacement(player))
+        if randomAction == 0:
+            coord = player.randomMove(
+                self.game.possibleMoves(player.getCoordinates()))
+            self.game.movePlayer(player, coord)
+        elif randomAction == 1:
+            coord, direction = player.randomBarrier(
+                self.game.possibleBarrierPlacement(player))
+            self.game.placeWall(coord, direction, player)
+
+        self.game.nextPlayer()
+        self.newTurn = True
+        return
+
     def mainLoop(self) -> None:
+        """Main loop of the game"""
         self.highlightPlayer(self.game.getCurrentPlayer())
         self.highlightBarrier()
+        while not self.game.checkGameOver():
+            self.displayPossibleMoves(self.game.getCurrentPlayer())
+
+            self.placement(self.game.getCurrentPlayer())
+            self.actualizeGame()
+
+            self.board.newFrame(
+                self.game.getCurrentPlayer(), self.game.getPlayerList())
+
+        endWindow = End(self.game.getPreviousPlayer(),
+                        self.game.getSquareWidth(),
+                        self.game.getNumberOfPlayers(),
+                        self.game.getNumberOfBarriers(),
+                        self.game.getNumberOfBots())
         while True:
-            while not self.game.checkGameOver():
-                self.displayPossibleMoves(self.game.getCurrentPlayer())
-
-                self.placement(self.game.getCurrentPlayer())
-                self.actualizeGame()
-
-                self.board.newFrame(
-                    self.game.getCurrentPlayer(), self.game.getPlayerList())
-            # TODO: Game has ended. display the end screen
-            end = End(self.game.getPreviousPlayer(), self.game.getSquareWidth(
-            ), self.game.getNumberOfPlayers(), self.game.getNumberOfBarriers(), self.game.getNumberOfBots())
-            while self.game.checkGameOver():
-                end.setWindow()
-                pygame.display.update()
-            raise SystemExit
+            endWindow.setWindow()
+            pygame.display.update()
 
 
 if __name__ == "__main__":
-
     width = 11
     nbBarrier = 4
     nbPlayer = 2

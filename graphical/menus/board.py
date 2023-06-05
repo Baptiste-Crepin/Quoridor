@@ -3,38 +3,31 @@ from typing import TypeVar
 
 from player import Player
 from graphical.barriers.barrier import Barrier
-from graphical.barriers.horizontalBarrier import HorrizontalBarrier
+from graphical.barriers.horizontalBarrier import HorizontalBarrier
 from graphical.widgets.informationPlayer import informationPlayer
 from graphical.widgets.displayInformation import displayInformation
 from graphical.menus.tablePlayer import TablePlayer
 from graphical.barriers.verticalBarrier import VerticalBarrier
 from graphical.barriers.intersection import Intersection
+from graphical.widgets.menu import Menu
 
 
-class Board:
+class Board(Menu):
+    """Class that handles the display of the board"""
     BarrierOrCell = TypeVar('BarrierOrCell', Barrier, TablePlayer)
 
-    def __init__(self, Width):
+    def __init__(self, Width: int) -> None:
+        """Initializes the board"""
+        super().__init__()
         self.col = Width
 
-        self.windowWidth = 1330
-        self.windowHeight = 750
-        self.window = pygame.display.set_mode(
-            (self.windowWidth, self.windowHeight))
-
         self.clicked = False
-        self.white = pygame.Color(255, 255, 255)
-        self.grey = pygame.Color(217, 217, 217, 35)
-        self.black = pygame.Color(0, 0, 0)
-        self.darkBlue = pygame.Color(0, 0, 48)
-        self.lightBlue = pygame.Color(90, 173, 255)
-        self.purple = pygame.Color(204, 0, 204)
         self.rect = self.initializeObjectList(TablePlayer)
-        self.Vbarriers = self.initializeObjectList(VerticalBarrier, 1, 0)
-        self.Hbarriers = self.initializeObjectList(HorrizontalBarrier, 0, 1)
+        self.verticalBarriers = self.initializeObjectList(
+            VerticalBarrier, 1, 0)
+        self.horizontalBarriers = self.initializeObjectList(
+            HorizontalBarrier, 0, 1)
         self.intersection = self.initializeObjectList(Intersection, 1, 1)
-
-        self.player = Player(0)
 
         pygame.display.set_caption("plateau")
         self.play = True
@@ -45,8 +38,8 @@ class Board:
                 for i in range(self.col - offsetRow)]
 
     def hoverCells(self, cellsList: list[list[TablePlayer]]) -> None | bool:
-        for i, row in enumerate(cellsList):
-            for j, cell in enumerate(row):
+        for row in cellsList:
+            for cell in row:
                 if not cell.highlighted:
                     continue
                 if cell.collides(pygame.mouse.get_pos()):
@@ -69,18 +62,17 @@ class Board:
                 self.clearHover(barrierList)
         return False
 
-    def interactObject(self, listeObject: list[list[Barrier | TablePlayer]], pos: tuple[int, int]) -> None | tuple[str, int, int]:
-        for i, row in enumerate(listeObject):
+    def interactObject(self, listObject: list[list[BarrierOrCell]], pos: tuple[int, int]) -> None | tuple[str, int, int]:
+        for i, row in enumerate(listObject):
             for j, element in enumerate(row):
-                colli = element.collides(pos)
-                if colli:
+                if element.collides(pos):
                     return (type(element).__name__, j, i)
 
     def hoverLogic(self) -> None:
         self.clearHover(self.rect)
-        if self.hoverBarriers(self.Hbarriers, 1, 0):
+        if self.hoverBarriers(self.horizontalBarriers, 1, 0):
             return
-        if self.hoverBarriers(self.Vbarriers, 0, 1):
+        if self.hoverBarriers(self.verticalBarriers, 0, 1):
             return
         self.hoverCells(self.rect)
         return
@@ -88,25 +80,24 @@ class Board:
     def mouseLogic(self) -> None | tuple[str, int, int]:
         self.hoverLogic()
 
-        if pygame.mouse.get_pressed()[0] == 1 and not self.clicked:
+        if pygame.mouse.get_pressed()[0] and not self.clicked:
             self.clicked = True
             pos = pygame.mouse.get_pos()
 
-            for array in [self.Vbarriers, self.Hbarriers, self.rect]:
-                clickedElement = self.interactObject(array, pos)
-                if clickedElement:
+            for array in [self.verticalBarriers, self.horizontalBarriers, self.rect]:
+                if clickedElement := self.interactObject(array, pos):
                     return clickedElement
 
-        if pygame.mouse.get_pressed()[0] == 0 and self.clicked:
+        if not pygame.mouse.get_pressed()[0] and self.clicked:
             self.clicked = False
 
-    def quitWindow(self, event) -> None:
-        if event.type == pygame.QUIT or event.type == pygame.WINDOWCLOSE:
+    def quitWindow(self, eventType: int) -> None:
+        if eventType in [pygame.QUIT, pygame.WINDOWCLOSE]:
             raise SystemExit
 
     def handleEvents(self) -> None | tuple[str, int, int]:
         for event in pygame.event.get():
-            self.quitWindow(event)
+            self.quitWindow(event.type)
             return self.mouseLogic()
 
     def clearScreen(self) -> None:
@@ -124,8 +115,8 @@ class Board:
 
     def clearAllHighlight(self) -> None:
         self.clearHighlight(self.rect)
-        self.clearPossiblePlacement(self.Vbarriers)
-        self.clearPossiblePlacement(self.Hbarriers)
+        self.clearPossiblePlacement(self.verticalBarriers)
+        self.clearPossiblePlacement(self.horizontalBarriers)
 
     def clearHover(self, objectList: list[list[BarrierOrCell]]) -> None:
         for row in objectList:
@@ -133,21 +124,21 @@ class Board:
                 element.hover = False
 
     def displayTable(self) -> None:
-        for i, row in enumerate(self.rect):
-            for j, cell in enumerate(row):
+        for row in self.rect:
+            for cell in row:
                 cell.drawCase(self.window, self.white)
 
     def displayHighlightedCells(self):
-        for i, row in enumerate(self.rect):
-            for j, cell in enumerate(row):
+        for row in self.rect:
+            for cell in row:
                 if cell.highlighted:
                     cell.drawCase(self.window, pygame.Color(255, 204, 255))
                 if cell.hover:
                     cell.drawCase(self.window, pygame.Color(255, 0, 0))
 
     def displayPlayers(self) -> None:
-        for i, row in enumerate(self.rect):
-            for j, cell in enumerate(row):
+        for row in self.rect:
+            for cell in row:
                 if cell.player.getNumber() != 0:
                     pygame.draw.circle(self.window,
                                        cell.player.getColor(),
@@ -155,9 +146,9 @@ class Board:
                                         (cell.y + cell.sizeCase()//2)),
                                        cell.sizeCase()//3-5)
 
-    def higlightPlayer(self, player: Player) -> None:
-        for i, row in enumerate(self.rect):
-            for j, cell in enumerate(row):
+    def highlightPlayer(self, player: Player) -> None:
+        for row in self.rect:
+            for cell in row:
                 if cell.player.getNumber() == player.getNumber():
                     pygame.draw.circle(self.window,
                                        (255, 255, 255),
@@ -166,8 +157,8 @@ class Board:
                                        cell.sizeCase()//6)
 
     def displayBarriers(self, barrierList: list[list[Barrier]]) -> None:
-        for i, row in enumerate(barrierList):
-            for j, barrier in enumerate(row):
+        for row in barrierList:
+            for barrier in row:
                 if barrier.placed:
                     barrier.draw(self.window, self.purple)
 
@@ -181,30 +172,30 @@ class Board:
     def displayIntersection(self) -> None:
         for i, row in enumerate(self.intersection):
             for j, intersection in enumerate(row):
-                if ((self.Vbarriers[i][j].placed and
-                     self.Vbarriers[i][j+1].placed) or
-                    (self.Hbarriers[i][j].placed and
-                     self.Hbarriers[i+1][j].placed)):
+                if ((self.verticalBarriers[i][j].placed and
+                     self.verticalBarriers[i][j+1].placed) or
+                    (self.horizontalBarriers[i][j].placed and
+                     self.horizontalBarriers[i+1][j].placed)):
 
                     VnbBarriers = 0
-                    if self.Vbarriers[i][j].placed:
-                        while j-VnbBarriers >= 0 and self.Vbarriers[i][j-VnbBarriers].placed:
+                    if self.verticalBarriers[i][j].placed:
+                        while j-VnbBarriers >= 0 and self.verticalBarriers[i][j-VnbBarriers].placed:
                             VnbBarriers += 1
 
                     HnbBarriers = 0
-                    if self.Hbarriers[i][j].placed:
-                        while i-HnbBarriers >= 0 and self.Hbarriers[i-HnbBarriers][j].placed:
+                    if self.horizontalBarriers[i][j].placed:
+                        while i-HnbBarriers >= 0 and self.horizontalBarriers[i-HnbBarriers][j].placed:
                             HnbBarriers += 1
 
                     if VnbBarriers % 2 == 0 and HnbBarriers % 2 == 0:
                         continue
 
-                    if i < len(self.Vbarriers)-1 and i < len(self.Hbarriers)-1:
-                        if self.Vbarriers[i+1][j].placed:
+                    if i < len(self.verticalBarriers)-1 and i < len(self.horizontalBarriers)-1:
+                        if self.verticalBarriers[i+1][j].placed:
                             self.intersection[i +
                                               1][j].draw(self.window, self.grey)
-                    if j < len(self.Vbarriers)-1 and j < len(self.Hbarriers)-1:
-                        if self.Hbarriers[i][j+1].placed:
+                    if j < len(self.verticalBarriers)-1 and j < len(self.horizontalBarriers)-1:
+                        if self.horizontalBarriers[i][j+1].placed:
                             self.intersection[i][j +
                                                  1].draw(self.window, self.grey)
 
@@ -222,7 +213,7 @@ class Board:
                                3: (len(self.rect)-1, i+1), 4: (0, i+1)}
                 start = goalLineMap[player.getNumber()]
                 self.rect[start[0]][start[1]].drawCase(
-                    self.window, player.getColor())
+                    self.window, pygame.Color(player.getColor()))
 
             goalCornerMap = {1: ((0, len(self.rect)-1), (len(self.rect)-1, len(self.rect)-1)),
                              2: ((0, 0), (len(self.rect)-1, 0)),
@@ -266,9 +257,7 @@ class Board:
                     self.window, player.getColor(), Triangle_point)
 
     def displayPlayerInformation(self, currentPlayer: Player, playerList: list[Player]) -> None:
-        height = 190
-        if len(playerList) == 4:
-            height = 330
+        height = 330 if len(playerList) == 4 else 190
         pygame.draw.rect(self.window, self.lightBlue,
                          (750, 10, 570, height), border_radius=10)
 
@@ -291,11 +280,11 @@ class Board:
         self.displayPlayerGoal(playerList)
         self.displayHighlightedCells()
         self.displayPlayers()
-        self.displayBarriers(self.Hbarriers)
-        self.displayBarriers(self.Vbarriers)
+        self.displayBarriers(self.horizontalBarriers)
+        self.displayBarriers(self.verticalBarriers)
         self.displayIntersection()
         self.displayPlayerInformation(currentPlayer, playerList)
-        self.higlightPlayer(currentPlayer)
+        self.highlightPlayer(currentPlayer)
         pygame.display.flip()
 
 

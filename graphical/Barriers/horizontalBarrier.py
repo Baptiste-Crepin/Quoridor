@@ -1,7 +1,7 @@
 from .barrier import Barrier
 
 
-class HorrizontalBarrier(Barrier):
+class HorizontalBarrier(Barrier):
     def __init__(self, boardX: int, boardY: int, col: int, i: int = 0, j: int = 0) -> None:
         super().__init__(boardX, boardY, col, i, j)
 
