@@ -1,4 +1,5 @@
 import pygame
+import threading
 from graphical.widgets.button import Button
 from graphical.widgets.menu import Menu
 from player import Player
@@ -54,7 +55,13 @@ class choiseServer(Menu):
             self.serverPositions.append(pygame.Rect(
                 70, self.coordYServer(i), 600, 200))
 
+    def run_client(self, i: int):
+        self.searchServer.connect(
+            self.serverList[i]["ip"], self.serverList[i]["port"])
+        print("Self connect to", self.serverList[i]["lobbyName"])
+
     def Event(self):
+        from graphical.menus.waitingRoom import WaitingRoom
         for event in pygame.event.get():
             if event.type == pygame.QUIT or event.type == pygame.WINDOWCLOSE:
                 pygame.quit()
@@ -69,9 +76,13 @@ class choiseServer(Menu):
                     self.serverList = self.searchServer.discover()
                 for i, server in enumerate(self.serverPositions):
                     if server.collidepoint(event.pos):
-                        self.searchServer.connect(
-                            self.serverList[i]["ip"], self.serverList[i]["port"])
-                        self.searchServer.waitForGameLaunch()
+                        client_thread = threading.Thread(target=self.run_client, args=(i,))
+                        client_thread.start()
+                        board = WaitingRoom(self.serverList[i]["width"], self.serverList[i]["players"], self.serverList[i]
+                                            ["barriers"], self.serverList[i]["bots"], self.serverList[i]["lobbyName"], self.searchServer, False)
+                        while True:
+                            board.setWindow()
+                            pygame.display.update()
 
     def setWindow(self) -> None:
         self.window.fill(self.darkBlue, rect=None, special_flags=0)

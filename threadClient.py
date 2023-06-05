@@ -2,6 +2,7 @@ import threading
 import pickle
 
 
+
 class Thread_client(threading.Thread):
     def __init__(self, c, multiplayerClient):
         threading.Thread.__init__(self)
@@ -9,18 +10,19 @@ class Thread_client(threading.Thread):
         self.multiplayerClient = multiplayerClient
         self.start()
 
-    def handleGameState(self, message:list) -> None:
+    def handleGameState(self, message: list) -> None:
         self.multiplayerClient.game.setGrid(message[1])
         self.multiplayerClient.game.setCurrentPlayerN(message[2])
-        self.multiplayerClient.game.setCurrentPlayer(self.multiplayerClient.game.getPlayerList()[message[2]])
-        
-    def handleChatMessage(self, message:list) -> None:
+        self.multiplayerClient.game.setCurrentPlayer(
+            self.multiplayerClient.game.getPlayerList()[message[2]])
+
+    def handleChatMessage(self, message: list) -> None:
         print("chat not implemented yet")
-        
-    def handleQuestion(self, message:list) -> None:
+
+    def handleQuestion(self, message: list) -> None:
         print("? not implemented yet")
-        
-    def handleEmpty(self, message:list) -> None:
+
+    def handleEmpty(self, message: list) -> None:
         print("\"\" not implemented yet")
 
     def run(self):
@@ -30,7 +32,7 @@ class Thread_client(threading.Thread):
             '?': self.handleQuestion,
             '': self.handleEmpty,
         }
-        
+
         while True:
             try:
                 received_message = self.connexion.recv(4096)
@@ -45,9 +47,7 @@ class Thread_client(threading.Thread):
             except Exception as e:
                 print("connection error:")
                 print(e)
-                print(self.connected)
                 raise Exception("Player disconnected while in game")
-
 
         # self.connexion.close()
 

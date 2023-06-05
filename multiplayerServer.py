@@ -4,13 +4,13 @@ import socket
 import sys
 import threading
 import pickle
-DISCOVERY_MSG = b"SERVER_DISCOVERY_REQUEST"
-start = False
+import time
 
 
 def boutton(connected):
     message = True
     pickeled_message = pickle.dumps(message)
+    time.sleep(0.5)
     for i in range(len(connected)):
         print("sending starter message to client  :", i)
         connected[i].send(pickeled_message)
@@ -109,7 +109,7 @@ def acceptConnexions(mySocket, init, initializedQueue,):
 
 
 def handle_client_request(data, client_address, dsock, lobbyInfo):
-    if data == DISCOVERY_MSG:
+    if data == b"SERVER_DISCOVERY_REQUEST":
         print("incomming discovery packet from:", client_address)
         # Convert the server IP address to binary format
         response = pickle.dumps(lobbyInfo)
@@ -133,11 +133,14 @@ def createServer(width, nbBarrier, nbPlayer, nbBots, name, port=45678):
 
     hostname = socket.gethostname()
     host = socket.gethostbyname(hostname)
-    lobbyInfo = {'discoverymessage': DISCOVERY_MSG,
+    lobbyInfo = {'discoverymessage': b"SERVER_DISCOVERY_REQUEST",
                  'ip': host,
                  'port': port,
                  'lobbyName': name,
                  'players': nbPlayer,
+                 'width': width,
+                 'barriers': nbBarrier,
+                 'bots': nbBots,
                  'remining': 1
                  }
 
@@ -165,8 +168,9 @@ def createServer(width, nbBarrier, nbPlayer, nbBots, name, port=45678):
 
 
 if __name__ == "__main__":
-    width = 7
-    nbBarrier = 4
+    width = 5
+    nbBarrier = 10
     nbPlayer = 2
-    nbBots = 0
-    createServer(width, nbBarrier, nbPlayer, nbBots, "titi")
+    nbBot = 0
+    serverName = "test"
+    createServer(width, nbBarrier, nbPlayer, nbBot, serverName)

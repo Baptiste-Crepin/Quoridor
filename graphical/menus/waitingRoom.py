@@ -1,23 +1,34 @@
 import pygame
+import socket
+import threading
+
 from graphical.widgets.button import Button
 from graphical.widgets.menu import Menu
 from player import Player
 from multiplayerServer import createServer
-from multiplayerServer import acceptConnexions
+from multiplayerClient import SearchServer
 
 
 class WaitingRoom(Menu):
-    def __init__(self, width: int, nbPlayer: int, nbBarrier: int, nbBot: int, serverName: str, Host: bool) -> None:
+    def __init__(self, width: int, nbPlayer: int, nbBarrier: int, nbBot: int, serverName: str, serverConnection, Host: bool = False) -> None:
         super().__init__()
         self.width = width
         self.nbPlayer = nbPlayer
         self.nbBarrier = nbBarrier
         self.nbBot = nbBot
         self.serverName = serverName
+        self.serverConnection = serverConnection
         self.host = Host
-        # self.server = createServer(
-        #     width, nbBarrier, nbPlayer, nbBot, serverName)
-        self.clientList = ["zrberve", "erbhb", "eubri"]
+        self.start = False
+
+        self.clientList = ["zrberve", 'ejdàej', 'roefijer']
+
+        # this one launches the waiting room but does not launch the game
+        # thread = threading.Thread(
+        #     target=self.serverConnection.waitForGameLaunch)
+
+        # this one launches the game but does not launch the waiting room
+        # self.serverConnection.waitForGameLaunch()
 
     def displayPlayer(self) -> None:
         for i in range(4):
