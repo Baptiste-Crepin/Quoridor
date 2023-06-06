@@ -1,4 +1,5 @@
 import pygame
+from graphical.widgets.back import Back
 
 
 class Menu():
@@ -28,8 +29,9 @@ class Menu():
         self.buttonHeight = 120
         self.buttonSize = (self.buttonWidth, self.buttonHeight)
         self.buttonX = self.windowWidth//2-self.buttonWidth//2
+        self.back = Back(self.window)
 
-    def setWindow(self):
+    def mainLoop(self):
         self.window.fill(self.darkBlue)
         for event in pygame.event.get():
             if event.type == pygame.QUIT or event.type == pygame.WINDOWCLOSE:
@@ -41,5 +43,5 @@ if __name__ == "__main__":
     board = Menu()
 
     while True:
-        board.setWindow()
+        board.mainLoop()
         pygame.display.update()

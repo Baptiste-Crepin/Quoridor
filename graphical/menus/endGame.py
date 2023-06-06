@@ -43,7 +43,7 @@ class End(Menu):
                     pygame.init()
                     board = Play()
                     while True:
-                        board.setWindow()
+                        board.mainLoop()
                         pygame.display.update()
                 elif pygame.Rect(self.coordReplay).collidepoint(event.pos):
                     pygame.init()
@@ -55,7 +55,7 @@ class End(Menu):
                 elif pygame.Rect(self.coordQuit).collidepoint(event.pos):
                     raise SystemExit
 
-    def setWindow(self):
+    def mainLoop(self):
         self.window.fill(self.backGround)
         text_surface = self.font.render(self.Winner(), True, self.white)
         text_rect = text_surface.get_rect(center=(self.windowWidth // 2, 100))
@@ -73,5 +73,5 @@ if __name__ == "__main__":
     board = End(Player(0, 4), 5, 2, 10, 0)
 
     while True:
-        board.setWindow()
+        board.mainLoop()
         pygame.display.update()

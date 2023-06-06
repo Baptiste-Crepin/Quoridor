@@ -3,7 +3,8 @@ import time
 from localGame import LocalGame
 from graphical.widgets.button import Button
 from graphical.widgets.menu import Menu
-from graphical.menus.selectServerName import ServerName
+
+from graphical.menus.sizeGrid import SizeGrid
 
 
 class selectBarrier(Menu):
@@ -17,7 +18,6 @@ class selectBarrier(Menu):
         self.multi = multi
         self.barrier = 1
         self.circleWidth = 100
-
         self.doneButton = pygame.Rect(
             self.buttonX, 560, self.buttonWidth, self.buttonHeight)
 
@@ -64,7 +64,7 @@ class selectBarrier(Menu):
         return button
 
     def Event(self) -> None:
-        from graphical.menus.sizeGrid import SizeGrid
+        from graphical.menus.selectServerName import ServerName
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT or event.type == pygame.WINDOWCLOSE:
@@ -90,21 +90,16 @@ class selectBarrier(Menu):
                             self.GridSize, self.NumberPlayers, self.barrier, self.NumberBots)
                     else:
                         board = ServerName(
-                            self.GridSize, self.NumberPlayers, self.barrier, self.NumberBots)
+                            self.GridSize, self.NumberPlayers, self.barrier, self.NumberBots, self.method)
                     time.sleep(0.2)
                     while True:
                         board.mainLoop()
                         pygame.display.update()
 
-                elif self.ButtonBack().collidepoint(event.pos) and event.button == 1:
-                    pygame.init()
-                    board = SizeGrid(self.NumberPlayers,
-                                     self.NumberBots, self.method)
-                    while True:
-                        board.setWindow()
-                        pygame.display.update()
+                self.back.Event(event, SizeGrid, (self.NumberPlayers,
+                                self.NumberBots, self.method, self.multi))
 
-    def setWindow(self) -> None:
+    def mainLoop(self) -> None:
         self.window.fill(self.backGround)
 
         text_surface = self.font.render(
@@ -126,7 +121,7 @@ class selectBarrier(Menu):
 
         Button(self.window, self.doneButton, self.lighterBlue, "Done")
         self.Event()
-        self.ButtonBack()
+        self.back.drawButton()
         pygame.display.flip()
 
 
@@ -135,5 +130,5 @@ if __name__ == "__main__":
     board = selectBarrier(1, 1, 11, 0)
 
     while True:
-        board.setWindow()
+        board.mainLoop()
         pygame.display.update()

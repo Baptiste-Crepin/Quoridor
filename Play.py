@@ -26,24 +26,23 @@ class Play(Menu):
                     # pygame.init()
                     board = Menutype()
                     while True:
-                        board.setWindow()
+                        board.mainLoop()
                         pygame.display.update()
 
                 elif pygame.Rect(self.posRules, self.buttonSize).collidepoint(event.pos):
                     # pygame.init()
                     board = Rules()
                     while True:
-                        board.setWindow()
+                        board.mainLoop()
                         pygame.display.update()
 
-        pygame.display.flip()
-
-    def setWindow(self) -> None:
+    def mainLoop(self) -> None:
         self.window.fill(self.backGround)
 
         Button(self.window, self.playButton, self.blue, "PLAY")
         Button(self.window, self.rulesButton, self.blue, "RULES")
         self.Event()
+        pygame.display.flip()
 
 
 if __name__ == "__main__":
@@ -51,5 +50,5 @@ if __name__ == "__main__":
     board = Play()
 
     while True:
-        board.setWindow()
+        board.mainLoop()
         pygame.display.update()

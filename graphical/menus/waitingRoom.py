@@ -60,7 +60,7 @@ class WaitingRoom(Menu):
             if event.type == pygame.QUIT or event.type == pygame.WINDOWCLOSE:
                 pygame.quit()
 
-    def setWindow(self) -> None:
+    def mainLoop(self) -> None:
         self.window.fill(self.darkBlue, rect=None, special_flags=0)
         self.displayPlayer()
         if self.host:
@@ -78,4 +78,4 @@ if __name__ == "__main__":
 
     board = WaitingRoom(5, 4, 4, 0, "toto", True)
     while True:
-        board.setWindow()
+        board.mainLoop()

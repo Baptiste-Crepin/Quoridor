@@ -1,6 +1,7 @@
 import pygame
 from graphical.widgets.button import Button
 from graphical.widgets.menu import Menu
+from graphical.menus.choicePlayer import NumberPlayer
 
 
 class SizeGrid(Menu):
@@ -16,21 +17,8 @@ class SizeGrid(Menu):
         self.pos3 = (self.buttonX - (self.buttonWidth*0.7), 420)
         self.pos4 = (self.buttonX + (self.buttonWidth*0.7), 420)
 
-    def ButtonBack(self) -> pygame.Rect:
-        coord = [(5, 40), (30, 10), (30, 20), (70, 20),
-                 (70, 60), (30, 60), (30, 70)]
-        button = pygame.draw.polygon(self.window, self.darkBlue, coord)
-        font = pygame.font.SysFont("Extra Bold Italic", 20, False, True)
-        text = font.render("Back", True, self.white)
-        buttonText = text.get_rect(center=button.center)
-        self.window.blit(text, buttonText)
-        return button
-
     def Event(self):
         from graphical.menus.choiceBarrier import selectBarrier
-        from graphical.menus.choicePlayer import NumberPlayer
-        from graphical.menus.choiceBot import NumberBots
-
         sizeFromPos = {self.pos1: 5, self.pos3: 9,
                        self.pos2: 7, self.pos4: 11}
 
@@ -46,20 +34,12 @@ class SizeGrid(Menu):
                     board = selectBarrier(
                         self.nbPlayers, self.nbBot, sizeFromPos[pos], self.method, self.multi)
                     while True:
-                        board.setWindow()
+                        board.mainLoop()
                         pygame.display.update()
 
-            if self.ButtonBack().collidepoint(event.pos) and event.button == 1:
-                pygame.init()
-                if self.method == 1:
-                    board = NumberPlayer(self.multi)
-                else:
-                    board = NumberBots(self.nbPlayers, self.multi)
-                while True:
-                    board.setWindow()
-                    pygame.display.update()
+            self.back.Event(event, NumberPlayer, (self.multi))
 
-    def setWindow(self):
+    def mainLoop(self):
         self.window.fill(self.backGround)
 
         text_surface = self.font.render(
@@ -84,7 +64,7 @@ class SizeGrid(Menu):
         Button(self.window, pygame.Rect(
             self.pos4, self.buttonSize), self.blue, "11X11")
 
-        self.ButtonBack()
+        self.back.drawButton()
         self.Event()
         pygame.display.flip()
 
@@ -94,5 +74,5 @@ if __name__ == "__main__":
     board = SizeGrid(2, 0, 1)
 
     while True:
-        board.setWindow()
+        board.mainLoop()
         pygame.display.update()

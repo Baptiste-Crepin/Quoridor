@@ -1,6 +1,7 @@
 import pygame
 from graphical.widgets.button import Button
 from graphical.widgets.menu import Menu
+from graphical.menus.choicePlayer import NumberPlayer
 
 
 class NumberBots(Menu):
@@ -17,19 +18,8 @@ class NumberBots(Menu):
         self.secondRect = (self.buttonX, 370,
                            self.buttonWidth, self.buttonHeight)
 
-    def ButtonBack(self) -> pygame.Rect:
-        coord = [(5, 40), (30, 10), (30, 20), (70, 20),
-                 (70, 60), (30, 60), (30, 70)]
-        button = pygame.draw.polygon(self.window, self.darkBlue, coord)
-        font = pygame.font.SysFont("Extra Bold Italic", 20, False, True)
-        text = font.render("Back", True, self.white)
-        buttonText = text.get_rect(center=button.center)
-        self.window.blit(text, buttonText)
-        return button
-
     def Event(self, method: int) -> None:
         from graphical.menus.sizeGrid import SizeGrid
-        from graphical.menus.choicePlayer import NumberPlayer
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT or event.type == pygame.WINDOWCLOSE:
@@ -48,17 +38,12 @@ class NumberBots(Menu):
                     board = SizeGrid(self.nbPlayers,
                                      nbBotsFromPos[pos], method, self.multi)
                     while True:
-                        board.setWindow()
+                        board.mainLoop()
                         pygame.display.update()
 
-            if self.ButtonBack().collidepoint(event.pos) and event.button == 1:
-                pygame.init()
-                board = NumberPlayer(self.multi)
-                while True:
-                    board.setWindow()
-                    pygame.display.update()
+            self.back.Event(event, NumberPlayer, (self.multi))
 
-    def setWindow(self) -> None:
+    def mainLoop(self) -> None:
         self.window.fill(self.backGround)
         if self.nbPlayers == 1:
             text_surface = self.font.render("How many bots?", True, self.white)
@@ -76,7 +61,7 @@ class NumberBots(Menu):
 
             Button(self.window, pygame.Rect(self.firstRect), self.blue, "1")
             Button(self.window, pygame.Rect(self.secondRect), self.blue, "3")
-            self.ButtonBack()
+            self.back.drawButton()
             self.Event(1)
 
         elif self.nbPlayers == 2:
@@ -95,7 +80,7 @@ class NumberBots(Menu):
             self.window.blit(text_surface, text_rect)
             Button(self.window, pygame.Rect(self.firstRect), self.blue, "Yes")
             Button(self.window, pygame.Rect(self.secondRect), self.blue, "No")
-            self.ButtonBack()
+            self.back.drawButton()
             self.Event(2)
 
         pygame.display.flip()
@@ -106,5 +91,5 @@ if __name__ == "__main__":
     board = NumberBots(2)
 
     while True:
-        board.setWindow()
+        board.mainLoop()
         pygame.display.update()

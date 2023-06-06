@@ -5,17 +5,19 @@ import threading
 from graphical.widgets.input import Input
 from graphical.widgets.button import Button
 from graphical.widgets.menu import Menu
+
 from multiplayerServer import createServer
 from multiplayerClient import SearchServer
 
 
 class ServerName(Menu):
-    def __init__(self, width: int, nbPlayer: int, nbBarrier: int, nbBot: int) -> None:
+    def __init__(self, width: int, nbPlayer: int, nbBarrier: int, nbBot: int, method: int) -> None:
         super().__init__()
         self.width = width
         self.nbPlayer = nbPlayer
         self.nbBarrier = nbBarrier
         self.nbBot = nbBot
+        self.method = method
 
         self.sendPos = (self.buttonX, 500)
         self.buttonSize = (self.buttonWidth, 50)
@@ -52,15 +54,12 @@ class ServerName(Menu):
         client_thread.start()
 
     def Event(self):
+        from graphical.menus.choiceBarrier import selectBarrier
         for event in pygame.event.get():
             if event.type == pygame.QUIT or event.type == pygame.WINDOWCLOSE:
                 pygame.quit()
             self.input.Event(event)
             if event.type == pygame.MOUSEBUTTONDOWN:
-                if self.input.rect.collidepoint(event.pos):
-                    self.input.active = True
-                else:
-                    self.input.active = False
                 if self.sendRect.collidepoint(event.pos):
                     if self.input.text != "":
                         from multiplayerServer import createServer
@@ -70,11 +69,13 @@ class ServerName(Menu):
                         board = WaitingRoom(self.width, self.nbPlayer, self.nbBarrier,
                                             self.nbBot, self.input.text, self.searchServer, True)
                         while True:
-                            board.setWindow()
+                            board.mainLoop()
                             pygame.display.update()
+                self.back.Event(event, selectBarrier, (self.nbPlayer,
+                                self.nbBot, self.width, self.method, True))
 
     def mainLoop(self):
-        self.window.fill(self.darkBlue, rect=None, special_flags=0)
+        self.window.fill(self.blue, rect=None, special_flags=0)
         font = pygame.font.SysFont(
             "Extra Bold Italic", 60, False, True)
         text = font.render(

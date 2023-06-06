@@ -2,11 +2,12 @@ import pygame
 import threading
 from graphical.widgets.button import Button
 from graphical.widgets.menu import Menu
+from graphical.menus.choiceHost import ChoiceHost
 from player import Player
 from multiplayerClient import SearchServer
 
 
-class choiseServer(Menu):
+class ChoiceServer(Menu):
     def __init__(self) -> None:
         super().__init__()
         self.searchServer = SearchServer()
@@ -76,18 +77,21 @@ class choiseServer(Menu):
                     self.serverList = self.searchServer.discover()
                 for i, server in enumerate(self.serverPositions):
                     if server.collidepoint(event.pos):
-                        client_thread = threading.Thread(target=self.run_client, args=(i,))
+                        client_thread = threading.Thread(
+                            target=self.run_client, args=(i,))
                         client_thread.start()
                         board = WaitingRoom(self.serverList[i]["width"], self.serverList[i]["players"], self.serverList[i]
                                             ["barriers"], self.serverList[i]["bots"], self.serverList[i]["lobbyName"], self.searchServer, False)
                         while True:
-                            board.setWindow()
+                            board.mainLoop()
                             pygame.display.update()
+                self.back.Event(event, ChoiceHost)
 
-    def setWindow(self) -> None:
-        self.window.fill(self.darkBlue, rect=None, special_flags=0)
+    def mainLoop(self) -> None:
+        self.window.fill(self.blue, rect=None, special_flags=0)
         self.displayServer()
         Button(self.window, self.refresh, self.lighterBlue, "Refresh")
+        self.back.drawButton()
 
         self.Event()
         pygame.display.flip()
@@ -96,6 +100,6 @@ class choiseServer(Menu):
 if __name__ == "__main__":
     pygame.init()
 
-    board = choiseServer()
+    board = ChoiceServer()
     while True:
-        board.setWindow()
+        board.mainLoop()

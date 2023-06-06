@@ -26,10 +26,10 @@ class Rules(Menu):
                     pygame.init()
                     board = Play()
                     while True:
-                        board.setWindow()
+                        board.mainLoop()
                         pygame.display.update()
 
-    def setWindow(self) -> None:
+    def mainLoop(self) -> None:
         backGround = pygame.image.load('pictures/Rule.png')
         self.window.blit(backGround, (-5, -20))
         self.ButtonBack()
@@ -42,5 +42,5 @@ if __name__ == "__main__":
     board = Rules()
 
     while True:
-        board.setWindow()
+        board.mainLoop()
         pygame.display.update()

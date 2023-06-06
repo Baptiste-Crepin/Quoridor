@@ -115,7 +115,7 @@ class LocalGame():
             end = End(self.game.getPreviousPlayer(), self.game.getSquareWidth(
             ), self.game.getNumberOfPlayers(), self.game.getNumberOfBarriers(), self.game.getNumberOfBots())
             while self.game.checkGameOver():
-                end.setWindow()
+                end.mainLoop()
                 pygame.display.update()
             raise SystemExit
 
