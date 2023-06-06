@@ -10,7 +10,7 @@ from multiplayerClient import SearchServer
 
 
 class WaitingRoom(Menu):
-    def __init__(self, width: int, nbPlayer: int, nbBarrier: int, nbBot: int, serverName: str, serverConnection, Host: bool = False) -> None:
+    def __init__(self, startvars: list, width: int, nbPlayer: int, nbBarrier: int, nbBot: int, serverName: str, serverConnection, Host: bool = False) -> None:
         super().__init__()
         self.width = width
         self.nbPlayer = nbPlayer
@@ -20,15 +20,10 @@ class WaitingRoom(Menu):
         self.serverConnection = serverConnection
         self.host = Host
         self.start = False
+        self.startvars = startvars
+        self.serverConnection.connexion.setblocking(False)
 
         self.clientList = ["zrberve", 'ejdàej', 'roefijer']
-
-        # this one launches the waiting room but does not launch the game
-        # thread = threading.Thread(
-        #     target=self.serverConnection.waitForGameLaunch)
-
-        # this one launches the game but does not launch the waiting room
-        # self.serverConnection.waitForGameLaunch()
 
     def displayPlayer(self) -> None:
         for i in range(4):
@@ -61,16 +56,27 @@ class WaitingRoom(Menu):
                 pygame.quit()
 
     def mainLoop(self) -> None:
+
         self.window.fill(self.backGround, rect=None, special_flags=0)
+
         self.displayPlayer()
         if self.host:
             Button(self.window, pygame.Rect(
                 self.windowWidth//2-150, self.windowHeight*0.60, 300, 80), self.lighterBlue, "Start")
             Button(self.window, pygame.Rect(
                 self.windowWidth//2-150, self.windowHeight*0.75, 300, 80), self.lighterBlue, "Refresh")
-
         self.Event()
         pygame.display.flip()
+        if self.start == False:
+            try:
+                # This will now return immediately if there is no data to receive
+                self.start = self.serverConnection.multiLaunch(self.startvars)
+            except BlockingIOError:
+                # No data to receive yet
+                pass
+            except Exception as e:
+                # Handle other exceptions
+                print("Unexpected error:", e)
 
 
 if __name__ == "__main__":

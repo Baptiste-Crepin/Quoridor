@@ -11,6 +11,7 @@ class ChoiceServer(Menu):
     def __init__(self) -> None:
         super().__init__()
         self.searchServer = SearchServer()
+        self.startvars = []
         self.serverList = self.searchServer.discover()
         print(self.serverList)
         self.serverPosition = 0
@@ -56,10 +57,9 @@ class ChoiceServer(Menu):
             self.serverPositions.append(pygame.Rect(
                 70, self.coordYServer(i), 600, 200))
 
-    def run_client(self, i: int):
-        self.searchServer.connect(
-            self.serverList[i]["ip"], self.serverList[i]["port"])
-        print("Self connect to", self.serverList[i]["lobbyName"])
+
+
+
 
     def Event(self):
         from graphical.menus.waitingRoom import WaitingRoom
@@ -77,10 +77,12 @@ class ChoiceServer(Menu):
                     self.serverList = self.searchServer.discover()
                 for i, server in enumerate(self.serverPositions):
                     if server.collidepoint(event.pos):
-                        client_thread = threading.Thread(
-                            target=self.run_client, args=(i,))
-                        client_thread.start()
-                        board = WaitingRoom(self.serverList[i]["width"], self.serverList[i]["players"], self.serverList[i]
+
+                        self.startvars = self.searchServer.connect(self.serverList[i]["ip"],
+                                                                    self.serverList[i]["port"])
+                        print(self.startvars)
+                        print()
+                        board = WaitingRoom(self.startvars,self.serverList[i]["width"], self.serverList[i]["players"], self.serverList[i]
                                             ["barriers"], self.serverList[i]["bots"], self.serverList[i]["lobbyName"], self.searchServer, False)
                         while True:
                             board.mainLoop()

@@ -10,7 +10,7 @@ import time
 def boutton(connected):
     message = True
     pickeled_message = pickle.dumps(message)
-    time.sleep(0.5)
+    time.sleep(1)
     for i in range(len(connected)):
         print("sending starter message to client  :", i)
         connected[i].send(pickeled_message)
@@ -101,6 +101,7 @@ def acceptConnexions(mySocket, init, initializedQueue,):
         ThreadClient(connexion, init[0], initializedQueue, connected, nbBots)
 
         init_msg = pickle.dumps(init)
+        print("sending init msg" )
         connexion.send(init_msg)
 
         print("Client", init[0], "connected, awaiting other players")

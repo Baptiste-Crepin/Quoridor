@@ -47,26 +47,32 @@ class SearchServer():
         try:
             self.connexion.connect((ip, port))
             print("Connexion active")
+            serverMessage = self.connexion.recv(4096)
+            startVars = pickle.loads(serverMessage)
+            print("startvars : ", startVars)
+            return startVars
         except socket.error:
             print("Erreur sur la connection")
             sys.exit()
 
-    def waitForGameLaunch(self):
-        start = False
-        while start == False:
-
-            serverMessage = self.connexion.recv(4096)
-            startVars = pickle.loads(serverMessage)
-
+    def multiLaunch(self, startVars):
+        print("checking for starter msg")
+        try:
             serverMessage = self.connexion.recv(4096)
             unpickeled_message = pickle.loads(serverMessage)
 
             print(unpickeled_message)
             if unpickeled_message == True:
-                print("starting game")
+                print("starting game", startVars)
+                self.connexion.setblocking(True)
                 createGame(self.connexion, startVars)
-            else:
-                print("waiting for server start")
+                return True
+        except:
+            return False
+
+
+
+
 
 
 class MultiplayerGame(LocalGame):
