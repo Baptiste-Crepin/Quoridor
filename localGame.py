@@ -12,6 +12,12 @@ class LocalGame():
         self.board = Board(self.game.getSquareWidth())
         self.newTurn = True
 
+        pygame.mixer.init()
+        self.barrierPlacementSound = pygame.mixer.Sound(
+            './assets/sounds/barrierPlacement.wav')
+        self.movementSound = pygame.mixer.Sound(
+            './assets/sounds/movement.wav')
+
     def highlightPlayer(self, player):
         for PossibleMoveCoordo in self.game.possibleMoves(player.getCoordinates()):
             self.board.rect[PossibleMoveCoordo[1]
@@ -49,11 +55,6 @@ class LocalGame():
                         'Right']
 
     def placement(self, currentPlayer: Player):
-        if isinstance(currentPlayer, Bot):
-            self.board.newFrame(currentPlayer, self.game.getPlayerList())
-            currentPlayer.randomMoves(self.game.possibleBarrierPlacement(
-                currentPlayer), self.game.possibleMoves(currentPlayer.getCoordinates()))
-
         player = self.game.getCurrentPlayer()
         if isinstance(player, Bot):
             self.board.newFrame(self.game.getCurrentPlayer(),
@@ -62,10 +63,12 @@ class LocalGame():
                 player), self.game.possibleMoves(player.getCoordinates()))
             if isinstance(randomMove[1], int):
                 self.game.movePlayer(player, randomMove)
+                self.movementSound.play()
             elif isinstance(randomMove[0], tuple) and isinstance(randomMove[1], str):
                 coordo = randomMove[0]
                 direction = randomMove[1]
                 self.game.placeWall(coordo, direction, player)
+                self.barrierPlacementSound.play()
 
             self.game.nextPlayer()
             self.newTurn = True
@@ -83,17 +86,20 @@ class LocalGame():
                 return
             self.board.clearHover(self.board.rect)
             self.game.movePlayer(currentPlayer, clickCoordo)
+            self.movementSound.play()
 
         if action == 'VerticalBarrier':
             if (clickCoordo, 'Right') not in self.game.possibleBarrierPlacement(currentPlayer):
                 return
             self.game.placeWall(clickCoordo, 'Right',
                                 currentPlayer, place=True)
+            self.barrierPlacementSound.play()
 
         if action == 'HorrizontalBarrier':
             if (clickCoordo, 'Down') not in self.game.possibleBarrierPlacement(currentPlayer):
                 return
             self.game.placeWall(clickCoordo, 'Down', currentPlayer)
+            self.barrierPlacementSound.play()
 
         self.board.clearAllHighlight()
         self.game.nextPlayer()
