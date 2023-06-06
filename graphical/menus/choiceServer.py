@@ -36,7 +36,7 @@ class ChoiceServer(Menu):
         pygame.draw.rect(self.window, self.lighterBlue,
                          (50, 50+self.serverPosition, 640, self.heightServerRect()), border_radius=5)
         for i in range(len(self.serverList)):
-            dico = {2: 630, 4: 420}
+            dico = {2: 560, 3: 490, 4: 420}
             pygame.draw.rect(self.window, self.black, (70, self.coordYServer(i), 600, 200),
                              border_radius=10)
             font = pygame.font.SysFont(
@@ -88,7 +88,7 @@ class ChoiceServer(Menu):
                 self.back.Event(event, ChoiceHost)
 
     def mainLoop(self) -> None:
-        self.window.fill(self.blue, rect=None, special_flags=0)
+        self.window.fill(self.backGround, rect=None, special_flags=0)
         self.displayServer()
         Button(self.window, self.refresh, self.lighterBlue, "Refresh")
         self.back.drawButton()

@@ -75,7 +75,7 @@ class ServerName(Menu):
                                 self.nbBot, self.width, self.method, True))
 
     def mainLoop(self):
-        self.window.fill(self.blue, rect=None, special_flags=0)
+        self.window.fill(self.backGround, rect=None, special_flags=0)
         font = pygame.font.SysFont(
             "Extra Bold Italic", 60, False, True)
         text = font.render(

@@ -61,7 +61,7 @@ class WaitingRoom(Menu):
                 pygame.quit()
 
     def mainLoop(self) -> None:
-        self.window.fill(self.darkBlue, rect=None, special_flags=0)
+        self.window.fill(self.backGround, rect=None, special_flags=0)
         self.displayPlayer()
         if self.host:
             Button(self.window, pygame.Rect(
