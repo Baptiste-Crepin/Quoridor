@@ -56,7 +56,6 @@ class SearchServer():
             sys.exit()
 
     def multiLaunch(self, startVars):
-        print("checking for starter msg")
         try:
             serverMessage = self.connexion.recv(4096)
             unpickeled_message = pickle.loads(serverMessage)
@@ -69,10 +68,6 @@ class SearchServer():
                 return True
         except:
             return False
-
-
-
-
 
 
 class MultiplayerGame(LocalGame):

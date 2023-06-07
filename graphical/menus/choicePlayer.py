@@ -7,9 +7,14 @@ class NumberPlayer(Menu):
     def __init__(self, multi: bool = False):
         super().__init__()
         self.multi = multi
+        self.initializeButton()
+
+    def initializeButton(self):
 
         self.pos1 = (self.buttonX - (self.buttonWidth*0.7), 250)
         self.pos2 = (self.buttonX + (self.buttonWidth*0.7), 250)
+        if self.multi:
+            self.pos2 = ((self.windowWidth*0.5) - (self.buttonWidth*0.5), 250)
         self.pos3 = (self.buttonX - (self.buttonWidth*0.7), 420)
         self.pos4 = (self.buttonX + (self.buttonWidth*0.7), 420)
 
@@ -29,6 +34,10 @@ class NumberPlayer(Menu):
 
         PlayersFromPos = {self.pos1: [NumberBots, (1, self.multi)], self.pos2: [NumberBots, (2, self.multi)],
                           self.pos3: [SizeGrid, (3, 1, 1, self.multi)], self.pos4: [SizeGrid, (4, 0, 1, self.multi)]}
+        if self.multi:
+            PlayersFromPos = {self.pos2: [SizeGrid, (2, 0, 1, self.multi)],
+                              self.pos3: [SizeGrid, (3, 1, 1, self.multi)], self.pos4: [SizeGrid, (4, 0, 1, self.multi)]}
+
         for event in pygame.event.get():
             if event.type == pygame.QUIT or event.type == pygame.WINDOWCLOSE:
                 raise SystemExit
@@ -61,7 +70,8 @@ class NumberPlayer(Menu):
 
         self.window.blit(contour_surface, contour_rect)
         self.window.blit(text_surface, text_rect)
-        Button(self.window, self.Rect1, self.blue, "1")
+        if not self.multi:
+            Button(self.window, self.Rect1, self.blue, "1")
         Button(self.window, self.Rect2, self.blue, "2")
         Button(self.window, self.Rect3, self.blue, "3")
         Button(self.window, self.Rect4, self.blue, "4")

@@ -3,13 +3,13 @@ import pygame
 from typing import TypeVar
 
 from player import Player
-from graphical.Barriers.barrier import Barrier
-from graphical.Barriers.horizontalBarrier import HorrizontalBarrier
+from graphical.barriers.barrier import Barrier
+from graphical.barriers.horizontalBarrier import HorrizontalBarrier
 from graphical.widgets.informationPlayer import informationPlayer
 from graphical.widgets.displayInformation import displayInformation
 from graphical.menus.tablePlayer import TablePlayer
-from graphical.Barriers.verticalBarrier import VerticalBarrier
-from graphical.Barriers.intersection import Intersection
+from graphical.barriers.verticalBarrier import VerticalBarrier
+from graphical.barriers.intersection import Intersection
 
 
 class Board:

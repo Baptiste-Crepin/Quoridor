@@ -44,7 +44,10 @@ class ChoiceServer(Menu):
                 "Extra Bold Italic", 60, False, True)
             serverName = font.render(
                 self.serverList[i]["lobbyName"], True, self.white)
-            self.window.blit(serverName, (70, self.coordYServer(i)+10))
+            sizeGrid = font.render(
+                str(self.serverList[i]["width"])+"X"+str(self.serverList[i]["width"]), True, self.white)
+            self.window.blit(serverName, (80, self.coordYServer(i)+10))
+            self.window.blit(sizeGrid, (80, self.coordYServer(i)+150))
 
             for j in range(self.serverList[i]["players"]):
                 if j < self.serverList[i]["players"]-self.serverList[i]["remining"]:
@@ -56,10 +59,6 @@ class ChoiceServer(Menu):
 
             self.serverPositions.append(pygame.Rect(
                 70, self.coordYServer(i), 600, 200))
-
-
-
-
 
     def Event(self):
         from graphical.menus.waitingRoom import WaitingRoom
@@ -79,10 +78,10 @@ class ChoiceServer(Menu):
                     if server.collidepoint(event.pos):
 
                         self.startvars = self.searchServer.connect(self.serverList[i]["ip"],
-                                                                    self.serverList[i]["port"])
+                                                                   self.serverList[i]["port"])
                         print(self.startvars)
                         print()
-                        board = WaitingRoom(self.startvars,self.serverList[i]["width"], self.serverList[i]["players"], self.serverList[i]
+                        board = WaitingRoom(self.startvars, self.serverList[i]["width"], self.serverList[i]["players"], self.serverList[i]
                                             ["barriers"], self.serverList[i]["bots"], self.serverList[i]["lobbyName"], self.searchServer, False)
                         while True:
                             board.mainLoop()
