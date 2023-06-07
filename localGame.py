@@ -12,7 +12,7 @@ class LocalGame():
         self.board = Board(self.game.getSquareWidth())
         self.newTurn = True
 
-    def highlightPlayer(self, player):
+    def highlightPlayer(self, player: Player) -> None:
         for PossibleMoveCoordo in self.game.possibleMoves(player.getCoordinates()):
             self.board.rect[PossibleMoveCoordo[1]
                             ][PossibleMoveCoordo[0]].highlighted = True

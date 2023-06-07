@@ -19,22 +19,15 @@ class Play(Menu):
         from graphical.menus.rules import Rules
         from graphical.menus.type import Menutype
         for event in pygame.event.get():
-            if event.type == pygame.QUIT or event.type == pygame.WINDOWCLOSE:
-                raise SystemExit
-            elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
+            self.defaultEventHandler(event)
+            if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
                 if pygame.Rect(self.posPlay, self.buttonSize).collidepoint(event.pos):
-                    # pygame.init()
                     board = Menutype()
-                    while True:
-                        board.mainLoop()
-                        pygame.display.update()
+                    self.newMenu(self, board)
 
                 elif pygame.Rect(self.posRules, self.buttonSize).collidepoint(event.pos):
-                    # pygame.init()
                     board = Rules()
-                    while True:
-                        board.mainLoop()
-                        pygame.display.update()
+                    self.newMenu(self, board)
 
     def mainLoop(self) -> None:
         self.window.fill(self.backGround)

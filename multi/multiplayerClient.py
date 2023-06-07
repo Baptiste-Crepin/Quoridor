@@ -2,13 +2,15 @@ import pickle
 import socket
 import sys
 import time
+
 import pygame
+from typing import Any
 
 from Bot import Bot
 from player import Player
 from graphical.menus.board import Board
 from localGame import LocalGame
-from threadClient import StoppableThreadClient
+from multi.threadClient import StoppableThreadClient
 from graphical.menus.endGame import End
 
 DISCOVERY_MSG = b"SERVER_DISCOVERY_REQUEST"
@@ -16,16 +18,15 @@ DISCOVERY_MSG = b"SERVER_DISCOVERY_REQUEST"
 
 class SearchServer():
     def __init__(self) -> None:
-        self.connexion = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        self.connection = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.discoSock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         self.discoSock.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
 
-    def discover(self):
+    def discover(self) -> list[dict[str, Any]]:
         self.discoSock.sendto(DISCOVERY_MSG, ('<broadcast>', 5555))
         # Set a timeout of 5 seconds for waiting for responses
         self.discoSock.settimeout(1.0)
-        result = list()
-        serverList = list()
+        serverList = list[dict[str, Any]]()
 
         try:
             start_time = time.time()
@@ -41,15 +42,13 @@ class SearchServer():
 
         except socket.timeout:
             print('request timed out / no server found')
-        for server in serverList:
-            result.append(server)
-        return result
+        return list(serverList)
 
-    def connect(self, ip, port):
+    def connect(self, ip: str, port: int) -> list[int]:
         try:
-            self.connexion.connect((ip, port))
-            print("Connexion active")
-            serverMessage = self.connexion.recv(4096)
+            self.connection.connect((ip, port))
+            print("Connection active")
+            serverMessage = self.connection.recv(4096)
             startVars = pickle.loads(serverMessage)
             print("startvars : ", startVars)
             return startVars
@@ -57,27 +56,29 @@ class SearchServer():
             print("Erreur sur la connection")
             sys.exit()
 
-    def multiLaunch(self, startVars):
+    def multiLaunch(self, startVars: list[int]) -> bool:
         try:
-            serverMessage = self.connexion.recv(4096)
+            serverMessage = self.connection.recv(4096)
             unpickeled_message = pickle.loads(serverMessage)
 
             print(unpickeled_message)
             if unpickeled_message == True:
                 print("starting game", startVars)
-                self.connexion.setblocking(True)
-                createGame(self.connexion, startVars)
+                self.connection.setblocking(True)
+                createGame(self.connection, startVars)
                 return True
-        except:
+            return False
+
+        except Exception:
             return False
 
 
 class MultiplayerGame(LocalGame):
-    def __init__(self, connexion, width, nbBarrier, nbPlayer, nbBots=0, num=-1) -> None:
+    def __init__(self, connection: socket.socket, width: int, nbBarrier: int, nbPlayer: int, nbBots: int = 0, num: int = -1) -> None:
         super().__init__(width, nbPlayer, nbBarrier, nbBots)
         self.board = Board(self.game.getSquareWidth())
         self.num = num
-        self.thread = StoppableThreadClient(connexion, self)
+        self.thread = StoppableThreadClient(connection, self)
 
     def displayPossibleMoves(self, player: Player):
         self.board.clearAllHighlight()
@@ -121,7 +122,7 @@ class MultiplayerGame(LocalGame):
         self.board.clearAllHighlight()
         self.highlightPlayer(currentPlayer)
         self.highlightBarrier()
-        print("tour fini pour " + str(self.num))
+        print(f"tour fini pour {str(self.num)}")
         self.thread.emet()
 
     def mainLoop(self) -> None:
@@ -143,14 +144,13 @@ class MultiplayerGame(LocalGame):
             end = End(self.game.getPreviousPlayer(), self.game.getSquareWidth(
             ), self.game.getNumberOfPlayers(), self.game.getNumberOfBarriers(), self.game.getNumberOfBots())
 
-
             while self.game.checkGameOver():
                 end.mainLoop()
                 pygame.display.update()
             raise SystemExit
 
 
-def createGame(connexion, startVars):
+def createGame(connection: socket.socket, startVars: list[Any]):
 
     print("Game infos:", startVars)
     num = int(startVars[0])
@@ -159,5 +159,5 @@ def createGame(connexion, startVars):
     nbPlayer = startVars[3]
     nbBots = startVars[4]
 
-    Game = MultiplayerGame(connexion, width, nbBarrier, nbPlayer, nbBots, num)
+    Game = MultiplayerGame(connection, width, nbBarrier, nbPlayer, nbBots, num)
     Game.mainLoop()

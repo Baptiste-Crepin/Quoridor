@@ -3,33 +3,25 @@ import pygame
 from typing import TypeVar
 
 from player import Player
-from graphical.Barriers.barrier import Barrier
-from graphical.Barriers.horizontalBarrier import HorrizontalBarrier
+from graphical.barriers.barrier import Barrier
+from graphical.barriers.horizontalBarrier import HorrizontalBarrier
 from graphical.widgets.informationPlayer import informationPlayer
 from graphical.widgets.displayInformation import displayInformation
 from graphical.menus.tablePlayer import TablePlayer
-from graphical.Barriers.verticalBarrier import VerticalBarrier
-from graphical.Barriers.intersection import Intersection
+from graphical.barriers.verticalBarrier import VerticalBarrier
+from graphical.barriers.intersection import Intersection
+from graphical.widgets.menu import Menu
 
 
-class Board:
+class Board(Menu):
     BarrierOrCell = TypeVar('BarrierOrCell', Barrier, TablePlayer)
 
     def __init__(self, Width):
+        super().__init__()
         self.col = Width
 
-        self.windowWidth = 1330
-        self.windowHeight = 750
-        self.window = pygame.display.set_mode(
-            (self.windowWidth, self.windowHeight))
-
         self.clicked = False
-        self.white = pygame.Color(255, 255, 255)
-        self.grey = pygame.Color(217, 217, 217, 35)
-        self.black = pygame.Color(0, 0, 0)
-        self.darkBlue = pygame.Color(0, 0, 48)
-        self.lightBlue = pygame.Color(90, 173, 255)
-        self.purple = pygame.Color(204, 0, 204)
+
         self.rect = self.initializeObjectList(TablePlayer)
         self.Vbarriers = self.initializeObjectList(VerticalBarrier, 1, 0)
         self.Hbarriers = self.initializeObjectList(HorrizontalBarrier, 0, 1)
@@ -101,9 +93,8 @@ class Board:
         if pygame.mouse.get_pressed()[0] == 0 and self.clicked:
             self.clicked = False
 
-    def quitWindow(self, event) -> None:
-        if event.type == pygame.QUIT or event.type == pygame.WINDOWCLOSE:
-            raise SystemExit
+    def quitWindow(self, event: pygame.event.Event) -> None:
+        self.defaultEventHandler(event)
 
     def handleEvents(self) -> None | tuple[str, int, int]:
         for event in pygame.event.get():
@@ -196,14 +187,16 @@ class Board:
                     if VnbBarriers % 2 == 0 and HnbBarriers % 2 == 0:
                         continue
 
-                    if i < len(self.Vbarriers)-1 and i < len(self.Hbarriers)-1:
-                        if self.Vbarriers[i+1][j].placed:
-                            self.intersection[i +
-                                              1][j].draw(self.window, self.grey)
-                    if j < len(self.Vbarriers)-1 and j < len(self.Hbarriers)-1:
-                        if self.Hbarriers[i][j+1].placed:
-                            self.intersection[i][j +
-                                                 1].draw(self.window, self.grey)
+                    if (i < len(self.Vbarriers)-1 and
+                        i < len(self.Hbarriers)-1 and
+                            self.Vbarriers[i+1][j].placed):
+                        self.intersection[i + 1][j].draw(self.window,
+                                                         self.grey)
+                    if (j < len(self.Vbarriers)-1 and
+                        j < len(self.Hbarriers)-1 and
+                            self.Hbarriers[i][j+1].placed):
+                        self.intersection[i][j + 1].draw(self.window,
+                                                         self.grey)
 
                     intersection.draw(self.window, self.purple)
                     continue

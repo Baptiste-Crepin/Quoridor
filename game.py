@@ -44,7 +44,7 @@ class Game():
     def setSquareWidth(self, value: int) -> None:
         self.__squareWidth = value
 
-    def setGrid(self, value: list) -> None:
+    def setGrid(self, value: list[list[Cell]]) -> None:
         self.__grid = value
 
     def setNumberOfPlayers(self, value: int) -> None:
@@ -53,7 +53,7 @@ class Game():
     def setNumberOfBots(self, value: int) -> None:
         self.__NumberOfBots = value
 
-    def setPlayerList(self, value: list) -> None:
+    def setPlayerList(self, value: list[Player]) -> None:
         self.__PlayerList = value
 
     def setCurrentPlayerN(self, value: int) -> None:

@@ -28,23 +28,18 @@ class Menutype(Menu):
         from graphical.menus.choicePlayer import NumberPlayer
 
         for event in pygame.event.get():
-            if event.type == pygame.QUIT or event.type == pygame.WINDOWCLOSE:
-                raise SystemExit
-            elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
+            self.defaultEventHandler(event)
+            if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
                 if pygame.Rect(self.posSolo, self.buttonSize).collidepoint(event.pos):
 
                     board = NumberPlayer()
-                    while True:
-                        board.mainLoop()
-                        pygame.display.update()
+                    self.newMenu(self, board)
 
                 elif pygame.Rect(self.posMulti, self.buttonSize).collidepoint(event.pos):
                     board = ChoiceHost()
-                    while True:
-                        board.mainLoop()
-                        pygame.display.update()
+                    self.newMenu(self, board)
 
-                self.back.Event(event, Play)
+                self.back.Event(event, self, Play)
 
             pygame.display.flip()
 

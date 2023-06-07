@@ -1,16 +1,17 @@
 import pygame
-import socket
-import threading
+from typing import Any
 
 from graphical.widgets.button import Button
 from graphical.widgets.menu import Menu
 from player import Player
-from multiplayerServer import createServer
-from multiplayerClient import SearchServer
+# from multiplayerServer import createServer
+# from multiplayerClient import SearchServer
+
+from multi.multiplayerClient import SearchServer
 
 
 class WaitingRoom(Menu):
-    def __init__(self, startvars: list, width: int, nbPlayer: int, nbBarrier: int, nbBot: int, serverName: str, serverConnection, Host: bool = False) -> None:
+    def __init__(self, startVars: list[Any], width: int, nbPlayer: int, nbBarrier: int, nbBot: int, serverName: str, serverConnection: SearchServer, Host: bool = False) -> None:
         super().__init__()
         self.width = width
         self.nbPlayer = nbPlayer
@@ -20,8 +21,8 @@ class WaitingRoom(Menu):
         self.serverConnection = serverConnection
         self.host = Host
         self.start = False
-        self.startvars = startvars
-        self.serverConnection.connexion.setblocking(False)
+        self.startVars = startVars
+        self.serverConnection.connection.setblocking(False)
 
         self.clientList = ["zrberve", 'ejdàej', 'roefijer']
 
@@ -32,19 +33,17 @@ class WaitingRoom(Menu):
                 ), ((self.windowWidth//5)*i+self.windowWidth//5, self.windowHeight//3), 70)
                 font = pygame.font.SysFont(
                     "Extra Bold Italic", 60, False, True)
-                player = font.render(
-                    "player "+str(i+1), True, self.white)
+                player = font.render(f"player {str(i + 1)}", True, self.white)
                 self.window.blit(
                     player, ((self.windowWidth//5)*i+self.windowWidth//7, self.windowHeight//3+80))
-            elif len(self.clientList)-1 < i:
+            else:
                 pygame.draw.circle(self.window, Player(i+1).getColor(
                 ), ((self.windowWidth//5)*i+self.windowWidth//5, self.windowHeight//3), 70, 10)
                 font = pygame.font.SysFont(
                     "Extra Bold Italic", 60, False, True)
                 wait = font.render(
                     "waiting for", True, self.white)
-                player = font.render(
-                    "player "+str(i+1), True, self.white)
+                player = font.render(f"player {str(i + 1)}", True, self.white)
                 self.window.blit(
                     wait, ((self.windowWidth//5)*i+self.windowWidth//8, self.windowHeight//3+80))
                 self.window.blit(
@@ -52,8 +51,7 @@ class WaitingRoom(Menu):
 
     def Event(self) -> None:
         for event in pygame.event.get():
-            if event.type == pygame.QUIT or event.type == pygame.WINDOWCLOSE:
-                pygame.quit()
+            self.defaultEventHandler(event)
 
     def mainLoop(self) -> None:
 
@@ -70,18 +68,10 @@ class WaitingRoom(Menu):
         if self.start == False:
             try:
                 # This will now return immediately if there is no data to receive
-                self.start = self.serverConnection.multiLaunch(self.startvars)
+                self.start = self.serverConnection.multiLaunch(self.startVars)
             except BlockingIOError:
                 # No data to receive yet
                 pass
             except Exception as e:
                 # Handle other exceptions
                 print("Unexpected error:", e)
-
-
-if __name__ == "__main__":
-    pygame.init()
-
-    board = WaitingRoom(5, 4, 4, 0, "toto", True)
-    while True:
-        board.mainLoop()

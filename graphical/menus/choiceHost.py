@@ -28,22 +28,17 @@ class ChoiceHost(Menu):
         from graphical.menus.choiceServer import ChoiceServer
 
         for event in pygame.event.get():
-            if event.type == pygame.QUIT or event.type == pygame.WINDOWCLOSE:
-                raise SystemExit
-            elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
+            self.defaultEventHandler(event)
+            if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
                 if pygame.Rect(self.posHost, self.buttonSize).collidepoint(event.pos):
                     board = NumberPlayer(True)
-                    while True:
-                        board.mainLoop()
-                        pygame.display.update()
+                    self.newMenu(self, board)
 
                 elif pygame.Rect(self.posJoin, self.buttonSize).collidepoint(event.pos):
                     board = ChoiceServer()
-                    while True:
-                        board.mainLoop()
-                        pygame.display.update()
+                    self.newMenu(self, board)
 
-                self.back.Event(event, Menutype)
+                self.back.Event(event, self, Menutype)
             pygame.display.flip()
 
 

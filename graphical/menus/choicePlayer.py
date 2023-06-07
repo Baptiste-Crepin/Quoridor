@@ -9,52 +9,54 @@ class NumberPlayer(Menu):
         self.multi = multi
         self.initializeButton()
 
-    def initializeButton(self):
-
-        self.pos1 = (self.buttonX - (self.buttonWidth*0.7), 250)
-        self.pos2 = (self.buttonX + (self.buttonWidth*0.7), 250)
+    def button2pos(self, yOffset: float, yPos: float) -> tuple[float, float]:
         if self.multi:
-            self.pos2 = ((self.windowWidth*0.5) - (self.buttonWidth*0.5), 250)
-        self.pos3 = (self.buttonX - (self.buttonWidth*0.7), 420)
-        self.pos4 = (self.buttonX + (self.buttonWidth*0.7), 420)
+            return ((self.windowWidth//2) - (self.buttonWidth//2), yPos)
+        return (self.buttonX + yOffset, yPos)
 
-        self.Rect1 = pygame.Rect(
-            self.pos1, self.buttonSize)
-        self.Rect2 = pygame.Rect(
-            self.pos2, self.buttonSize)
-        self.Rect3 = pygame.Rect(
-            self.pos3, self.buttonSize)
-        self.Rect4 = pygame.Rect(
-            self.pos4, self.buttonSize)
+    def initializeButton(self):
+        offset = self.buttonWidth*0.7
+        yPos = self.windowHeight // 3
+        self.posRect1 = (self.buttonX - offset, yPos)
+        self.posRect2 = self.button2pos(offset, yPos)
+        self.posRect3 = (self.buttonX - offset, yPos * 2)
+        self.posRect4 = (self.buttonX + offset, yPos * 2)
+
+        self.Rect1 = pygame.Rect(self.posRect1, self.buttonSize)
+        self.Rect2 = pygame.Rect(self.posRect2, self.buttonSize)
+        self.Rect3 = pygame.Rect(self.posRect3, self.buttonSize)
+        self.Rect4 = pygame.Rect(self.posRect4, self.buttonSize)
 
     def Event(self):
         from graphical.menus.choiceBot import NumberBots
         from graphical.menus.sizeGrid import SizeGrid
         from graphical.menus.type import Menutype
 
-        PlayersFromPos = {self.pos1: [NumberBots, (1, self.multi)], self.pos2: [NumberBots, (2, self.multi)],
-                          self.pos3: [SizeGrid, (3, 1, 1, self.multi)], self.pos4: [SizeGrid, (4, 0, 1, self.multi)]}
+        PlayersFromPos = {self.posRect1: [NumberBots, (1, self.multi)],
+                          self.posRect2: [NumberBots, (2, self.multi)],
+                          self.posRect3: [SizeGrid, (3, 1, 1, self.multi)],
+                          self.posRect4: [SizeGrid, (4, 0, 1, self.multi)]}
         if self.multi:
-            PlayersFromPos = {self.pos2: [SizeGrid, (2, 0, 1, self.multi)],
-                              self.pos3: [SizeGrid, (3, 1, 1, self.multi)], self.pos4: [SizeGrid, (4, 0, 1, self.multi)]}
+            PlayersFromPos = {self.posRect2: [SizeGrid, (2, 0, 1, self.multi)],
+                              self.posRect3: [SizeGrid, (3, 1, 1, self.multi)],
+                              self.posRect4: [SizeGrid, (4, 0, 1, self.multi)]}
 
         for event in pygame.event.get():
-            if event.type == pygame.QUIT or event.type == pygame.WINDOWCLOSE:
-                raise SystemExit
-            elif not (event.type == pygame.MOUSEBUTTONDOWN and event.button == 1):
+            self.defaultEventHandler(event)
+            if event.type != pygame.MOUSEBUTTONDOWN or event.button != 1:
                 return
 
-            for pos in PlayersFromPos.keys():
+            for pos in PlayersFromPos:
                 if pygame.Rect(pos, self.buttonSize).collidepoint(event.pos):
-                    pygame.init()
-                    if type(PlayersFromPos[pos][1]) == tuple:
-                        board = PlayersFromPos[pos][0](*PlayersFromPos[pos][1])
-                    else:
-                        board = PlayersFromPos[pos][0](PlayersFromPos[pos][1])
-                    while True:
-                        board.mainLoop()
-                        pygame.display.update()
-            self.back.Event(event, Menutype)
+                    args = PlayersFromPos[pos][1]
+                    if not isinstance(args, tuple):
+                        continue
+                    # calls the constructor of the class in PlayersFromPos[pos][0] with the arguments in PlayersFromPos[pos][1]
+                    board = PlayersFromPos[pos][0](*args)  # type: ignore
+                    if isinstance(board, object):
+                        self.newMenu(self, board)
+
+            self.back.Event(event, self, Menutype)
 
     def mainLoop(self):
         self.window.fill(self.backGround)

@@ -19,15 +19,14 @@ class Rules(Menu):
     def Event(self) -> None:
         from Play import Play
         for event in pygame.event.get():
-            if event.type == pygame.QUIT or event.type == pygame.WINDOWCLOSE:
-                raise SystemExit
-            elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
-                if self.ButtonBack().collidepoint(event.pos) and event.button == 1:
-                    pygame.init()
-                    board = Play()
-                    while True:
-                        board.mainLoop()
-                        pygame.display.update()
+            self.defaultEventHandler(event)
+            if (event.type == pygame.MOUSEBUTTONDOWN and
+                event.button == 1 and
+               self.ButtonBack().collidepoint(event.pos)):
+                board = Play()
+                while True:
+                    board.mainLoop()
+                    pygame.display.update()
 
     def mainLoop(self) -> None:
         backGround = pygame.image.load('pictures/Rule.png')

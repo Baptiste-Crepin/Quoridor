@@ -5,9 +5,10 @@ import sys
 import threading
 import pickle
 import time
+from typing import Any
 
 
-def boutton(connected):
+def boutton(connected: dict[int, socket.socket]):
     message = True
     pickeled_message = pickle.dumps(message)
     time.sleep(1)
@@ -18,10 +19,11 @@ def boutton(connected):
 
 class ThreadClient(threading.Thread):
 
-    def __init__(self, connexion, idd, queue, connected, nbBots):
+    def __init__(self, connection: socket.socket, id: int, queue: queue.Queue[int], connected: dict[int, socket.socket], nbBots: int) -> None:
         threading.Thread.__init__(self)
-        self.connexion = connexion
-        self.idc = idd
+
+        self.connection = connection
+        self.idc = id
         self.queue = queue
         self.connected = connected
         self.nbBots = nbBots
@@ -46,16 +48,16 @@ class ThreadClient(threading.Thread):
         self.queue.task_done()
         return current_client
 
-    def handleGameState(self, message: list) -> None:
+    def handleGameState(self, message: list[Any]) -> None:
         message[2] = self.nextClient()
         pickeled_message = pickle.dumps(message)
         for i in range(len(self.connected)):
             self.connected[i].send(pickeled_message)
 
-    def handleChatMessage(self, message: list) -> None:
+    def handleChatMessage(self, message: list[Any]) -> None:
         print("chat not implemented yet")
 
-    def handleEnd(self, message: list):
+    def handleEnd(self, message: list[Any]) -> None:
         pickeled_message = pickle.dumps(message)
         for i in range(len(self.connected)):
             self.connected[i].send(pickeled_message)
@@ -66,12 +68,6 @@ class ThreadClient(threading.Thread):
         while self.is_alive():
             time.sleep(1)
 
-    def handleQuestion(self, message: list) -> None:
-        print("? not implemented yet")
-
-    def handleEmpty(self, message: list) -> None:
-        print("\"\" not implemented yet")
-
     def run(self) -> None:
         '''
         gets the message from one client and sends it to all the clients
@@ -79,14 +75,12 @@ class ThreadClient(threading.Thread):
         message_handlers = {
             'game_state': self.handleGameState,
             'chat': self.handleChatMessage,
-            '?': self.handleQuestion,
-            'game_end': self.handleEnd,
-            '': self.handleEmpty,
+            'game_end': self.handleEnd
         }
 
         while True:
             try:
-                received_message = self.connexion.recv(4096)
+                received_message = self.connection.recv(4096)
                 message = pickle.loads(received_message)
 
                 message_type = message[0]
@@ -99,29 +93,29 @@ class ThreadClient(threading.Thread):
                 print("connection error:")
                 print(e)
                 print(self.connected)
-                raise Exception("Player disconnected while in game")
+                raise Exception("Player disconnected while in game") from e
 
-        # self.connexion.close()
+        # self.connection.close()
 
 
-def acceptConnexions(mySocket, init, initializedQueue,):
+def acceptConnections(mySocket: socket.socket, init: list[int], initializedQueue: queue.Queue[int]):
     '''
-    accepts the connexions of the clients and creates a thread for each of them to handle the messages
+    accepts the connections of the clients and creates a thread for each of them to handle the messages
     '''
     nbPlayer = init[3]
     nbBots = init[4]
-    connected = {}
+    connected = dict[int, socket.socket]()
 
     mySocket.listen(nbPlayer)
     while nbPlayer > len(connected):
-        connexion = mySocket.accept()[0]
+        connection = mySocket.accept()[0]
 
-        connected[init[0]] = connexion
-        ThreadClient(connexion, init[0], initializedQueue, connected, nbBots)
+        connected[init[0]] = connection
+        ThreadClient(connection, init[0], initializedQueue, connected, nbBots)
 
         init_msg = pickle.dumps(init)
-        print("sending init msg" )
-        connexion.send(init_msg)
+        print("sending init msg")
+        connection.send(init_msg)
 
         print("Client", init[0], "connected, awaiting other players")
         init[0] += 1
@@ -129,7 +123,7 @@ def acceptConnexions(mySocket, init, initializedQueue,):
     return connected
 
 
-def handle_client_request(data, client_address, dsock, lobbyInfo):
+def handle_client_request(data: bytes, client_address: tuple[str, int], dsock: socket.socket, lobbyInfo: dict[str, Any]):
     if data == b"SERVER_DISCOVERY_REQUEST":
         print("incomming discovery packet from:", client_address)
         # Convert the server IP address to binary format
@@ -138,16 +132,14 @@ def handle_client_request(data, client_address, dsock, lobbyInfo):
         print("handeling request")
 
 
-def discoveryServer(dsock, lobbyInfo):
+def discoveryServer(dsock: socket.socket, lobbyInfo: dict[str, Any]):
     while True:
         data, addre = dsock.recvfrom(1024)
         handle_client_request(data, addre, dsock, lobbyInfo)
 
 
-def createServer(width, nbBarrier, nbPlayer, nbBots, name, port=45678):
-    '''
-    creates a server with the given parameters
-    '''
+def createServer(width: int, nbBarrier: int, nbPlayer: int, nbBots: int, name: str, port: int = 45678) -> None:
+    '''creates a server with the given parameters'''
 
     ide = 0
     init = [ide, width, nbBarrier, nbPlayer, nbBots]
@@ -165,7 +157,7 @@ def createServer(width, nbBarrier, nbPlayer, nbBots, name, port=45678):
                  'remining': 1
                  }
 
-    initializedQueue = queue.Queue()
+    initializedQueue = queue.Queue[int]()
     initializedQueue.put(0)
     initializedQueue.task_done()
 
@@ -185,7 +177,7 @@ def createServer(width, nbBarrier, nbPlayer, nbBots, name, port=45678):
         target=discoveryServer, args=(discoSock, lobbyInfo))
     discothread.start()
 
-    acceptConnexions(serverSocket, init, initializedQueue)
+    acceptConnections(serverSocket, init, initializedQueue)
 
 
 if __name__ == "__main__":

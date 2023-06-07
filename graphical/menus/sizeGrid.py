@@ -12,34 +12,34 @@ class SizeGrid(Menu):
         self.nbBot = nbBot
         self.multi = multi
 
-        self.pos1 = (self.buttonX - (self.buttonWidth*0.7), 250)
-        self.pos2 = (self.buttonX + (self.buttonWidth*0.7), 250)
-        self.pos3 = (self.buttonX - (self.buttonWidth*0.7), 420)
-        self.pos4 = (self.buttonX + (self.buttonWidth*0.7), 420)
+        self.initializeButton()
+
+    def initializeButton(self):
+        yPos = self.windowHeight // 3
+        self.posButton1 = (self.buttonX - (self.buttonWidth*0.7), yPos)
+        self.posButton2 = (self.buttonX + (self.buttonWidth*0.7), yPos)
+        self.posButton3 = (self.buttonX - (self.buttonWidth*0.7), yPos * 2)
+        self.posButton4 = (self.buttonX + (self.buttonWidth*0.7), yPos * 2)
 
     def Event(self):
         from graphical.menus.choiceBarrier import selectBarrier
-        sizeFromPos = {self.pos1: 5, self.pos3: 9,
-                       self.pos2: 7, self.pos4: 11}
+        sizeFromPos = {self.posButton1: 5, self.posButton3: 9,
+                       self.posButton2: 7, self.posButton4: 11}
 
         for event in pygame.event.get():
-            if event.type == pygame.QUIT or event.type == pygame.WINDOWCLOSE:
-                raise SystemExit
-            elif not (event.type == pygame.MOUSEBUTTONDOWN and event.button == 1):
+            self.defaultEventHandler(event)
+            if event.type != pygame.MOUSEBUTTONDOWN or event.button != 1:
                 return
 
-            for pos in sizeFromPos.keys():
+            for pos in sizeFromPos:
                 if pygame.Rect(pos, self.buttonSize).collidepoint(event.pos):
-                    pygame.init()
                     board = selectBarrier(
                         self.nbPlayers, self.nbBot, sizeFromPos[pos], self.method, self.multi)
-                    while True:
-                        board.mainLoop()
-                        pygame.display.update()
+                    self.newMenu(self, board)
 
-            self.back.Event(event, NumberPlayer, (self.multi))
+            self.back.Event(event, self, NumberPlayer, (self.multi))
 
-    def mainLoop(self):
+    def mainLoop(self) -> None:
         self.window.fill(self.backGround)
 
         text_surface = self.font.render(
@@ -56,13 +56,13 @@ class SizeGrid(Menu):
         self.window.blit(text_surface, text_rect)
 
         Button(self.window, pygame.Rect(
-            self.pos1, self.buttonSize), self.blue, "5X5")
+            self.posButton1, self.buttonSize), self.blue, "5X5")
         Button(self.window, pygame.Rect(
-            self.pos2, self.buttonSize), self.blue, "7X7")
+            self.posButton2, self.buttonSize), self.blue, "7X7")
         Button(self.window, pygame.Rect(
-            self.pos3, self.buttonSize), self.blue, "9X9")
+            self.posButton3, self.buttonSize), self.blue, "9X9")
         Button(self.window, pygame.Rect(
-            self.pos4, self.buttonSize), self.blue, "11X11")
+            self.posButton4, self.buttonSize), self.blue, "11X11")
 
         self.back.drawButton()
         self.Event()

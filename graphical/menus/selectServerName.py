@@ -1,13 +1,12 @@
 import pygame
 import time
-import sys
 import threading
 from graphical.widgets.input import Input
 from graphical.widgets.button import Button
 from graphical.widgets.menu import Menu
 
-from multiplayerServer import createServer
-from multiplayerClient import SearchServer
+from multi.multiplayerServer import createServer
+from multi.multiplayerClient import SearchServer
 
 
 class ServerName(Menu):
@@ -39,15 +38,9 @@ class ServerName(Menu):
                      self.nbBot,
                      self.input.text)
 
-
-
-
-
-
     def launch_server(self):
 
         server_thread = threading.Thread(target=self.run_server)
-
 
         server_thread.start()
         # wait for server to start before connecting the client
@@ -56,28 +49,33 @@ class ServerName(Menu):
     def Event(self):
         from graphical.menus.choiceBarrier import selectBarrier
         for event in pygame.event.get():
-            if event.type == pygame.QUIT or event.type == pygame.WINDOWCLOSE:
-                pygame.quit()
+            self.defaultEventHandler(event)
             self.input.Event(event)
             if event.type == pygame.MOUSEBUTTONDOWN:
-                if self.sendRect.collidepoint(event.pos):
-                    if self.input.text != "":
-                        from multiplayerServer import createServer
-                        from graphical.menus.waitingRoom import WaitingRoom
-                        self.launch_server()
-                        time.sleep(2)
-                        serverList = self.searchServer.discover()
-                        self.startVars = self.searchServer.connect(serverList[0]["ip"], serverList[0]["port"])
-                        print("Self connect to", serverList[0]["lobbyName"])
+                if self.sendRect.collidepoint(event.pos) and self.input.text != "":
+                    from graphical.menus.waitingRoom import WaitingRoom
+                    self.launch_server()
+                    time.sleep(2)
+                    serverList = self.searchServer.discover()
+                    self.startVars = self.searchServer.connect(serverList[0]["ip"],
+                                                               serverList[0]["port"])
+                    print("Self connect to", serverList[0]["lobbyName"])
 
-                        board = WaitingRoom(self.startVars, self.width, self.nbPlayer, self.nbBarrier,
-                                            self.nbBot, self.input.text, self.searchServer, True)
+                    board = WaitingRoom(self.startVars,
+                                        self.width,
+                                        self.nbPlayer,
+                                        self.nbBarrier,
+                                        self.nbBot,
+                                        self.input.text,
+                                        self.searchServer,
+                                        True)
+                    self.newMenu(self, board)
 
-                        while True:
-                            board.mainLoop()
-                            pygame.display.update()
-                self.back.Event(event, selectBarrier, (self.nbPlayer,
-                                self.nbBot, self.width, self.method, True))
+                self.back.Event(event, self, selectBarrier, (self.nbPlayer,
+                                                             self.nbBot,
+                                                             self.width,
+                                                             self.method,
+                                                             True))
 
     def mainLoop(self):
         self.window.fill(self.backGround, rect=None, special_flags=0)

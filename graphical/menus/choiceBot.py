@@ -10,79 +10,66 @@ class NumberBots(Menu):
         self.nbPlayers = nbPlayers
         self.multi = multi
 
-        self.pos1 = (self.buttonX, 200)
-        self.pos2 = (self.buttonX, 370)
+        self.initializeButton()
 
-        self.firstRect = (self.buttonX, 200,
-                          self.buttonWidth, self.buttonHeight)
-        self.secondRect = (self.buttonX, 370,
-                           self.buttonWidth, self.buttonHeight)
+    def initializeButton(self) -> None:
+        self.ypos = self.windowHeight // 3
+        self.firstRect = (self.buttonX,
+                          self.ypos,
+                          self.buttonWidth,
+                          self.buttonHeight)
+        self.secondRect = (self.buttonX,
+                           self.ypos*2,
+                           self.buttonWidth,
+                           self.buttonHeight)
 
     def Event(self, method: int) -> None:
         from graphical.menus.sizeGrid import SizeGrid
+        nbBotsFromPos = {
+            1: {
+                self.firstRect: 1,
+                self.secondRect: 3},
+            2: {
+                self.firstRect: 2,
+                self.secondRect: 0}
+        }
 
         for event in pygame.event.get():
-            if event.type == pygame.QUIT or event.type == pygame.WINDOWCLOSE:
-                raise SystemExit
-            if not (event.type == pygame.MOUSEBUTTONDOWN and event.button == 1):
+            self.defaultEventHandler(event)
+            if event.type != pygame.MOUSEBUTTONDOWN or event.button != 1:
                 return
 
-            if method == 1:
-                nbBotsFromPos = {self.firstRect: 1, self.secondRect: 3}
-            else:
-                nbBotsFromPos = {self.firstRect: 2, self.secondRect: 0}
-
-            for pos in nbBotsFromPos.keys():
+            for pos in nbBotsFromPos[method]:
                 if pygame.Rect(pos).collidepoint(event.pos):
-                    pygame.init()
                     board = SizeGrid(self.nbPlayers,
-                                     nbBotsFromPos[pos], method, self.multi)
-                    while True:
-                        board.mainLoop()
-                        pygame.display.update()
+                                     nbBotsFromPos[method][pos], method, self.multi)
+                    self.newMenu(self, board)
 
-            self.back.Event(event, NumberPlayer, (self.multi))
+            self.back.Event(event, self, NumberPlayer, (self.multi))
+
+    def displayChoice(self, message: str, button1Txt: str, button2Txt: str, method: int) -> None:
+        text_surface = self.font.render(message, True, self.white)
+        text_rect = text_surface.get_rect(center=(self.windowWidth // 2, 50))
+
+        contour_surface = self.font.render(message, True, (0, 0, 0))
+        contour_rect = contour_surface.get_rect(center=(self.windowWidth // 2, 50))
+        contour_rect.move_ip(2, 2)
+
+        self.window.blit(contour_surface, contour_rect)
+        self.window.blit(text_surface, text_rect)
+
+        Button(self.window, pygame.Rect(self.firstRect), self.blue, button1Txt)
+        Button(self.window, pygame.Rect(self.secondRect), self.blue, button2Txt)
+        self.back.drawButton()
+        self.Event(method)
 
     def mainLoop(self) -> None:
         self.window.fill(self.backGround)
         if self.nbPlayers == 1:
-            text_surface = self.font.render("How many bots?", True, self.white)
-            text_rect = text_surface.get_rect(
-                center=(self.windowWidth // 2, 50))
-
-            contour_surface = self.font.render(
-                "How many bots?", True, (0, 0, 0))
-            contour_rect = contour_surface.get_rect(
-                center=(self.windowWidth // 2, 50))
-            contour_rect.move_ip(2, 2)
-
-            self.window.blit(contour_surface, contour_rect)
-            self.window.blit(text_surface, text_rect)
-
-            Button(self.window, pygame.Rect(self.firstRect), self.blue, "1")
-            Button(self.window, pygame.Rect(self.secondRect), self.blue, "3")
-            self.back.drawButton()
-            self.Event(1)
-
+            self.displayChoice("How many bots?", "1", "3", 1)
         elif self.nbPlayers == 2:
-            text_surface = self.font.render(
-                "Do you want to play with bots?", True, self.white)
-            text_rect = text_surface.get_rect(
-                center=(self.windowWidth // 2, 50))
-
-            contour_surface = self.font.render(
-                "Do you want to play with bots?", True, (0, 0, 0))
-            contour_rect = contour_surface.get_rect(
-                center=(self.windowWidth // 2, 50))
-            contour_rect.move_ip(2, 2)
-
-            self.window.blit(contour_surface, contour_rect)
-            self.window.blit(text_surface, text_rect)
-            Button(self.window, pygame.Rect(self.firstRect), self.blue, "Yes")
-            Button(self.window, pygame.Rect(self.secondRect), self.blue, "No")
-            self.back.drawButton()
-            self.Event(2)
-
+            self.displayChoice(
+                "Do you want to play with bots?", "Yes", "No", 2)
         pygame.display.flip()
 
 

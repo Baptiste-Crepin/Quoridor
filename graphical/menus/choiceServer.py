@@ -1,21 +1,21 @@
 import pygame
-import threading
+
 from graphical.widgets.button import Button
 from graphical.widgets.menu import Menu
 from graphical.menus.choiceHost import ChoiceHost
 from player import Player
-from multiplayerClient import SearchServer
+from multi.multiplayerClient import SearchServer
 
 
 class ChoiceServer(Menu):
     def __init__(self) -> None:
         super().__init__()
         self.searchServer = SearchServer()
-        self.startvars = []
+        self.startvars = list[int]()
         self.serverList = self.searchServer.discover()
         print(self.serverList)
         self.serverPosition = 0
-        self.serverPositions = []
+        self.serverPositions = list[pygame.Rect]()
         self.refresh = pygame.Rect(900, 50, 300, 100)
 
     def coordYServer(self, i: int) -> int:
@@ -25,7 +25,7 @@ class ChoiceServer(Menu):
         return 220*len(self.serverList)+20
 
     def displayServer(self) -> None:
-        self.serverPositions = []
+        self.serverPositions = list[pygame.Rect]()
         if len(self.serverList) == 0:
             font = pygame.font.SysFont(
                 "Extra Bold Italic", 60, False, True)
@@ -53,7 +53,7 @@ class ChoiceServer(Menu):
                 if j < self.serverList[i]["players"]-self.serverList[i]["remining"]:
                     pygame.draw.circle(self.window, Player(j+1).getColor(),
                                        (70*j+dico[self.serverList[i]["players"]], self.coordYServer(i)+160), 25)
-                elif j >= self.serverList[i]["players"]-self.serverList[i]["remining"]:
+                else:
                     pygame.draw.circle(self.window, Player(j+1).getColor(),
                                        (70*j+dico[self.serverList[i]["players"]], self.coordYServer(i)+160), 25, 5)
 
@@ -63,9 +63,7 @@ class ChoiceServer(Menu):
     def Event(self):
         from graphical.menus.waitingRoom import WaitingRoom
         for event in pygame.event.get():
-            if event.type == pygame.QUIT or event.type == pygame.WINDOWCLOSE:
-                pygame.quit()
-
+            self.defaultEventHandler(event)
             if event.type == pygame.MOUSEWHEEL:
                 if event.y < 0 and self.serverPosition > -(self.heightServerRect()-450):
                     self.serverPosition -= 50
@@ -81,12 +79,16 @@ class ChoiceServer(Menu):
                                                                    self.serverList[i]["port"])
                         print(self.startvars)
                         print()
-                        board = WaitingRoom(self.startvars, self.serverList[i]["width"], self.serverList[i]["players"], self.serverList[i]
-                                            ["barriers"], self.serverList[i]["bots"], self.serverList[i]["lobbyName"], self.searchServer, False)
-                        while True:
-                            board.mainLoop()
-                            pygame.display.update()
-                self.back.Event(event, ChoiceHost)
+                        board = WaitingRoom(self.startvars,
+                                            self.serverList[i]["width"],
+                                            self.serverList[i]["players"],
+                                            self.serverList[i]["barriers"],
+                                            self.serverList[i]["bots"],
+                                            self.serverList[i]["lobbyName"],
+                                            self.searchServer,
+                                            False)
+                        self.newMenu(self, board)
+                self.back.Event(event, self, ChoiceHost)
 
     def mainLoop(self) -> None:
         self.window.fill(self.backGround, rect=None, special_flags=0)

@@ -27,7 +27,7 @@ class End(Menu):
                                       self.windowHeight//2+150, 200, 80)
 
     def Winner(self) -> str:
-        return self.curentplayer.stringColor() + " Player won !"
+        return f"{self.curentplayer.stringColor()} Player won !"
 
     def displayWinner(self) -> None:
         pygame.draw.circle(
@@ -36,22 +36,15 @@ class End(Menu):
     def Event(self):
         for event in pygame.event.get():
             from localGame import LocalGame
-            if event.type == pygame.QUIT or event.type == pygame.WINDOWCLOSE:
-                raise SystemExit
-            elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
+            self.defaultEventHandler(event)
+            if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
                 if pygame.Rect(self.coordLobby).collidepoint(event.pos):
-                    pygame.init()
                     board = Play()
-                    while True:
-                        board.mainLoop()
-                        pygame.display.update()
+                    self.newMenu(self, board)
                 elif pygame.Rect(self.coordReplay).collidepoint(event.pos):
-                    pygame.init()
                     board = LocalGame(
                         self.width, self.nbPlayer, self.nbBarrier, self.nbBots)
-                    while True:
-                        board.mainLoop()
-                        pygame.display.update()
+                    self.newMenu(self, board)
                 elif pygame.Rect(self.coordQuit).collidepoint(event.pos):
                     raise SystemExit
 
