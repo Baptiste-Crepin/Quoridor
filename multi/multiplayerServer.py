@@ -19,7 +19,7 @@ def boutton(connected: dict[int, socket.socket]):
 
 class ThreadClient(threading.Thread):
 
-    def __init__(self, connection: socket.socket, id: int, queue: queue.Queue[int], connected: dict[int, socket.socket], nbBots: int) -> None:
+    def __init__(self, connection: socket.socket, id: int, queue: queue.Queue[int], connected: dict[int, socket.socket], nbBots: int,discostop: threading.Event) -> None:
         threading.Thread.__init__(self)
 
         self.connection = connection
@@ -29,9 +29,11 @@ class ThreadClient(threading.Thread):
         self.nbBots = nbBots
         self.start()
         self.stopEvent = threading.Event()
+        self.discostop = discostop
 
     def stop(self):
         self.stopEvent.set()
+        self.discostop.set()
 
     def stopped(self):
         return self.stopEvent.is_set()
@@ -98,7 +100,7 @@ class ThreadClient(threading.Thread):
         # self.connection.close()
 
 
-def acceptConnections(mySocket: socket.socket, init: list[int], initializedQueue: queue.Queue[int]):
+def acceptConnections(mySocket: socket.socket, init: list[int], initializedQueue: queue.Queue[int],stopEvent: threading.Event):
     '''
     accepts the connections of the clients and creates a thread for each of them to handle the messages
     '''
@@ -111,7 +113,7 @@ def acceptConnections(mySocket: socket.socket, init: list[int], initializedQueue
         connection = mySocket.accept()[0]
 
         connected[init[0]] = connection
-        ThreadClient(connection, init[0], initializedQueue, connected, nbBots)
+        ThreadClient(connection, init[0], initializedQueue, connected, nbBots,stopEvent)
 
         init_msg = pickle.dumps(init)
         print("sending init msg")
@@ -132,10 +134,13 @@ def handle_client_request(data: bytes, client_address: tuple[str, int], dsock: s
         print("handeling request")
 
 
-def discoveryServer(dsock: socket.socket, lobbyInfo: dict[str, Any]):
-    while True:
+def discoveryServer(dsock: socket.socket, lobbyInfo: dict, stopEvent: threading.Event):
+    while not stopEvent.is_set():
         data, addre = dsock.recvfrom(1024)
+        if stopEvent.is_set():
+            break
         handle_client_request(data, addre, dsock, lobbyInfo)
+
 
 
 def createServer(width: int, nbBarrier: int, nbPlayer: int, nbBots: int, name: str, port: int = 45678) -> None:
@@ -173,11 +178,11 @@ def createServer(width: int, nbBarrier: int, nbPlayer: int, nbBots: int, name: s
         sys.exit()
 
     print(f"\n\n\n{'='*15} Server |{host} : {port}| on {'='*15}\n\n")
-    discothread = threading.Thread(
-        target=discoveryServer, args=(discoSock, lobbyInfo))
+    stopEvent = threading.Event()
+    discothread = threading.Thread(target=discoveryServer, args=(discoSock, lobbyInfo, stopEvent))
     discothread.start()
 
-    acceptConnections(serverSocket, init, initializedQueue)
+    acceptConnections(serverSocket, init, initializedQueue,stopEvent)
 
 
 if __name__ == "__main__":
