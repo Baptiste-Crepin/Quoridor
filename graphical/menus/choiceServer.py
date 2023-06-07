@@ -4,7 +4,7 @@ from graphical.widgets.button import Button
 from graphical.widgets.menu import Menu
 from graphical.menus.choiceHost import ChoiceHost
 from player import Player
-from multi.multiplayerClient import SearchServer
+from multi.dicoveryServer import SearchServer
 
 
 class ChoiceServer(Menu):

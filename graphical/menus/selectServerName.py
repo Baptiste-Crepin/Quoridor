@@ -1,12 +1,14 @@
-import pygame
-import time
+import socket
 import threading
-from graphical.widgets.input import Input
-from graphical.widgets.button import Button
-from graphical.widgets.menu import Menu
+import time
 
+import pygame
+
+from graphical.widgets.button import Button
+from graphical.widgets.input import Input
+from graphical.widgets.menu import Menu
+from multi.dicoveryServer import SearchServer
 from multi.multiplayerServer import createServer
-from multi.multiplayerClient import SearchServer
 
 
 class ServerName(Menu):
@@ -40,9 +42,7 @@ class ServerName(Menu):
 
     def launch_server(self):
 
-        server_thread = threading.Thread(target=self.run_server)
-
-        server_thread.start()
+        threading.Thread(target=self.run_server).start()
         # wait for server to start before connecting the client
         time.sleep(0.5)
 
@@ -56,10 +56,9 @@ class ServerName(Menu):
                     from graphical.menus.waitingRoom import WaitingRoom
                     self.launch_server()
                     time.sleep(2)
-                    serverList = self.searchServer.discover()
-                    self.startVars = self.searchServer.connect(serverList[0]["ip"],
-                                                               serverList[0]["port"])
-                    print("Self connect to", serverList[0]["lobbyName"])
+
+                    self.startVars = self.searchServer.connect(socket.gethostbyname(socket.gethostname()), 45678)
+                    print("Self connect to", socket.gethostbyname(socket.gethostname()))
 
                     board = WaitingRoom(self.startVars,
                                         self.width,

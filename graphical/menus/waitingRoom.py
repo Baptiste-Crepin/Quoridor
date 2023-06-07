@@ -1,17 +1,20 @@
-import pygame
 from typing import Any
+
+import pygame
 
 from graphical.widgets.button import Button
 from graphical.widgets.menu import Menu
+from multi.dicoveryServer import SearchServer
 from player import Player
+
+
 # from multiplayerServer import createServer
 # from multiplayerClient import SearchServer
 
-from multi.multiplayerClient import SearchServer
-
 
 class WaitingRoom(Menu):
-    def __init__(self, startVars: list[Any], width: int, nbPlayer: int, nbBarrier: int, nbBot: int, serverName: str, serverConnection: SearchServer, Host: bool = False) -> None:
+    def __init__(self, startVars: list[Any], width: int, nbPlayer: int, nbBarrier: int, nbBot: int, serverName: str,
+                 serverConnection: SearchServer, Host: bool = False) -> None:
         super().__init__()
         self.width = width
         self.nbPlayer = nbPlayer
@@ -28,26 +31,26 @@ class WaitingRoom(Menu):
 
     def displayPlayer(self) -> None:
         for i in range(4):
-            if len(self.clientList)-1 >= i:
-                pygame.draw.circle(self.window, Player(i+1).getColor(
-                ), ((self.windowWidth//5)*i+self.windowWidth//5, self.windowHeight//3), 70)
+            if len(self.clientList) - 1 >= i:
+                pygame.draw.circle(self.window, Player(i + 1).getColor(
+                ), ((self.windowWidth // 5) * i + self.windowWidth // 5, self.windowHeight // 3), 70)
                 font = pygame.font.SysFont(
                     "Extra Bold Italic", 60, False, True)
                 player = font.render(f"player {str(i + 1)}", True, self.white)
                 self.window.blit(
-                    player, ((self.windowWidth//5)*i+self.windowWidth//7, self.windowHeight//3+80))
+                    player, ((self.windowWidth // 5) * i + self.windowWidth // 7, self.windowHeight // 3 + 80))
             else:
-                pygame.draw.circle(self.window, Player(i+1).getColor(
-                ), ((self.windowWidth//5)*i+self.windowWidth//5, self.windowHeight//3), 70, 10)
+                pygame.draw.circle(self.window, Player(i + 1).getColor(
+                ), ((self.windowWidth // 5) * i + self.windowWidth // 5, self.windowHeight // 3), 70, 10)
                 font = pygame.font.SysFont(
                     "Extra Bold Italic", 60, False, True)
                 wait = font.render(
                     "waiting for", True, self.white)
                 player = font.render(f"player {str(i + 1)}", True, self.white)
                 self.window.blit(
-                    wait, ((self.windowWidth//5)*i+self.windowWidth//8, self.windowHeight//3+80))
+                    wait, ((self.windowWidth // 5) * i + self.windowWidth // 8, self.windowHeight // 3 + 80))
                 self.window.blit(
-                    player, ((self.windowWidth//5)*i+self.windowWidth//7, self.windowHeight//3+130))
+                    player, ((self.windowWidth // 5) * i + self.windowWidth // 7, self.windowHeight // 3 + 130))
 
     def Event(self) -> None:
         for event in pygame.event.get():
@@ -60,15 +63,15 @@ class WaitingRoom(Menu):
         self.displayPlayer()
         if self.host:
             Button(self.window, pygame.Rect(
-                self.windowWidth//2-150, self.windowHeight*0.60, 300, 80), self.lighterBlue, "Start")
+                self.windowWidth // 2 - 150, self.windowHeight * 0.60, 300, 80), self.lighterBlue, "Start")
             Button(self.window, pygame.Rect(
-                self.windowWidth//2-150, self.windowHeight*0.75, 300, 80), self.lighterBlue, "Refresh")
+                self.windowWidth // 2 - 150, self.windowHeight * 0.75, 300, 80), self.lighterBlue, "Refresh")
         self.Event()
         pygame.display.flip()
         if self.start == False:
             try:
                 # This will now return immediately if there is no data to receive
-                self.start = self.serverConnection.multiLaunch(self.startVars)
+                self.start = self.serverConnection.multiLaunch(self.startVars, self.host)
             except BlockingIOError:
                 # No data to receive yet
                 pass

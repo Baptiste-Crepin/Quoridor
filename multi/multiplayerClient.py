@@ -1,86 +1,28 @@
-import pickle
 import socket
-import sys
 import time
 
 import pygame
-from typing import Any
 
 from Bot import Bot
-from player import Player
 from graphical.menus.board import Board
+from graphical.menus.endGame import End
 from localGame import LocalGame
 from multi.threadClient import StoppableThreadClient
-from graphical.menus.endGame import End
-
-DISCOVERY_MSG = b"SERVER_DISCOVERY_REQUEST"
-
-
-class SearchServer():
-    def __init__(self) -> None:
-        self.connection = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        self.discoSock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-        self.discoSock.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
-
-    def discover(self) -> list[dict[str, Any]]:
-        self.discoSock.sendto(DISCOVERY_MSG, ('<broadcast>', 5555))
-        # Set a timeout of 5 seconds for waiting for responses
-        self.discoSock.settimeout(1.0)
-        serverList = list[dict[str, Any]]()
-
-        try:
-            start_time = time.time()
-            while time.time() - start_time < 3:
-
-                data, _ = self.discoSock.recvfrom(1024)
-                try:
-                    server_info = pickle.loads(data)
-                    serverList.append(server_info)
-                    print("Server info:", server_info)
-                except pickle.UnpicklingError:
-                    print("Received a non-Python object.")
-
-        except socket.timeout:
-            print('request timed out / no server found')
-        return list(serverList)
-
-    def connect(self, ip: str, port: int) -> list[int]:
-        try:
-            self.connection.connect((ip, port))
-            print("Connection active")
-            serverMessage = self.connection.recv(4096)
-            startVars = pickle.loads(serverMessage)
-            print("startvars : ", startVars)
-            return startVars
-        except socket.error:
-            print("Erreur sur la connection")
-            sys.exit()
-
-    def multiLaunch(self, startVars: list[int]) -> bool:
-        try:
-            serverMessage = self.connection.recv(4096)
-            unpickeled_message = pickle.loads(serverMessage)
-
-            print(unpickeled_message)
-            if unpickeled_message == True:
-                print("starting game", startVars)
-                self.connection.setblocking(True)
-                createGame(self.connection, startVars)
-                return True
-            return False
-
-        except Exception:
-            return False
+from player import Player
 
 
 class MultiplayerGame(LocalGame):
-    def __init__(self, connection: socket.socket, width: int, nbBarrier: int, nbPlayer: int, nbBots: int = 0, num: int = -1) -> None:
+    """LocalGame child class  for multiplayer"""
+
+    def __init__(self, connection: socket.socket, width: int, nbBarrier: int, nbPlayer: int, nbBots: int = 0,
+                 num: int = -1) -> None:
         super().__init__(width, nbPlayer, nbBarrier, nbBots)
         self.board = Board(self.game.getSquareWidth())
         self.num = num
         self.thread = StoppableThreadClient(connection, self)
 
     def displayPossibleMoves(self, player: Player):
+        """highlights the possible moves but only for the client's player"""
         self.board.clearAllHighlight()
         if ((not isinstance(player, Bot) or player.getNumber() == self.num + 1) and
                 (self.game.getCurrentPlayer().getNumber() == self.num + 1)):
@@ -88,12 +30,13 @@ class MultiplayerGame(LocalGame):
             self.highlightBarrier()
 
     def placement(self, currentPlayer: Player):
+        """ logic for the player's actions, sends the state of the game when a player finishes he's turn """
         if isinstance(currentPlayer, Bot) and self.num == 0:
             self.board.newFrame(currentPlayer, self.game.getPlayerList())
             currentPlayer.randomMoves(self.game.possibleBarrierPlacement(
                 currentPlayer), self.game.possibleMoves(currentPlayer.getCoordinates()))
             print("Bot played")
-            self.thread.emet()
+            self.thread.emet()  # sends the state of the game to the server when bot plays
             return
         event = self.board.handleEvents()
         if not event:
@@ -123,14 +66,14 @@ class MultiplayerGame(LocalGame):
         self.highlightPlayer(currentPlayer)
         self.highlightBarrier()
         print(f"tour fini pour {str(self.num)}")
-        self.thread.emet()
+        self.thread.emet()  # sends the state of the game to the server when user plays
 
     def mainLoop(self) -> None:
+        """main loop of the class to play until victory is detected by End function"""
         self.highlightPlayer(self.game.getCurrentPlayer())
         self.highlightBarrier()
         while True:
             while not self.game.checkGameOver():
-
                 self.displayPossibleMoves(self.game.getCurrentPlayer())
 
                 self.placement(self.game.getCurrentPlayer())
@@ -139,25 +82,11 @@ class MultiplayerGame(LocalGame):
                 self.board.newFrame(
                     self.game.getCurrentPlayer(), self.game.getPlayerList())
             # TODO: Game has ended. display the end screen
-            self.thread.ender()
-            time.sleep(0.4)
+            self.thread.ender()  # send  the current player and the end game message
+            time.sleep(0.4)  # wait for the server to actualise every client
             end = End(self.game.getPreviousPlayer(), self.game.getSquareWidth(
             ), self.game.getNumberOfPlayers(), self.game.getNumberOfBarriers(), self.game.getNumberOfBots())
-
             while self.game.checkGameOver():
                 end.mainLoop()
                 pygame.display.update()
             raise SystemExit
-
-
-def createGame(connection: socket.socket, startVars: list[Any]):
-
-    print("Game infos:", startVars)
-    num = int(startVars[0])
-    width = startVars[1]
-    nbBarrier = startVars[2]
-    nbPlayer = startVars[3]
-    nbBots = startVars[4]
-
-    Game = MultiplayerGame(connection, width, nbBarrier, nbPlayer, nbBots, num)
-    Game.mainLoop()

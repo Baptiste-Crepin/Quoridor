@@ -1,8 +1,8 @@
-import threading
 import pickle
+import socket
+import threading
 import time
 from typing import Any, TYPE_CHECKING
-import socket
 
 if TYPE_CHECKING:
     # avoid circular import when type checking
@@ -10,6 +10,8 @@ if TYPE_CHECKING:
 
 
 class StoppableThreadClient(threading.Thread):
+    """this class runs itself in a thread and is meand to handle client action for each client at any time"""
+
     def __init__(self, connection: socket.socket, multiplayerClient: 'MultiplayerGame'):
         # super(StoppableThreadClient, self).__init__()
         super().__init__()
@@ -19,6 +21,7 @@ class StoppableThreadClient(threading.Thread):
         self.start()
 
     def handleGameState(self, message: list[Any]) -> None:
+        """upon reception of a 'game_state' messages update the state of the game accordingly"""
         self.multiplayerClient.game.setGrid(message[1])
         self.multiplayerClient.game.getCurrentPlayer().setBarrier(message[3])
         self.multiplayerClient.game.setCurrentPlayerN(message[2])
@@ -35,14 +38,18 @@ class StoppableThreadClient(threading.Thread):
         print("chat not implemented yet")
 
     def handleEnd(self, message: list[Any]):
+        """upon reception of a 'game_end' messages update the state of the game accordingly then stop the thread if
+        possible"""
         self.multiplayerClient.game.setCurrentPlayer(message[1])
         if self.is_alive():
-            print("Thread is still alive; stoping it now.")
+            print("Thread is still alive; stopping it now.")
             self.stop()
         while self.is_alive():
             time.sleep(1)
 
     def run(self):
+        """ this function is executed at the start of the thread try to receive message then calls the appropriate
+        method depending on the message type /'header'"""
         while not self.stopped():
             message_handlers = {
                 'game_state': self.handleGameState,
@@ -65,6 +72,7 @@ class StoppableThreadClient(threading.Thread):
         self.connection.close()
 
     def emet(self):
+        """sends the state of the game as well as the amount of remaining barriers for the current player"""
         grid = self.multiplayerClient.game.getGrid()
         barriersLeft = self.multiplayerClient.game.getCurrentPlayer().getBarrier()
         msg = ['game_state', grid, self.multiplayerClient.num, barriersLeft]
@@ -72,11 +80,13 @@ class StoppableThreadClient(threading.Thread):
         self.connection.send(data)
 
     def ender(self) -> None:
+        """sends the 'game_end' with the current player in it """
         currentplayer = self.multiplayerClient.game.getCurrentPlayer()
         msg = ['game_end', currentplayer]
         data = pickle.dumps(msg)
         self.connection.send(data)
 
     def reco(self):
+        """receives message from server then return the unpicked version of it """
         dump = self.connection.recv(4096)
         return pickle.loads(dump)
