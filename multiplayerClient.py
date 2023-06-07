@@ -2,12 +2,14 @@ import pickle
 import socket
 import sys
 import time
+import pygame
 
 from Bot import Bot
 from player import Player
 from graphical.menus.board import Board
 from localGame import LocalGame
-from threadClient import Thread_client
+from threadClient import StoppableThreadClient
+from graphical.menus.endGame import End
 
 DISCOVERY_MSG = b"SERVER_DISCOVERY_REQUEST"
 
@@ -75,7 +77,7 @@ class MultiplayerGame(LocalGame):
         super().__init__(width, nbPlayer, nbBarrier, nbBots)
         self.board = Board(self.game.getSquareWidth())
         self.num = num
-        self.thread = Thread_client(connexion, self)
+        self.thread = StoppableThreadClient(connexion, self)
 
     def displayPossibleMoves(self, player: Player):
         self.board.clearAllHighlight()
@@ -121,6 +123,31 @@ class MultiplayerGame(LocalGame):
         self.highlightBarrier()
         print("tour fini pour " + str(self.num))
         self.thread.emet()
+
+    def mainLoop(self) -> None:
+        self.highlightPlayer(self.game.getCurrentPlayer())
+        self.highlightBarrier()
+        while True:
+            while not self.game.checkGameOver():
+
+                self.displayPossibleMoves(self.game.getCurrentPlayer())
+
+                self.placement(self.game.getCurrentPlayer())
+                self.actualizeGame()
+
+                self.board.newFrame(
+                    self.game.getCurrentPlayer(), self.game.getPlayerList())
+            # TODO: Game has ended. display the end screen
+            self.thread.ender()
+            time.sleep(0.4)
+            end = End(self.game.getPreviousPlayer(), self.game.getSquareWidth(
+            ), self.game.getNumberOfPlayers(), self.game.getNumberOfBarriers(), self.game.getNumberOfBots())
+
+
+            while self.game.checkGameOver():
+                end.mainLoop()
+                pygame.display.update()
+            raise SystemExit
 
 
 def createGame(connexion, startVars):

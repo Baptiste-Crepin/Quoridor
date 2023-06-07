@@ -21,11 +21,18 @@ class ThreadClient(threading.Thread):
     def __init__(self, connexion, idd, queue, connected, nbBots):
         threading.Thread.__init__(self)
         self.connexion = connexion
-        self.start()
         self.idc = idd
         self.queue = queue
         self.connected = connected
         self.nbBots = nbBots
+        self.start()
+        self.stopEvent = threading.Event()
+
+    def stop(self):
+        self.stopEvent.set()
+
+    def stopped(self):
+        return self.stopEvent.is_set()
 
     def getConnected(self):
         return self.connected
@@ -48,6 +55,17 @@ class ThreadClient(threading.Thread):
     def handleChatMessage(self, message: list) -> None:
         print("chat not implemented yet")
 
+    def handleEnd(self, message: list):
+        pickeled_message = pickle.dumps(message)
+        for i in range(len(self.connected)):
+            self.connected[i].send(pickeled_message)
+        time.sleep(0.2)
+        if self.is_alive():
+            print("Server side Thread is still alive; stoping it now.")
+            self.stop()
+        while self.is_alive():
+            time.sleep(1)
+
     def handleQuestion(self, message: list) -> None:
         print("? not implemented yet")
 
@@ -62,6 +80,7 @@ class ThreadClient(threading.Thread):
             'game_state': self.handleGameState,
             'chat': self.handleChatMessage,
             '?': self.handleQuestion,
+            'game_end': self.handleEnd,
             '': self.handleEmpty,
         }
 
@@ -107,6 +126,7 @@ def acceptConnexions(mySocket, init, initializedQueue,):
         print("Client", init[0], "connected, awaiting other players")
         init[0] += 1
     boutton(connected)
+    return connected
 
 
 def handle_client_request(data, client_address, dsock, lobbyInfo):
