@@ -46,6 +46,4 @@ class TablePlayer():
     def collides(self, otherCoord: tuple[int, int]) -> bool:
         if otherCoord[1] < self.y or otherCoord[1] > self.y + self.width:
             return False
-        if otherCoord[0] < self.x or otherCoord[0] > self.x + self.height:
-            return False
-        return True
+        return otherCoord[0] >= self.x and otherCoord[0] <= self.x + self.height

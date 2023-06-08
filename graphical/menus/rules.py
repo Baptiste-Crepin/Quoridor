@@ -30,7 +30,7 @@ class Rules(Menu):
                         pygame.display.update()
 
     def setWindow(self) -> None:
-        backGround = pygame.image.load('pictures/Rule.png')
+        backGround = pygame.image.load('assets/pictures/Rule.png')
         self.window.blit(backGround, (-5, -20))
         self.ButtonBack()
         self.Event()

@@ -19,10 +19,13 @@ class Menu():
         self.font = pygame.font.Font(None, 36)
 
         self.white = pygame.Color(255, 255, 255)
+        self.grey = pygame.Color(217, 217, 217, 35)
         self.black = pygame.Color(0, 0, 0)
-        self.blue = pygame.Color(138, 201, 244)
         self.lighterBlue = pygame.Color(138, 201, 244)
+        self.lightBlue = pygame.Color(90, 173, 255)
+        self.blue = pygame.Color(138, 201, 244)
         self.darkBlue = pygame.Color(0, 0, 48)
+        self.purple = pygame.Color(204, 0, 204)
 
         self.buttonWidth = 400
         self.buttonHeight = 120
@@ -32,7 +35,7 @@ class Menu():
     def setWindow(self):
         self.window.fill(self.darkBlue)
         for event in pygame.event.get():
-            if event.type == pygame.QUIT or event.type == pygame.WINDOWCLOSE:
+            if event.type in [pygame.QUIT, pygame.WINDOWCLOSE]:
                 raise SystemExit
 
 
