@@ -32,7 +32,7 @@ class WaitingRoom(Menu):
 
     def displayPlayer(self) -> None:
         for i in range(self.nbPlayer):
-            if self.clientListLen >= i:
+            if self.clientListLen - 1 >= i:
                 pygame.draw.circle(self.window, Player(i + 1).getColor(
                 ), ((self.windowWidth // 5) * i + self.windowWidth // 5, self.windowHeight // 3), 70)
                 font = pygame.font.SysFont(
@@ -72,21 +72,7 @@ class WaitingRoom(Menu):
         if self.start == False:
             try:
                 # This will now return immediately if there is no data to receive
-                self.start = self.serverConnection.multiLaunch(self.startVars)
-            except BlockingIOError:
-                # No data to receive yet
-                pass
+                self.start, self.clientListLen = self.serverConnection.multiLaunch(self.startVars, self.clientListLen)
             except Exception as e:
-                # Handle other exceptions
                 print("Unexpected error:", e)
-            try:
-                message = self.serverConnection.roomstate()
-                if message:
-                    print("client conected:", self.clientListLen)
-                    self.clientListLen = int(message)
-            except BlockingIOError:
-                # No data to receive yet
-                pass
-            except Exception as e:
-                # Handle other exceptions
-                print("Unexpected error:", e)
+            # Handle other exceptions

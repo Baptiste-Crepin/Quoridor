@@ -52,22 +52,24 @@ class SearchServer():
             print("Erreur sur la connection")
             raise SystemExit
 
-    def multiLaunch(self, startVars: list[int]) -> bool:
+    def multiLaunch(self, startVars: list[int], clientListLen) -> tuple:
         """waits for the server to send the starter message then starts the game"""
         try:
             serverMessage = self.connection.recv(4096)
+            print("recived:", serverMessage)
             unpickeled_message = pickle.loads(serverMessage)
-
-            print(unpickeled_message)
-            if unpickeled_message == True:
+            print("unpickeled : ", unpickeled_message)
+            if unpickeled_message[0] != "lenConnected":
                 print("starting game", startVars)
                 self.connection.setblocking(True)
                 self.createGame(self.connection, startVars)
-                return True
-            return False
+                return True, clientListLen
+            else:
+                print("conected players = ", unpickeled_message[1])
+                return False, int(unpickeled_message[1])
 
         except Exception:
-            return False
+            return False, clientListLen
 
     @staticmethod
     def createGame(connection: socket.socket, startVars: list[Any]):

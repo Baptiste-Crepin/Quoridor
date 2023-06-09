@@ -96,7 +96,7 @@ class serverSubThread(threading.Thread):
 
     @staticmethod
     def starter(connected: dict[int, socket.socket]):
-        message = True
+        message = ["sterter", True]
         pickeled_message = pickle.dumps(message)
         time.sleep(1)
         for i in range(len(connected)):
@@ -105,7 +105,7 @@ class serverSubThread(threading.Thread):
 
     @staticmethod
     def roomstatus(connected: dict[int, socket.socket]):
-        msg = str(len(connected))
+        msg = ["lenConnected", len(connected)]
         pickeled_message = pickle.dumps(msg)
         for i in range(len(connected)):
             print("sending ", msg, " message to client  :", i)
@@ -131,10 +131,9 @@ def acceptConnections(mySocket: socket.socket, init: list[int], initializedQueue
         init_msg = pickle.dumps(init)
         print("sending init msg")
         connection.send(init_msg)
-        serverSubThread.roomstatus(connected)
         lobbyinfos["connectedPlayers"] = len(connected)
-
         print("Client", init[0], "connected, awaiting other players")
+        serverSubThread.roomstatus(connected)
         init[0] += 1
     serverSubThread.starter(connected)
     return connected
@@ -197,6 +196,7 @@ def createServer(width: int, nbBarrier: int, nbPlayer: int, nbBots: int, name: s
     stopEvent = threading.Event()
     discothread = threading.Thread(target=discoveryServer, args=(discoSock, lobbyInfo, stopEvent))
     discothread.start()
+    lobbyInfo["connectedPlayers"] += 1
 
     acceptConnections(serverSocket, init, initializedQueue, stopEvent, lobbyInfo, )
 

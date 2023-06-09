@@ -50,8 +50,8 @@ class ChoiceServer(Menu):
             self.window.blit(sizeGrid, (80, self.coordYServer(i) + 150))
 
             for j in range(self.serverList[i]["players"]):
-                if j < (self.serverList[i]["players"] - self.serverList[i]["bots"]) - self.serverList[i][
-                    "connectedPlayers"]:
+                if self.serverList[i]["connectedPlayers"] - 1 >= j:
+                    # if j > (self.serverList[i]["players"] - self.serverList[i]["connectedPlayers"]):
                     pygame.draw.circle(self.window, Player(j + 1).getColor(),
                                        (70 * j + dico[self.serverList[i]["players"]], self.coordYServer(i) + 160), 25)
                 else:
