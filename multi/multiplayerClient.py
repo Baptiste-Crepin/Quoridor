@@ -49,34 +49,36 @@ class MultiplayerGame(LocalGame):
 
         (action, x, y) = event
         clickCoordo = (x, y)
+        if ((not isinstance(self.game.getCurrentPlayer(), Bot) or self.game.getCurrentPlayer().getNumber()
+             == self.num + 1) and (self.game.getCurrentPlayer().getNumber() == self.num + 1)):
 
-        if action == 'TablePlayer':
-            if clickCoordo not in self.game.possibleMoves(currentPlayer.getCoordinates()):
-                return
-            self.board.clearHover(self.board.rect)
-            self.game.movePlayer(currentPlayer, clickCoordo)
+            if action == 'TablePlayer':
+                if clickCoordo not in self.game.possibleMoves(currentPlayer.getCoordinates()):
+                    return
+                self.board.clearHover(self.board.rect)
+                self.game.movePlayer(currentPlayer, clickCoordo)
 
-        if action == 'VerticalBarrier':
-            if (clickCoordo, 'Right') not in self.game.possibleBarrierPlacement(currentPlayer):
-                return
-            self.game.placeWall(clickCoordo, 'Right',
-                                currentPlayer, place=True)
+            if action == 'VerticalBarrier':
+                if (clickCoordo, 'Right') not in self.game.possibleBarrierPlacement(currentPlayer):
+                    return
+                self.game.placeWall(clickCoordo, 'Right',
+                                    currentPlayer, place=True)
 
-        if action == 'HorrizontalBarrier':
-            if (clickCoordo, 'Down') not in self.game.possibleBarrierPlacement(currentPlayer):
-                return
-            self.game.placeWall(clickCoordo, 'Down', currentPlayer)
+            if action == 'HorrizontalBarrier':
+                if (clickCoordo, 'Down') not in self.game.possibleBarrierPlacement(currentPlayer):
+                    return
+                self.game.placeWall(clickCoordo, 'Down', currentPlayer)
 
-        self.board.clearAllHighlight()
-        self.highlightPlayer(currentPlayer)
-        self.highlightBarrier()
-        print(f"tour fini pour {str(self.num)}")
-        self.thread.emet()  # sends the state of the game to the server when user plays
-        print("waiting for server response ")
-        self.response_event.wait()  # waits for the server response
-        print("server responded")
-
-        self.response_event.clear()
+            self.board.clearAllHighlight()
+            self.highlightPlayer(currentPlayer)
+            self.highlightBarrier()
+            print(f"tour fini pour {str(self.num)}")
+            self.thread.emet()  # sends the state of the game to the server when user plays
+            print("waiting for server response ")
+            self.response_event.wait()  # waits for the server response
+            print("server responded")
+            
+            self.response_event.clear()
         # time.sleep(0.5)
 
     def mainLoop(self) -> None:
@@ -85,9 +87,8 @@ class MultiplayerGame(LocalGame):
         self.highlightBarrier()
         while True:
             while not self.game.checkGameOver():
-                self.displayPossibleMoves(self.game.getCurrentPlayer())
-
                 self.placement(self.game.getCurrentPlayer())
+                self.displayPossibleMoves(self.game.getCurrentPlayer())
                 self.actualizeGame()
                 self.board.newFrame(
                     self.game.getCurrentPlayer(), self.game.getPlayerList())
