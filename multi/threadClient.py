@@ -12,11 +12,12 @@ if TYPE_CHECKING:
 class StoppableThreadClient(threading.Thread):
     """this class runs itself in a thread and is meand to handle client action for each client at any time"""
 
-    def __init__(self, connection: socket.socket, multiplayerClient: 'MultiplayerGame'):
+    def __init__(self, connection: socket.socket, multiplayerClient: 'MultiplayerGame', response_event):
         # super(StoppableThreadClient, self).__init__()
         super().__init__()
         self.connection = connection
         self.multiplayerClient = multiplayerClient
+        self.response_event = response_event
         self.stopEvent = threading.Event()
         self.start()
 
@@ -41,8 +42,8 @@ class StoppableThreadClient(threading.Thread):
         print(message)
 
     def handleEnd(self, message: list[Any]):
-        """upon reception of a 'game_end' messages update the state of the game accordingly then stop the thread if
-        possible"""
+        """ upon reception of a 'game_end' messages update the state of the game accordingly then stop the thread if
+        possible """
         self.multiplayerClient.game.setCurrentPlayer(message[1])
         if self.is_alive():
             print("Thread is still alive; stopping it now.")
@@ -65,6 +66,7 @@ class StoppableThreadClient(threading.Thread):
                     received_message = self.connection.recv(4096)
                     message = pickle.loads(received_message)
                     message_type = message[0]
+                    self.response_event.set()
                     if message_type in message_handlers:
                         message_handlers[message_type](message)
                     else:
