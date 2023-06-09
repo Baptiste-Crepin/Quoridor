@@ -22,6 +22,7 @@ class serverSubThread(threading.Thread):
         self.start()
         self.stopEvent = threading.Event()
         self.discostop = discostop
+        self.response_event = threading.Event()
 
     def stop(self):
         self.stopEvent.set()
@@ -96,7 +97,7 @@ class serverSubThread(threading.Thread):
                 print("connection error:")
                 print(e)
                 print(self.connected)
-                self.disconectMessage(["server_message", f"Client {self.clientId} has disconnected."])
+                self.disconectMessage([f"Client {self.clientId} has disconnected."])
                 raise Exception("Player disconnected while in game") from e
 
         # self.connection.close()

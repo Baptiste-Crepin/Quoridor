@@ -1,4 +1,5 @@
 import socket
+import threading
 import time
 
 import pygame
@@ -19,7 +20,8 @@ class MultiplayerGame(LocalGame):
         super().__init__(width, nbPlayer, nbBarrier, nbBots)
         self.board = Board(self.game.getSquareWidth())
         self.num = num
-        self.thread = StoppableThreadClient(connection, self)
+        self.response_event = threading.Event()
+        self.thread = StoppableThreadClient(connection, self, self.response_event)
 
     def displayPossibleMoves(self, player: Player):
         """highlights the possible moves but only for the client's player"""
@@ -36,8 +38,10 @@ class MultiplayerGame(LocalGame):
             currentPlayer.randomMoves(self.game.possibleBarrierPlacement(
                 currentPlayer), self.game.possibleMoves(currentPlayer.getCoordinates()))
             print("Bot played")
-
+            # self.response_event.wait()  # waits for the server response
+            # self.response_event.clear()
             self.thread.emet()  # sends the state of the game to the server when bot plays
+
             return
         event = self.board.handleEvents()
         if not event:
@@ -68,7 +72,12 @@ class MultiplayerGame(LocalGame):
         self.highlightBarrier()
         print(f"tour fini pour {str(self.num)}")
         self.thread.emet()  # sends the state of the game to the server when user plays
-        time.sleep(0.5)
+        print("waiting for server response ")
+        self.response_event.wait()  # waits for the server response
+        print("server responded")
+
+        self.response_event.clear()
+        # time.sleep(0.5)
 
     def mainLoop(self) -> None:
         """main loop of the class to play until victory is detected by End function"""
@@ -82,7 +91,6 @@ class MultiplayerGame(LocalGame):
                 self.actualizeGame()
                 self.board.newFrame(
                     self.game.getCurrentPlayer(), self.game.getPlayerList())
-                time.sleep(0.2)
             # TODO: Game has ended. display the end screen
             self.thread.ender()  # send  the current player and the end game message
             time.sleep(0.4)  # wait for the server to actualise every client

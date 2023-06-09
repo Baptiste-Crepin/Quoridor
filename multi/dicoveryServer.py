@@ -53,7 +53,6 @@ class SearchServer():
             raise SystemExit
 
     def multiLaunch(self, startVars: list[int], clientListLen) -> tuple:
-        """waits for the server to send the starter message then starts the game"""
         try:
             serverMessage = self.connection.recv(4096)
             print("recived:", serverMessage)
@@ -68,7 +67,8 @@ class SearchServer():
                 print("conected players = ", unpickeled_message[1])
                 return False, int(unpickeled_message[1])
 
-        except Exception:
+
+        except Exception as e:
             return False, clientListLen
 
     @staticmethod
