@@ -36,7 +36,9 @@ class MultiplayerGame(LocalGame):
             currentPlayer.randomMoves(self.game.possibleBarrierPlacement(
                 currentPlayer), self.game.possibleMoves(currentPlayer.getCoordinates()))
             print("Bot played")
+
             self.thread.emet()  # sends the state of the game to the server when bot plays
+            self.game.nextPlayer()
             return
         event = self.board.handleEvents()
         if not event:
@@ -67,7 +69,8 @@ class MultiplayerGame(LocalGame):
         self.highlightBarrier()
         print(f"tour fini pour {str(self.num)}")
         self.thread.emet()  # sends the state of the game to the server when user plays
-        # self.game.nextPlayer()
+
+        self.game.nextPlayer()
 
     def mainLoop(self) -> None:
         """main loop of the class to play until victory is detected by End function"""

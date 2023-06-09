@@ -22,10 +22,10 @@ class StoppableThreadClient(threading.Thread):
 
     def handleGameState(self, message: list[Any]) -> None:
         """upon reception of a 'game_state' messages update the state of the game accordingly"""
-        self.multiplayerClient.game.setGrid(message[1])
-        self.multiplayerClient.game.getCurrentPlayer().setBarrier(message[3])
         self.multiplayerClient.game.setCurrentPlayerN(message[2])
         self.multiplayerClient.game.setCurrentPlayer(self.multiplayerClient.game.getPlayerList()[message[2]])
+        self.multiplayerClient.game.getCurrentPlayer().setBarrier(message[3])
+        self.multiplayerClient.game.setGrid(message[1])
 
     def stop(self):
         self.stopEvent.set()
