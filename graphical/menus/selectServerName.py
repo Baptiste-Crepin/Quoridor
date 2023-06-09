@@ -20,7 +20,6 @@ class ServerName(Menu):
         self.nbBarrier = nbBarrier
         self.nbBot = nbBot
         self.method = method
-
         self.sendPos = (self.buttonX, 500)
         self.buttonSize = (self.buttonWidth, 50)
 

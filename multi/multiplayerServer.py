@@ -15,7 +15,7 @@ class serverSubThread(threading.Thread):
                  nbBots: int, discostop: threading.Event) -> None:
         threading.Thread.__init__(self)
         self.connection = connection
-        self.idc = id
+        self.clientId = id
         self.queue = queue
         self.connected = connected
         self.nbBots = nbBots
@@ -65,6 +65,12 @@ class serverSubThread(threading.Thread):
         while self.is_alive():
             time.sleep(1)
 
+    def disconectMessage(self, message):
+        message = ['mpAbort', message]
+        pickeled_message = pickle.dumps(message)
+        for i in range(len(self.connected)):
+            self.connected[i].send(pickeled_message)
+
     def run(self) -> None:
         '''
         gets the message from one client and sends it to all the clients
@@ -90,6 +96,7 @@ class serverSubThread(threading.Thread):
                 print("connection error:")
                 print(e)
                 print(self.connected)
+                self.disconectMessage(["server_message", f"Client {self.clientId} has disconnected."])
                 raise Exception("Player disconnected while in game") from e
 
         # self.connection.close()

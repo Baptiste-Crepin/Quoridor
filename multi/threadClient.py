@@ -36,6 +36,10 @@ class StoppableThreadClient(threading.Thread):
     def handleChatMessage(self, message: list[Any]) -> None:
         print("chat not implemented yet")
 
+    def handleAbort(self, message: list[Any]):
+        """ the server has aborted the game due to some network issue aborting the game for the client"""
+        print(message)
+
     def handleEnd(self, message: list[Any]):
         """upon reception of a 'game_end' messages update the state of the game accordingly then stop the thread if
         possible"""
@@ -53,6 +57,7 @@ class StoppableThreadClient(threading.Thread):
             message_handlers = {
                 'game_state': self.handleGameState,
                 'chat': self.handleChatMessage,
+                'mpAbort': self.handleAbort,
                 'game_end': self.handleEnd
             }
             while True:
@@ -80,7 +85,7 @@ class StoppableThreadClient(threading.Thread):
         print("sending game state")
 
     def ender(self) -> None:
-        """sends the 'game_end' with the current player in it """
+        """ sends the 'game_end' with the current player in it """
         currentplayer = self.multiplayerClient.game.getCurrentPlayer()
         msg = ['game_end', currentplayer]
         data = pickle.dumps(msg)

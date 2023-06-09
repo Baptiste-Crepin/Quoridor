@@ -38,7 +38,6 @@ class MultiplayerGame(LocalGame):
             print("Bot played")
 
             self.thread.emet()  # sends the state of the game to the server when bot plays
-            self.game.nextPlayer()
             return
         event = self.board.handleEvents()
         if not event:
@@ -69,8 +68,7 @@ class MultiplayerGame(LocalGame):
         self.highlightBarrier()
         print(f"tour fini pour {str(self.num)}")
         self.thread.emet()  # sends the state of the game to the server when user plays
-
-        self.game.nextPlayer()
+        time.sleep(0.5)
 
     def mainLoop(self) -> None:
         """main loop of the class to play until victory is detected by End function"""
@@ -81,10 +79,10 @@ class MultiplayerGame(LocalGame):
                 self.displayPossibleMoves(self.game.getCurrentPlayer())
 
                 self.placement(self.game.getCurrentPlayer())
-
                 self.actualizeGame()
                 self.board.newFrame(
                     self.game.getCurrentPlayer(), self.game.getPlayerList())
+                time.sleep(0.2)
             # TODO: Game has ended. display the end screen
             self.thread.ender()  # send  the current player and the end game message
             time.sleep(0.4)  # wait for the server to actualise every client
@@ -94,5 +92,3 @@ class MultiplayerGame(LocalGame):
                 end.mainLoop()
                 pygame.display.update()
             raise SystemExit
-
-
