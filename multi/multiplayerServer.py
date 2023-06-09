@@ -8,11 +8,11 @@ import time
 from typing import Any
 
 
-class ThreadClient(threading.Thread):
+class serverSubThread(threading.Thread):
     """ class that creates a thread for each client to handle incoming data at any time  """
 
     def __init__(self, connection: socket.socket, id: int, queue: queue.Queue[int], connected: dict[int, socket.socket],
-                 nbBots: int, discostop: threading.Event, host, port) -> None:
+                 nbBots: int, discostop: threading.Event) -> None:
         threading.Thread.__init__(self)
         self.connection = connection
         self.idc = id
@@ -36,9 +36,9 @@ class ThreadClient(threading.Thread):
     def nextClient(self) -> int:
         """retrieves the current player from the queue, returns the next one"""
         current_client = self.queue.get()
-        print(current_client)
-        current_client = (
-                                 current_client + 1) % (len(self.connected) + self.nbBots)
+        print(current_client, '-->', ((current_client + 1) % (len(self.connected) + self.nbBots)), " total clients :",
+              len(self.connected) + self.nbBots)
+        current_client = (current_client + 1) % (len(self.connected) + self.nbBots)
         self.queue.put(current_client)
         self.queue.task_done()
         return current_client
@@ -103,9 +103,17 @@ class ThreadClient(threading.Thread):
             print("sending starter message to client  :", i)
             connected[i].send(pickeled_message)
 
+    @staticmethod
+    def roomstatus(connected: dict[int, socket.socket]):
+        msg = str(len(connected))
+        pickeled_message = pickle.dumps(msg)
+        for i in range(len(connected)):
+            print("sending ", msg, " message to client  :", i)
+            connected[i].send(pickeled_message)
+
 
 def acceptConnections(mySocket: socket.socket, init: list[int], initializedQueue: queue.Queue[int],
-                      stopEvent: threading.Event, host, port):
+                      stopEvent: threading.Event, lobbyinfos):
     '''
     accepts the connections of the clients and creates a thread for each of them to handle the messages
     '''
@@ -118,15 +126,17 @@ def acceptConnections(mySocket: socket.socket, init: list[int], initializedQueue
         connection = mySocket.accept()[0]
 
         connected[init[0]] = connection
-        ThreadClient(connection, init[0], initializedQueue, connected, nbBots, stopEvent, host, port)
+        serverSubThread(connection, init[0], initializedQueue, connected, nbBots, stopEvent)
 
         init_msg = pickle.dumps(init)
         print("sending init msg")
         connection.send(init_msg)
+        serverSubThread.roomstatus(connected)
+        lobbyinfos["connectedPlayers"] = len(connected)
 
         print("Client", init[0], "connected, awaiting other players")
         init[0] += 1
-    ThreadClient.starter(connected)
+    serverSubThread.starter(connected)
     return connected
 
 
@@ -165,7 +175,7 @@ def createServer(width: int, nbBarrier: int, nbPlayer: int, nbBots: int, name: s
                  'width': width,
                  'barriers': nbBarrier,
                  'bots': nbBots,
-                 'remining': 1
+                 'connectedPlayers': 0
                  }
 
     initializedQueue = queue.Queue[int]()
@@ -188,7 +198,7 @@ def createServer(width: int, nbBarrier: int, nbPlayer: int, nbBots: int, name: s
     discothread = threading.Thread(target=discoveryServer, args=(discoSock, lobbyInfo, stopEvent))
     discothread.start()
 
-    acceptConnections(serverSocket, init, initializedQueue, stopEvent, host, port)
+    acceptConnections(serverSocket, init, initializedQueue, stopEvent, lobbyInfo, )
 
 
 if __name__ == "__main__":

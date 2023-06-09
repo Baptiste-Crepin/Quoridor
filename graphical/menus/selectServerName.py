@@ -66,6 +66,7 @@ class ServerName(Menu):
                                         self.nbBarrier,
                                         self.nbBot,
                                         self.input.text,
+                                        0,
                                         self.searchServer,
                                         True)
                     self.newMenu(self, board)

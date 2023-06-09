@@ -25,8 +25,7 @@ class StoppableThreadClient(threading.Thread):
         self.multiplayerClient.game.setGrid(message[1])
         self.multiplayerClient.game.getCurrentPlayer().setBarrier(message[3])
         self.multiplayerClient.game.setCurrentPlayerN(message[2])
-        self.multiplayerClient.game.setCurrentPlayer(
-            self.multiplayerClient.game.getPlayerList()[message[2]])
+        self.multiplayerClient.game.setCurrentPlayer(self.multiplayerClient.game.getPlayerList()[message[2]])
 
     def stop(self):
         self.stopEvent.set()
@@ -69,7 +68,7 @@ class StoppableThreadClient(threading.Thread):
                     print("connection error:")
                     print(e)
                     raise Exception("Player disconnected while in game") from e
-        self.connection.close()
+        # self.connection.close()
 
     def emet(self):
         """sends the state of the game as well as the amount of remaining barriers for the current player"""
@@ -78,6 +77,7 @@ class StoppableThreadClient(threading.Thread):
         msg = ['game_state', grid, self.multiplayerClient.num, barriersLeft]
         data = pickle.dumps(msg)
         self.connection.send(data)
+        print("sending game state")
 
     def ender(self) -> None:
         """sends the 'game_end' with the current player in it """

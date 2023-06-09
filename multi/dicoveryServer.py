@@ -52,7 +52,7 @@ class SearchServer():
             print("Erreur sur la connection")
             raise SystemExit
 
-    def multiLaunch(self, startVars: list[int], host: str) -> bool:
+    def multiLaunch(self, startVars: list[int]) -> bool:
         """waits for the server to send the starter message then starts the game"""
         try:
             serverMessage = self.connection.recv(4096)
@@ -81,3 +81,13 @@ class SearchServer():
 
         Game = MultiplayerGame(connection, width, nbBarrier, nbPlayer, nbBots, num)
         Game.mainLoop()
+
+    def roomstate(self):
+        try:
+            serverMessage = self.connection.recv(4096)
+            unpickeled_message = pickle.loads(serverMessage)
+            print("receiving room slots state:", unpickeled_message)
+            return unpickeled_message
+
+        except Exception:
+            return
