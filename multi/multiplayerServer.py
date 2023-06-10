@@ -179,8 +179,19 @@ def createServer(width: int, nbBarrier: int, nbPlayer: int, nbBots: int, name: s
     ide = 0
     init = [ide, width, nbBarrier, nbPlayer, nbBots]
 
-    hostname = socket.gethostname()
-    host = socket.gethostbyname(hostname)
+    # hostname = socket.gethostname()
+    # host = socket.gethostbyname(hostname)
+
+    s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    try:
+        # Doesn't need to be reachable, it's used to make the OS determine the preferred outgoing IP interface
+        s.connect(('10.255.255.255', 1))
+        host = s.getsockname()[0]
+    except Exception:
+        host = '0.0.0.0'  # Listen on all available interfaces
+    finally:
+        s.close()
+
     lobbyInfo = {'discoverymessage': b"SERVER_DISCOVERY_REQUEST",
                  'ip': host,
                  'port': port,
