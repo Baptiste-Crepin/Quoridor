@@ -52,7 +52,7 @@ class SearchServer():
             print("Erreur sur la connection")
             raise SystemExit
 
-    def multiLaunch(self, startVars: list[int], clientListLen) -> tuple:
+    def multiLaunch(self, startVars: list[int], clientListLen, host: bool) -> tuple:
         try:
             serverMessage = self.connection.recv(4096)
             print("recived:", serverMessage)
@@ -61,7 +61,8 @@ class SearchServer():
             if unpickeled_message[0] != "lenConnected":
                 print("starting game", startVars)
                 self.connection.setblocking(True)
-                self.createGame(self.connection, startVars)
+                self.createGame(self.connection, startVars, host)
+
                 return True, clientListLen
             else:
                 print("conected players = ", unpickeled_message[1])
@@ -72,7 +73,7 @@ class SearchServer():
             return False, clientListLen
 
     @staticmethod
-    def createGame(connection: socket.socket, startVars: list[Any]):
+    def createGame(connection: socket.socket, startVars: list[Any], host: bool):
         """ creates an instance of the class: MultiplayerGame passing the user's choices as parameters """
         print("Game infos:", startVars)
         num = int(startVars[0])
@@ -80,8 +81,7 @@ class SearchServer():
         nbBarrier = startVars[2]
         nbPlayer = startVars[3]
         nbBots = startVars[4]
-
-        Game = MultiplayerGame(connection, width, nbBarrier, nbPlayer, nbBots, num)
+        Game = MultiplayerGame(connection, width, nbBarrier, nbPlayer, host, nbBots, num)
         Game.mainLoop()
 
     def roomstate(self):

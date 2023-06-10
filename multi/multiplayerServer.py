@@ -66,7 +66,11 @@ class serverSubThread(threading.Thread):
         while self.is_alive():
             time.sleep(1)
 
-    def restartMP(self):
+    def restartMP(self, message: list[Any]) -> None:
+        print("restarting the multiplayer for all client")
+        pickeled_message = pickle.dumps(message)
+        for i in range(len(self.connected)):
+            self.connected[i].send(pickeled_message)
 
     def disconectMessage(self, message):
         message = ['mpAbort', message]

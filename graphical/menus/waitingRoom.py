@@ -72,7 +72,8 @@ class WaitingRoom(Menu):
         if self.start == False:
             try:
                 # This will now return immediately if there is no data to receive
-                self.start, self.clientListLen = self.serverConnection.multiLaunch(self.startVars, self.clientListLen)
+                self.start, self.clientListLen = self.serverConnection.multiLaunch(self.startVars, self.clientListLen,
+                                                                                   self.host)
             except Exception as e:
                 print("Unexpected error:", e)
             # Handle other exceptions

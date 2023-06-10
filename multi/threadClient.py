@@ -12,7 +12,7 @@ if TYPE_CHECKING:
 class StoppableThreadClient(threading.Thread):
     """this class runs itself in a thread and is meand to handle client action for each client at any time"""
 
-    def __init__(self, connection: socket.socket, multiplayerClient: 'MultiplayerGame', response_event):
+    def __init__(self, connection: socket.socket, multiplayerClient: 'MultiplayerGame', response_event, host: bool):
         # super(StoppableThreadClient, self).__init__()
         super().__init__()
         self.connection = connection
@@ -95,6 +95,12 @@ class StoppableThreadClient(threading.Thread):
         """ sends the 'game_end' with the current player in it """
         currentplayer = self.multiplayerClient.game.getCurrentPlayer()
         msg = ['game_end', currentplayer]
+        data = pickle.dumps(msg)
+        self.connection.send(data)
+
+    def restart(self) -> None:
+        print("sending restart message ")
+        msg = ['resetGame', True]
         data = pickle.dumps(msg)
         self.connection.send(data)
 

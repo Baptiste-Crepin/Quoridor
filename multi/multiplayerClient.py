@@ -15,13 +15,15 @@ from player import Player
 class MultiplayerGame(LocalGame):
     """LocalGame child class  for multiplayer"""
 
-    def __init__(self, connection: socket.socket, width: int, nbBarrier: int, nbPlayer: int, nbBots: int = 0,
+    def __init__(self, connection: socket.socket, width: int, nbBarrier: int, nbPlayer: int, host: bool,
+                 nbBots: int = 0,
                  num: int = -1) -> None:
         super().__init__(width, nbPlayer, nbBarrier, nbBots)
         self.board = Board(self.game.getSquareWidth())
         self.num = num
         self.response_event = threading.Event()
-        self.thread = StoppableThreadClient(connection, self, self.response_event)
+        self.host = host
+        self.thread = StoppableThreadClient(connection, self, self.response_event, host)
 
     def displayPossibleMoves(self, player: Player):
         """highlights the possible moves but only for the client's player"""
@@ -95,7 +97,8 @@ class MultiplayerGame(LocalGame):
                 self.board.newFrame(
                     self.game.getCurrentPlayer(), self.game.getPlayerList())
             # TODO: Game has ended. display the end screen
-            self.thread.ender()  # send  the current player and the end game message
+            # self.thread.ender()  # send  the current player and the end game message
+            self.thread.restart()
             time.sleep(0.4)  # wait for the server to actualise every client
             end = End(self.game.getPreviousPlayer(), self.game.getSquareWidth(
             ), self.game.getNumberOfPlayers(), self.game.getNumberOfBarriers(), self.game.getNumberOfBots())
