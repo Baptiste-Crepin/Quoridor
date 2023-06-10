@@ -88,21 +88,20 @@ class StoppableThreadClient(threading.Thread):
         barriersLeft = self.multiplayerClient.game.getCurrentPlayer().getBarrier()
         msg = ['game_state', grid, self.multiplayerClient.num, barriersLeft]
         data = pickle.dumps(msg)
-        self.connection.send(data)
-        print("sending game state")
+        self.connection.sendall(data)
 
     def ender(self) -> None:
         """ sends the 'game_end' with the current player in it """
         currentplayer = self.multiplayerClient.game.getCurrentPlayer()
         msg = ['game_end', currentplayer]
         data = pickle.dumps(msg)
-        self.connection.send(data)
+        self.connection.sendall(data)
 
     def restart(self) -> None:
         print("sending restart message ")
         msg = ['resetGame', True]
         data = pickle.dumps(msg)
-        self.connection.send(data)
+        self.connection.sendall(data)
 
     def reco(self):
         """receives message from server then return the unpicked version of it """

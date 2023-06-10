@@ -49,7 +49,7 @@ class serverSubThread(threading.Thread):
         message[2] = self.nextClient()
         pickeled_message = pickle.dumps(message)
         for i in range(len(self.connected)):
-            self.connected[i].send(pickeled_message)
+            self.connected[i].sendall(pickeled_message)
 
     def handleChatMessage(self, message: list[Any]) -> None:
         print("chat not implemented yet")
@@ -58,7 +58,7 @@ class serverSubThread(threading.Thread):
         Any]) -> None:  # recieved the end game message send the current player to all clients then ends the server thread
         pickeled_message = pickle.dumps(message)
         for i in range(len(self.connected)):
-            self.connected[i].send(pickeled_message)
+            self.connected[i].sendall(pickeled_message)
         time.sleep(0.2)
         if self.is_alive():
             print("Server side Thread is still alive; stoping it now.")
@@ -70,13 +70,13 @@ class serverSubThread(threading.Thread):
         print("restarting the multiplayer for all client")
         pickeled_message = pickle.dumps(message)
         for i in range(len(self.connected)):
-            self.connected[i].send(pickeled_message)
+            self.connected[i].sendall(pickeled_message)
 
     def disconectMessage(self, message):
         message = ['mpAbort', message]
         pickeled_message = pickle.dumps(message)
         for i in range(len(self.connected)):
-            self.connected[i].send(pickeled_message)
+            self.connected[i].sendall(pickeled_message)
 
     def run(self) -> None:
         '''
@@ -116,7 +116,7 @@ class serverSubThread(threading.Thread):
         time.sleep(1)
         for i in range(len(connected)):
             print("sending starter message to client  :", i)
-            connected[i].send(pickeled_message)
+            connected[i].sendall(pickeled_message)
 
     @staticmethod
     def roomstatus(connected: dict[int, socket.socket]):
@@ -124,7 +124,7 @@ class serverSubThread(threading.Thread):
         pickeled_message = pickle.dumps(msg)
         for i in range(len(connected)):
             print("sending ", msg, " message to client  :", i)
-            connected[i].send(pickeled_message)
+            connected[i].sendall(pickeled_message)
 
 
 def acceptConnections(mySocket: socket.socket, init: list[int], initializedQueue: queue.Queue[int],
@@ -145,7 +145,7 @@ def acceptConnections(mySocket: socket.socket, init: list[int], initializedQueue
 
         init_msg = pickle.dumps(init)
         print("sending init msg")
-        connection.send(init_msg)
+        connection.sendall(init_msg)
         lobbyinfos["connectedPlayers"] = len(connected)
         print("Client", init[0], "connected, awaiting other players")
         serverSubThread.roomstatus(connected)
