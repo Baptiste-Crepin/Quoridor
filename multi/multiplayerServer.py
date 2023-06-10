@@ -213,7 +213,11 @@ def createServer(width: int, nbBarrier: int, nbPlayer: int, nbBots: int, name: s
     discothread.start()
     lobbyInfo["connectedPlayers"] += 1
 
-    acceptConnections(serverSocket, init, initializedQueue, stopEvent, lobbyInfo, )
+    acceptConnections(serverSocket, init, initializedQueue, stopEvent, lobbyInfo)
+    discoSock.close()
+
+    stopEvent.set()
+    print("stoping discovery response procedure")
 
 
 if __name__ == "__main__":
