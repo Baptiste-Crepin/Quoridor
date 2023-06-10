@@ -88,7 +88,6 @@ class SearchServer():
         try:
             serverMessage = self.connection.recv(4096)
             unpickeled_message = pickle.loads(serverMessage)
-            print("receiving room slots state:", unpickeled_message)
             return unpickeled_message
 
         except Exception:

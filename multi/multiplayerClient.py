@@ -77,9 +77,11 @@ class MultiplayerGame(LocalGame):
             print("waiting for server response ")
             self.response_event.wait()  # waits for the server response
             print("server responded")
-            
+
             self.response_event.clear()
-        # time.sleep(0.5)
+
+    def resetGameState(self):
+        print("reseting the game")
 
     def mainLoop(self) -> None:
         """main loop of the class to play until victory is detected by End function"""

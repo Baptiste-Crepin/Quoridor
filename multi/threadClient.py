@@ -51,6 +51,10 @@ class StoppableThreadClient(threading.Thread):
         while self.is_alive():
             time.sleep(1)
 
+    def handleReset(self, message: list[Any]):
+        """Call resetGameState method of 'MultiplayerGame' instance"""
+        self.multiplayerClient.resetGameState()
+
     def run(self):
         """ this function is executed at the start of the thread try to receive message then calls the appropriate
         method depending on the message type /'header'"""
@@ -59,12 +63,13 @@ class StoppableThreadClient(threading.Thread):
                 'game_state': self.handleGameState,
                 'chat': self.handleChatMessage,
                 'mpAbort': self.handleAbort,
-                'game_end': self.handleEnd
+                'game_end': self.handleEnd,
+                'resetGame': self.handleReset
             }
             while True:
                 try:
-                    received_message = self.connection.recv(4096)
-                    message = pickle.loads(received_message)
+
+                    message = self.reco()
                     message_type = message[0]
                     self.response_event.set()
                     if message_type in message_handlers:

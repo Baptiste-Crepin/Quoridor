@@ -66,6 +66,8 @@ class serverSubThread(threading.Thread):
         while self.is_alive():
             time.sleep(1)
 
+    def restartMP(self):
+
     def disconectMessage(self, message):
         message = ['mpAbort', message]
         pickeled_message = pickle.dumps(message)
@@ -79,7 +81,8 @@ class serverSubThread(threading.Thread):
         message_handlers = {
             'game_state': self.handleGameState,
             'chat': self.handleChatMessage,
-            'game_end': self.handleEnd
+            'game_end': self.handleEnd,
+            'resetGame': self.restartMP
         }
 
         while True:
