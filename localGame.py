@@ -109,16 +109,16 @@ class LocalGame():
     def botMovement(self, player: Bot):
         # Logic for the bot to play
         self.board.newFrame(player, self.game.getPlayerList())
-        # randomAction = player.randomAction(
-        #     self.game.possibleBarrierPlacement(player))
-        # if randomAction == 0:
-        coord = player.randomMove(
-            self.game.possibleMoves(player.getCoordinates()))
-        self.game.movePlayer(player, coord)
-        # elif randomAction == 1:
-        #     coord, direction = player.randomBarrier(
-        #         self.game.possibleBarrierPlacement(player))
-        #     self.game.placeWall(coord, direction, player)
+        randomAction = player.randomAction(
+            self.game.possibleBarrierPlacement(player))
+        if randomAction == 0:
+            coord = player.randomMove(
+                self.game.possibleMoves(player.getCoordinates()))
+            self.game.movePlayer(player, coord)
+        elif randomAction == 1:
+            coord, direction = player.randomBarrier(
+                self.game.possibleBarrierPlacement(player))
+            self.game.placeWall(coord, direction, player)
 
         self.game.nextPlayer()
         self.newTurn = True

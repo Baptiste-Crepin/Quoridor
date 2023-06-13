@@ -289,7 +289,6 @@ class Game():
     def wallCollide(self, currentCoord: tuple[int, int], nextCoord: tuple[int, int], jump: bool = False) -> bool:
         """Return True if there is a wall between the currentCoord and the nextCoord"""
         CurrentCell = self.getCell(currentCoord)
-        print(nextCoord)
         targetCell = self.getCell(nextCoord)
 
         if (self.isValidWall(self.getDirection(currentCoord, nextCoord, True)) and
