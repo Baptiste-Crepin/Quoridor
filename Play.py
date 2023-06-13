@@ -7,13 +7,16 @@ class Play(Menu):
     def __init__(self) -> None:
         super().__init__()
 
-        self.posPlay = (self.buttonX, 200)
-        self.posRules = (self.buttonX, 370)
+        self.posPlay = (self.buttonX, 150)
+        self.posRules = (self.buttonX, 320)
+        self.posQuit = (self.buttonX, 490)
 
         self.playButton = pygame.Rect(
-            self.buttonX, 200, self.buttonWidth, self.buttonHeight)
+            self.buttonX, 150, self.buttonWidth, self.buttonHeight)
         self.rulesButton = pygame.Rect(
-            self.buttonX, 370, self.buttonWidth, self.buttonHeight)
+            self.buttonX, 320, self.buttonWidth, self.buttonHeight)
+        self.quitButton = pygame.Rect(
+            self.buttonX, 490, self.buttonWidth, self.buttonHeight)
 
     def Event(self) -> None:
         from graphical.menus.rules import Rules
@@ -28,12 +31,15 @@ class Play(Menu):
                 elif pygame.Rect(self.posRules, self.buttonSize).collidepoint(event.pos):
                     board = Rules()
                     self.newMenu(self, board)
+                elif pygame.Rect(self.posQuit, self.buttonSize).collidepoint(event.pos):
+                    pygame.quit()
 
     def mainLoop(self) -> None:
         self.window.fill(self.backGround)
 
         Button(self.window, self.playButton, self.blue, "PLAY")
         Button(self.window, self.rulesButton, self.blue, "RULES")
+        Button(self.window, self.quitButton, self.blue, "QUIT")
         self.Event()
         pygame.display.flip()
 
