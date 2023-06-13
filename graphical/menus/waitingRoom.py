@@ -9,13 +9,11 @@ from player import Player
 
 
 # from multiplayerServer import createServer
-# from multiplayerClient import SearchServer
 
 
 class WaitingRoom(Menu):
     def __init__(self, startVars: list[Any], width: int, nbPlayer: int, nbBarrier: int, nbBot: int, serverName: str,
-                 connectedPlayers: int,
-                 serverConnection: SearchServer, Host: bool = False) -> None:
+                 connectedPlayers: int, serverConnection: SearchServer, Host: bool = False) -> None:
         super().__init__()
         self.width = width
         self.nbPlayer = nbPlayer

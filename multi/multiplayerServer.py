@@ -12,7 +12,7 @@ class serverSubThread(threading.Thread):
     """ class that creates a thread for each client to handle incoming data at any time  """
 
     def __init__(self, connection: socket.socket, id: int, queue: queue.Queue[int], connected: dict[int, socket.socket],
-                 nbBots: int, discostop: threading.Event) -> None:
+                 nbBots: int) -> None:
         threading.Thread.__init__(self)
         self.connection = connection
         self.clientId = id
@@ -21,12 +21,10 @@ class serverSubThread(threading.Thread):
         self.nbBots = nbBots
         self.start()
         self.stopEvent = threading.Event()
-        self.discostop = discostop
         self.response_event = threading.Event()
 
     def stop(self):
         self.stopEvent.set()
-        self.discostop.set()
 
     def stopped(self):
         return self.stopEvent.is_set()
@@ -128,7 +126,7 @@ class serverSubThread(threading.Thread):
 
 
 def acceptConnections(mySocket: socket.socket, init: list[int], initializedQueue: queue.Queue[int],
-                      stopEvent: threading.Event, lobbyinfos):
+                      lobbyinfos):
     '''
     accepts the connections of the clients and creates a thread for each of them to handle the messages
     '''
@@ -141,7 +139,7 @@ def acceptConnections(mySocket: socket.socket, init: list[int], initializedQueue
         connection = mySocket.accept()[0]
 
         connected[init[0]] = connection
-        serverSubThread(connection, init[0], initializedQueue, connected, nbBots, stopEvent)
+        serverSubThread(connection, init[0], initializedQueue, connected, nbBots)
 
         init_msg = pickle.dumps(init)
         print("sending init msg")
@@ -166,11 +164,19 @@ def handle_client_request(data: bytes, client_address: tuple[str, int], dsock: s
 
 def discoveryServer(dsock: socket.socket, lobbyInfo: dict, stopEvent: threading.Event):
     """ respond to incoming discovery request until stopped"""
-    while not stopEvent.is_set():
-        data, addre = dsock.recvfrom(1024)
-        if stopEvent.is_set():
-            break
-        handle_client_request(data, addre, dsock, lobbyInfo)
+    dsock.settimeout(1)
+    try:
+        while not stopEvent.is_set():
+            try:
+                data, addre = dsock.recvfrom(1024)
+                handle_client_request(data, addre, dsock, lobbyInfo)
+            except socket.timeout:
+                # Timeout occurred, check if we need to stop the thread
+                continue
+    finally:
+        # Close the socket here, in the same thread that was using it.
+        dsock.close()
+        print("Stopped discovery server")
 
 
 def createServer(width: int, nbBarrier: int, nbPlayer: int, nbBots: int, name: str, port: int = 45678) -> None:
@@ -224,11 +230,13 @@ def createServer(width: int, nbBarrier: int, nbPlayer: int, nbBots: int, name: s
     discothread.start()
     lobbyInfo["connectedPlayers"] += 1
 
-    acceptConnections(serverSocket, init, initializedQueue, stopEvent, lobbyInfo)
-    discoSock.close()
-
+    acceptConnections(serverSocket, init, initializedQueue, lobbyInfo)
+    time.sleep(5)
     stopEvent.set()
-    print("stoping discovery response procedure")
+    time.sleep(0.3)
+    discothread.join()
+    discoSock.close()
+    print("stoped discovery response procedure")
 
 
 if __name__ == "__main__":
