@@ -102,7 +102,7 @@ class MultiplayerGame(LocalGame):
             self.thread.restart()
             time.sleep(0.4)  # wait for the server to actualise every client
             end = endGameMulti(self.game.getPlayer(), self.game.getSquareWidth(
-            ), self.game.getNumberOfPlayers(), self.game.getNumberOfBarriers(), self.game.getNumberOfBots())
+            ), self.game.getNumberOfPlayers(), self.game.getNumberOfBarriers(), self.game.getNumberOfBots(), self.host)
             while self.game.checkGameOver():
                 end.mainLoop()
                 pygame.display.update()
