@@ -16,9 +16,10 @@ from graphical.widgets.menu import Menu
 class Board(Menu):
     BarrierOrCell = TypeVar('BarrierOrCell', Barrier, TablePlayer)
 
-    def __init__(self, Width):
+    def __init__(self, Width: int, score: list[int]):
         super().__init__()
         self.col = Width
+        self.score = score
 
         self.clicked = False
 
@@ -223,7 +224,7 @@ class Board(Menu):
                     offset = 50
 
                 displayInformation(player, playerList, self.window,
-                                   self.black, pygame.Rect(760, 20 + offset + i * 70, 550, 50), i).displayNeutral()
+                                   self.black, pygame.Rect(760, 20 + offset + i * 70, 550, 50), i, self.score).displayNeutral()
 
     def newFrame(self, currentPlayer: Player, playerList: list[Player]) -> None:
         self.clearScreen()

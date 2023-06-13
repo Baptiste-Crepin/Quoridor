@@ -7,9 +7,10 @@ from graphical.menus.endGame import End
 
 
 class LocalGame():
-    def __init__(self, width, nbPlayer, nbBarrier, nbBots) -> None:
+    def __init__(self, width, nbPlayer, nbBarrier, nbBots, score: list[int] = [0, 0, 0, 0]) -> None:
         self.game = Game(width, nbPlayer, nbBarrier, nbBots)
-        self.board = Board(self.game.getSquareWidth())
+        self.score = score
+        self.board = Board(self.game.getSquareWidth(), score)
         self.newTurn = True
 
     def highlightPlayer(self, player: Player) -> None:
@@ -113,7 +114,7 @@ class LocalGame():
                     self.game.getCurrentPlayer(), self.game.getPlayerList())
             # TODO: Game has ended. display the end screen
             end = End(self.game.getPreviousPlayer(), self.game.getSquareWidth(
-            ), self.game.getNumberOfPlayers(), self.game.getNumberOfBarriers(), self.game.getNumberOfBots())
+            ), self.game.getNumberOfPlayers(), self.game.getNumberOfBarriers(), self.game.getNumberOfBots(), self.score)
             while self.game.checkGameOver():
                 end.mainLoop()
                 pygame.display.update()

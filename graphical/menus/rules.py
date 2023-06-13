@@ -29,8 +29,8 @@ class Rules(Menu):
                     pygame.display.update()
 
     def mainLoop(self) -> None:
-        backGround = pygame.image.load('pictures/Rule.png')
-        self.window.blit(backGround, (-5, -20))
+        self.window.fill(self.backGround)
+        pygame.draw.rect(self.window, self.lighterBlue, ())
         self.ButtonBack()
         self.Event()
         pygame.display.flip()

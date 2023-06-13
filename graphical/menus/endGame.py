@@ -6,7 +6,7 @@ from graphical.widgets.menu import Menu
 
 
 class End(Menu):
-    def __init__(self, curentPlayer: Player, width: int, nbPlayer: int, nbBarrier: int, nbBots: int):
+    def __init__(self, curentPlayer: Player, width: int, nbPlayer: int, nbBarrier: int, nbBots: int, score: list[int] = [0, 0, 0, 0]):
         super().__init__()
         self.curentplayer = curentPlayer
         self.width = width
@@ -18,7 +18,12 @@ class End(Menu):
         self.window = pygame.display.set_mode(
             size=(self.windowWidth, self.windowHeight))
         self.center = (self.windowWidth//2, self.windowHeight//2)
-
+        self.countPlayers1 = score[0]
+        self.countPlayers2 = score[1]
+        self.countPlayers3 = score[2]
+        self.countPlayers4 = score[3]
+        self.score = score
+        self.actualizeScore()
         self.coordQuit = pygame.Rect(self.windowWidth//2-110,
                                      self.windowHeight//2+250, 200, 80)
         self.coordReplay = pygame.Rect(self.windowWidth//2-220,
@@ -27,7 +32,11 @@ class End(Menu):
                                       self.windowHeight//2+150, 200, 80)
 
     def Winner(self) -> str:
-        return f"{self.curentplayer.stringColor()} Player won !"
+        return f"{self.curentplayer.stringColor()} Player won ! He have {self.score[self.curentplayer.getNumber()-1]} win(s)"
+
+    def actualizeScore(self):
+        self.score[self.curentplayer.getNumber()-1] += 1
+        return self.score
 
     def displayWinner(self) -> None:
         pygame.draw.circle(
@@ -43,12 +52,13 @@ class End(Menu):
                     self.newMenu(self, board)
                 elif pygame.Rect(self.coordReplay).collidepoint(event.pos):
                     board = LocalGame(
-                        self.width, self.nbPlayer, self.nbBarrier, self.nbBots)
+                        self.width, self.nbPlayer, self.nbBarrier, self.nbBots, self.score)
                     self.newMenu(self, board)
                 elif pygame.Rect(self.coordQuit).collidepoint(event.pos):
                     raise SystemExit
 
     def mainLoop(self):
+
         self.window.fill(self.backGround)
         text_surface = self.font.render(self.Winner(), True, self.white)
         text_rect = text_surface.get_rect(center=(self.windowWidth // 2, 100))
@@ -63,7 +73,7 @@ class End(Menu):
 
 if __name__ == "__main__":
     pygame.init()
-    board = End(Player(0, 4), 5, 2, 10, 0)
+    board = End(Player(0, 4), 5, 2, 10, 0, [0, 0, 0, 0])
 
     while True:
         board.mainLoop()
