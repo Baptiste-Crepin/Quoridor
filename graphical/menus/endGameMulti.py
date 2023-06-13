@@ -6,11 +6,11 @@ from graphical.widgets.button import Button
 from player import Player
 
 
-class endGameMulti(End):
+class EndGameMulti(End):
     def __init__(self, curentPlayer: Player, width: int, nbPlayer: int, nbBarrier: int, nbBots: int,
                  searchserver: object, host: bool):
         super().__init__(curentPlayer, width, nbPlayer, nbBarrier, nbBots)
-        self.earchserevr = searchserver
+        self.searchserevr = searchserver
         self.host = host
 
     def Event(self):
@@ -20,16 +20,15 @@ class endGameMulti(End):
                 if pygame.Rect(self.coordLobby).collidepoint(event.pos):
                     board = Play()
                     self.newMenu(self, board)
-                # elif pygame.Rect(self.coordReplay).collidepoint(event.pos):
-                #     if self.host:
-                #         from graphical.menus.waitingRoom import WaitingRoom
-                #         board = WaitingRoom(
-                #
-                #         )
+                elif pygame.Rect(self.coordReplay).collidepoint(event.pos):
+                    if self.host:
+                        print("host clicked on replay")
+                        pass
                 elif pygame.Rect(self.coordQuit).collidepoint(event.pos):
                     raise SystemExit
 
     def mainLoop(self):
+        """end game display loop"""
         self.window.fill(self.backGround)
         text_surface = self.font.render(self.Winner(), True, self.white)
         text_rect = text_surface.get_rect(center=(self.windowWidth // 2, 100))

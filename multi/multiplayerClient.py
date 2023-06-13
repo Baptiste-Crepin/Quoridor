@@ -6,7 +6,7 @@ import pygame
 
 from Bot import Bot
 from graphical.menus.board import Board
-from graphical.menus.endGameMulti import endGameMulti
+from graphical.menus.endGameMulti import EndGameMulti
 from localGame import LocalGame
 from multi.threadClient import StoppableThreadClient
 from player import Player
@@ -101,8 +101,9 @@ class MultiplayerGame(LocalGame):
             # self.thread.ender()  # send  the current player and the end game message
             self.thread.restart()
             time.sleep(0.4)  # wait for the server to actualise every client
-            end = endGameMulti(self.game.getPlayer(), self.game.getSquareWidth(
-            ), self.game.getNumberOfPlayers(), self.game.getNumberOfBarriers(), self.game.getNumberOfBots(), self.host)
+            end = EndGameMulti(self.game.getPreviousPlayer(), self.game.getSquareWidth(
+            ), self.game.getNumberOfPlayers(), self.game.getNumberOfBarriers(), self.game.getNumberOfBots(), self.score
+                               , self.host)
             while self.game.checkGameOver():
                 end.mainLoop()
                 pygame.display.update()

@@ -140,6 +140,7 @@ def acceptConnections(mySocket: socket.socket, init: list[int], initializedQueue
 
         connected[init[0]] = connection
         serverSubThread(connection, init[0], initializedQueue, connected, nbBots)
+        print("new instance of  subserver:", serverSubThread)
 
         init_msg = pickle.dumps(init)
         print("sending init msg")
