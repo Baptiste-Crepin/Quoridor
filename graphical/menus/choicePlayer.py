@@ -4,64 +4,61 @@ from graphical.widgets.menu import Menu
 
 
 class NumberPlayer(Menu):
-    def __init__(self):
+    def __init__(self, multi: bool = False):
         super().__init__()
+        self.multi = multi
+        self.initializeButton()
 
-        self.pos1 = (self.buttonX - (self.buttonWidth*0.7), 250)
-        self.pos2 = (self.buttonX + (self.buttonWidth*0.7), 250)
-        self.pos3 = (self.buttonX - (self.buttonWidth*0.7), 420)
-        self.pos4 = (self.buttonX + (self.buttonWidth*0.7), 420)
+    def button2pos(self, yOffset: float, yPos: float) -> tuple[float, float]:
+        if self.multi:
+            return ((self.windowWidth//2) - (self.buttonWidth//2), yPos)
+        return (self.buttonX + yOffset, yPos)
 
-        self.Rect1 = pygame.Rect(
-            self.pos1, self.buttonSize)
-        self.Rect2 = pygame.Rect(
-            self.pos2, self.buttonSize)
-        self.Rect3 = pygame.Rect(
-            self.pos3, self.buttonSize)
-        self.Rect4 = pygame.Rect(
-            self.pos4, self.buttonSize)
+    def initializeButton(self):
+        offset = self.buttonWidth*0.7
+        yPos = self.windowHeight // 3
+        self.posRect1 = (self.buttonX - offset, yPos)
+        self.posRect2 = self.button2pos(offset, yPos)
+        self.posRect3 = (self.buttonX - offset, yPos * 2)
+        self.posRect4 = (self.buttonX + offset, yPos * 2)
 
-    def ButtonBack(self) -> pygame.Rect:
-        coord = [(5, 40), (30, 10), (30, 20), (70, 20),
-                 (70, 60), (30, 60), (30, 70)]
-        button = pygame.draw.polygon(self.window, self.darkBlue, coord)
-        font = pygame.font.SysFont("Extra Bold Italic", 20, False, True)
-        text = font.render("Back", True, self.white)
-        buttonText = text.get_rect(center=button.center)
-        self.window.blit(text, buttonText)
-        return button
+        self.Rect1 = pygame.Rect(self.posRect1, self.buttonSize)
+        self.Rect2 = pygame.Rect(self.posRect2, self.buttonSize)
+        self.Rect3 = pygame.Rect(self.posRect3, self.buttonSize)
+        self.Rect4 = pygame.Rect(self.posRect4, self.buttonSize)
 
     def Event(self):
         from graphical.menus.choiceBot import NumberBots
         from graphical.menus.sizeGrid import SizeGrid
         from graphical.menus.type import Menutype
 
-        PlayersFromPos = {self.pos1: [NumberBots, 1], self.pos2: [NumberBots, 2],
-                          self.pos3: [SizeGrid, (3, 1, 1)], self.pos4: [SizeGrid, (4, 0, 1)]}
+        PlayersFromPos = {self.posRect1: [NumberBots, (1, self.multi)],
+                          self.posRect2: [NumberBots, (2, self.multi)],
+                          self.posRect3: [SizeGrid, (3, 1, 1, self.multi)],
+                          self.posRect4: [SizeGrid, (4, 0, 1, self.multi)]}
+        if self.multi:
+            PlayersFromPos = {self.posRect2: [SizeGrid, (2, 0, 1, self.multi)],
+                              self.posRect3: [SizeGrid, (3, 1, 1, self.multi)],
+                              self.posRect4: [SizeGrid, (4, 0, 1, self.multi)]}
+
         for event in pygame.event.get():
-            if event.type == pygame.QUIT or event.type == pygame.WINDOWCLOSE:
-                raise SystemExit
-            elif not (event.type == pygame.MOUSEBUTTONDOWN and event.button == 1):
+            self.defaultEventHandler(event)
+            if event.type != pygame.MOUSEBUTTONDOWN or event.button != 1:
                 return
 
-            for pos in PlayersFromPos.keys():
+            for pos in PlayersFromPos:
                 if pygame.Rect(pos, self.buttonSize).collidepoint(event.pos):
-                    pygame.init()
-                    if type(PlayersFromPos[pos][1]) == tuple:
-                        board = PlayersFromPos[pos][0](*PlayersFromPos[pos][1])
-                    else:
-                        board = PlayersFromPos[pos][0](PlayersFromPos[pos][1])
-                    while True:
-                        board.setWindow()
-                        pygame.display.update()
-            if self.ButtonBack().collidepoint(event.pos) and event.button == 1:
-                pygame.init()
-                board = Menutype()
-                while True:
-                    board.setWindow()
-                    pygame.display.update()
+                    args = PlayersFromPos[pos][1]
+                    if not isinstance(args, tuple):
+                        continue
+                    # calls the constructor of the class in PlayersFromPos[pos][0] with the arguments in PlayersFromPos[pos][1]
+                    board = PlayersFromPos[pos][0](*args)  # type: ignore
+                    if isinstance(board, object):
+                        self.newMenu(self, board)
 
-    def setWindow(self):
+            self.back.Event(event, self, Menutype)
+
+    def mainLoop(self):
         self.window.fill(self.backGround)
 
         text_surface = self.font.render("How many players?", True, self.white)
@@ -75,11 +72,12 @@ class NumberPlayer(Menu):
 
         self.window.blit(contour_surface, contour_rect)
         self.window.blit(text_surface, text_rect)
-        Button(self.window, self.Rect1, self.blue, "1")
+        if not self.multi:
+            Button(self.window, self.Rect1, self.blue, "1")
         Button(self.window, self.Rect2, self.blue, "2")
         Button(self.window, self.Rect3, self.blue, "3")
         Button(self.window, self.Rect4, self.blue, "4")
-        self.ButtonBack()
+        self.back.drawButton()
         self.Event()
         pygame.display.flip()
 
@@ -89,5 +87,5 @@ if __name__ == "__main__":
     board = NumberPlayer()
 
     while True:
-        board.setWindow()
+        board.mainLoop()
         pygame.display.update()

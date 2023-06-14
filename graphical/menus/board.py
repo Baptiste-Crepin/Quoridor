@@ -1,27 +1,30 @@
-import pygame
 from typing import TypeVar
 
-from player import Player
+import pygame
+
 from graphical.barriers.barrier import Barrier
 from graphical.barriers.horizontalBarrier import HorizontalBarrier
-from graphical.widgets.informationPlayer import informationPlayer
-from graphical.widgets.displayInformation import displayInformation
-from graphical.menus.tablePlayer import TablePlayer
-from graphical.barriers.verticalBarrier import VerticalBarrier
 from graphical.barriers.intersection import Intersection
+from graphical.barriers.verticalBarrier import VerticalBarrier
+from graphical.menus.tablePlayer import TablePlayer
+from graphical.widgets.displayInformation import displayInformation
+from graphical.widgets.informationPlayer import informationPlayer
 from graphical.widgets.menu import Menu
+from player import Player
 
 
 class Board(Menu):
     """Class that handles the display of the board"""
     BarrierOrCell = TypeVar('BarrierOrCell', Barrier, TablePlayer)
 
-    def __init__(self, Width: int) -> None:
+    def __init__(self, Width: int, score: list[int] = [0, 0, 0, 0]):
         """Initializes the board"""
         super().__init__()
         self.col = Width
+        self.score = score
 
         self.clicked = False
+
         self.rect = self.initializeObjectList(TablePlayer)
         self.verticalBarriers = self.initializeObjectList(
             VerticalBarrier, 1, 0)
@@ -32,9 +35,10 @@ class Board(Menu):
         pygame.display.set_caption("plateau")
         self.play = True
 
-    def initializeObjectList(self, objectType: type[BarrierOrCell], offsetRow: int = 0, offsetCol: int = 0) -> list[list[BarrierOrCell]]:
+    def initializeObjectList(self, objectType: type[BarrierOrCell], offsetRow: int = 0, offsetCol: int = 0) -> list[
+            list[BarrierOrCell]]:
         return [[objectType(self.windowWidth, self.windowHeight, self.col, i, j)
-                for j in range(self.col - offsetCol)]
+                 for j in range(self.col - offsetCol)]
                 for i in range(self.col - offsetRow)]
 
     def hoverCells(self, cellsList: list[list[TablePlayer]]) -> None | bool:
@@ -54,7 +58,7 @@ class Board(Menu):
                     if not barrier.possiblePlacement:
                         continue
                     barrier.hover = True
-                    barrierList[i+offsetRow][j+offsetCol].hover = True
+                    barrierList[i + offsetRow][j + offsetCol].hover = True
                     return True
                 if not barrier.possiblePlacement:
                     continue
@@ -91,13 +95,12 @@ class Board(Menu):
         if not pygame.mouse.get_pressed()[0] and self.clicked:
             self.clicked = False
 
-    def quitWindow(self, eventType: int) -> None:
-        if eventType in [pygame.QUIT, pygame.WINDOWCLOSE]:
-            raise SystemExit
+    def quitWindow(self, event: pygame.event.Event) -> None:
+        self.defaultEventHandler(event)
 
     def handleEvents(self) -> None | tuple[str, int, int]:
         for event in pygame.event.get():
-            self.quitWindow(event.type)
+            self.quitWindow(event)
             return self.mouseLogic()
 
     def clearScreen(self) -> None:
@@ -142,9 +145,9 @@ class Board(Menu):
                 if cell.player.getNumber() != 0:
                     pygame.draw.circle(self.window,
                                        cell.player.getColor(),
-                                       ((cell.x + cell.sizeCase()//2),
-                                        (cell.y + cell.sizeCase()//2)),
-                                       cell.sizeCase()//3-5)
+                                       ((cell.x + cell.sizeCase() // 2),
+                                        (cell.y + cell.sizeCase() // 2)),
+                                       cell.sizeCase() // 3 - 5)
 
     def highlightPlayer(self, player: Player) -> None:
         for row in self.rect:
@@ -152,9 +155,9 @@ class Board(Menu):
                 if cell.player.getNumber() == player.getNumber():
                     pygame.draw.circle(self.window,
                                        (255, 255, 255),
-                                       ((cell.x + cell.sizeCase()//2),
-                                        (cell.y + cell.sizeCase()//2)),
-                                       cell.sizeCase()//6)
+                                       ((cell.x + cell.sizeCase() // 2),
+                                        (cell.y + cell.sizeCase() // 2)),
+                                       cell.sizeCase() // 6)
 
     def displayBarriers(self, barrierList: list[list[Barrier]]) -> None:
         for row in barrierList:
@@ -272,7 +275,9 @@ class Board(Menu):
                     offset = 50
 
                 displayInformation(player, playerList, self.window,
-                                   self.black, pygame.Rect(760, 20 + offset + i * 70, 550, 50), i).displayNeutral()
+                                   self.black, pygame.Rect(
+                                       760, 20 + offset + i * 70, 550, 50), i,
+                                   self.score).displayNeutral()
 
     def newFrame(self, currentPlayer: Player, playerList: list[Player]) -> None:
         self.clearScreen()

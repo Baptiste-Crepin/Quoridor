@@ -9,10 +9,11 @@ from graphical.menus.endGame import End
 class LocalGame():
     """This class is the main class of the game. It handles the game logic and the graphical interface."""
 
-    def __init__(self, width: int, nbPlayer: int, nbBarrier: int, nbBots: int) -> None:
+    def __init__(self, width, nbPlayer, nbBarrier, nbBots, score: list[int] = [0, 0, 0, 0]) -> None:
         """Initializes the game"""
         self.game = Game(width, nbPlayer, nbBarrier, nbBots)
-        self.board = Board(self.game.getSquareWidth())
+        self.score = score
+        self.board = Board(self.game.getSquareWidth(), score)
         self.newTurn = True
 
         pygame.mixer.init()
@@ -134,8 +135,11 @@ class LocalGame():
             self.placement(self.game.getCurrentPlayer())
             self.actualizeGame()
 
-            self.board.newFrame(
-                self.game.getCurrentPlayer(), self.game.getPlayerList())
+            self.board.newFrame(self.game.getCurrentPlayer(),
+                                self.game.getPlayerList())
+            # TODO: Game has ended. display the end screen
+            # end = End(self.game.getPreviousPlayer(), self.game.getSquareWidth(
+            # ), self.game.getNumberOfPlayers(), self.game.getNumberOfBarriers(), self.game.getNumberOfBots(), self.score)
 
         endWindow = End(self.game.getPreviousPlayer(),
                         self.game.getSquareWidth(),
@@ -143,7 +147,7 @@ class LocalGame():
                         self.game.getNumberOfBarriers(),
                         self.game.getNumberOfBots())
         while True:
-            endWindow.setWindow()
+            endWindow.mainLoop()
             pygame.display.update()
 
 

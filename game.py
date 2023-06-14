@@ -1,7 +1,7 @@
-import random
-from player import Player
-from cell import Cell
 from Bot import Bot
+from cell import Cell
+from player import Player
+import random
 
 
 class Game():
@@ -119,7 +119,7 @@ class Game():
         playerList = [Player(x+1, self.getNumberOfBarriers())
                       for x in range(self.getNumberOfPlayers())]
         if self.getNumberOfBots() != 0:
-            bots = [Bot(len(playerList)+x+1, self.getNumberOfBarriers())
+            bots = [Bot(len(playerList) + x + 1, self.getNumberOfBarriers())
                     for x in range(self.getNumberOfBots())]
             playerList += bots
         return playerList
@@ -225,9 +225,9 @@ class Game():
         """Return the left and right direction of the given direction"""
         dirArray = ["Up", "Left", "Down", "Right"]
         index = dirArray.index(direction)
-        LeftElement, RightElement = index-1, index+1
+        LeftElement, RightElement = index - 1, index + 1
 
-        LeftElement = len(dirArray)-1 if LeftElement == -1 else LeftElement
+        LeftElement = len(dirArray) - 1 if LeftElement == -1 else LeftElement
         RightElement = 0 if RightElement == len(dirArray) else RightElement
 
         return dirArray[LeftElement], dirArray[RightElement]
@@ -339,7 +339,7 @@ class Game():
             return False
 
         if place and not ignorePlayerBarriers:
-            player.setBarrier(player.getBarrier()-1)
+            player.setBarrier(player.getBarrier() - 1)
         return True
 
     def detectBarrier(self, coord: tuple[int, int], direction: str) -> bool:
@@ -424,7 +424,7 @@ class Game():
     def winningSide(self, player: Player):
         '''Return the side that the player must reach to win'''
         direction = ["Down", "Up", "Right", "Left"]
-        return direction[player.getNumber()-1]
+        return direction[player.getNumber() - 1]
 
     def getWinningLine(self, player: Player) -> int:
         '''Return the line that the player must reach to win'''
@@ -643,7 +643,7 @@ def main() -> None:
                     coord = (Game.intInput("row")-1, Game.intInput("Col")-1)
                     direction = currentGame.directionInput()
 
-                player.setBarrier(player.getBarrier()-1)
+                player.setBarrier(player.getBarrier() - 1)
             else:
                 while coord not in currentGame.possibleMoves(player.getCoordinates()):
                     coord = (Game.intInput("row")-1, Game.intInput("Col")-1)

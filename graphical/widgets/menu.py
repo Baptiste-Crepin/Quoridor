@@ -1,4 +1,5 @@
 import pygame
+from graphical.widgets.back import Back
 
 
 class Menu():
@@ -31,12 +32,24 @@ class Menu():
         self.buttonHeight = 120
         self.buttonSize = (self.buttonWidth, self.buttonHeight)
         self.buttonX = self.windowWidth//2-self.buttonWidth//2
+        self.back = Back(self.window)
 
-    def setWindow(self):
+    def defaultEventHandler(self, event: pygame.event.Event) -> None:
+        if event.type in [pygame.QUIT, pygame.WINDOWCLOSE]:
+            raise SystemExit
+
+    def mainLoop(self):
         self.window.fill(self.darkBlue)
         for event in pygame.event.get():
             if event.type in [pygame.QUIT, pygame.WINDOWCLOSE]:
                 raise SystemExit
+
+    @staticmethod
+    def newMenu(currentBoard: object, newBoard: object) -> None:
+        del currentBoard
+        while True:
+            newBoard.mainLoop()  # type: ignore
+            pygame.display.update()
 
 
 if __name__ == "__main__":
@@ -44,5 +57,5 @@ if __name__ == "__main__":
     board = Menu()
 
     while True:
-        board.setWindow()
+        board.mainLoop()
         pygame.display.update()

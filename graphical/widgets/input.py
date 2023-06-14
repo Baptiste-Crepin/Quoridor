@@ -14,13 +14,13 @@ class Input:
         self.text = ""
 
     def createInput(self):
-        input = pygame.draw.rect(
+        inputRect = pygame.draw.rect(
             self.window, self.color, self.rect, border_radius=10)
         text = self.font.render(self.text, True, self.black)
-        buttonText = text.get_rect(center=input.center)
+        buttonText = text.get_rect(center=inputRect.center)
         self.window.blit(text, buttonText)
 
-    def Event(self, event):
+    def Event(self, event: pygame.event.Event):
 
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_BACKSPACE:
@@ -34,6 +34,5 @@ class Input:
                       pygame.K_s: "s", pygame.K_t: "t", pygame.K_u: "u", pygame.K_v: "v", pygame.K_w: "w", pygame.K_x: "x",
                       pygame.K_y: "y", pygame.K_z: "z", pygame.K_SPACE: " ", pygame.K_0: "0", pygame.K_1: "1", pygame.K_2: "2",
                       pygame.K_3: "3", pygame.K_4: "4", pygame.K_5: "5", pygame.K_6: "6", pygame.K_7: "7", pygame.K_8: "8", pygame.K_9: "9"}
-            letter = keyMap.get(event.key)
-            if letter:
+            if letter := keyMap.get(event.key):
                 self.text += letter

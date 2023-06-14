@@ -235,3 +235,4 @@ poetry.toml
 /dataSources.local.xml
 *.xml
 .idea/Quoridor.iml
+.idea/workspace.xml

@@ -4,19 +4,20 @@ from localGame import LocalGame
 from graphical.widgets.button import Button
 from graphical.widgets.menu import Menu
 
+from graphical.menus.sizeGrid import SizeGrid
+
 
 class selectBarrier(Menu):
 
-    def __init__(self, NumberPlayers: int, NumberBots: int, GridSize: int, method: int) -> None:
+    def __init__(self, NumberPlayers: int, NumberBots: int, GridSize: int, method: int, multi: bool = False) -> None:
         super().__init__()
         self.NumberPlayers = NumberPlayers
         self.NumberBots = NumberBots
         self.GridSize = GridSize
         self.method = method
-
+        self.multi = multi
         self.barrier = 1
         self.circleWidth = 100
-
         self.doneButton = pygame.Rect(
             self.buttonX, 560, self.buttonWidth, self.buttonHeight)
 
@@ -29,7 +30,7 @@ class selectBarrier(Menu):
     def drawSecondCircle(self) -> None:
         circle = pygame.draw.circle(
             self.window, self.lighterBlue, self.center, self.circleWidth, width=0)
-        font = pygame.font.SysFont("Roboto", 110, False, True)
+        font = pygame.font.SysFont("freesansbold", 110, False, True)
         text = font.render(str(self.barrier), True, self.white)
         buttonText = text.get_rect(center=circle.center)
         self.window.blit(text, buttonText)
@@ -62,52 +63,63 @@ class selectBarrier(Menu):
         self.window.blit(text, buttonText)
         return button
 
+    def ButtonDoneHandler(self) -> None:
+        from graphical.menus.selectServerName import ServerName
+        board = ServerName(self.GridSize,
+                           self.NumberPlayers,
+                           self.barrier,
+                           self.NumberBots,
+                           self.method)
+        if not self.multi:
+            board = LocalGame(self.GridSize,
+                              self.NumberPlayers,
+                              self.barrier,
+                              self.NumberBots)
+        time.sleep(0.2)
+        while True:
+            board.mainLoop()
+            pygame.display.update()
+
+    def upTriangleHandler(self) -> None:
+        maxBarrierMap = {5: 2, 7: 4, 9: 7, 11: 10}
+        if self.barrier < maxBarrierMap[self.GridSize]:
+            self.barrier += 1
+            self.downTriangleColor = self.white
+        if self.barrier == maxBarrierMap[self.GridSize]:
+            self.upTriangleColor = self.lighterBlue
+
+    def downTriangleHandler(self) -> None:
+        if self.barrier > 1:
+            self.barrier -= 1
+            self.upTriangleColor = self.white
+        if self.barrier < 2:
+            self.downTriangleColor = self.lighterBlue
+
     def Event(self) -> None:
-        from graphical.menus.sizeGrid import SizeGrid
-
         for event in pygame.event.get():
-            if event.type == pygame.QUIT or event.type == pygame.WINDOWCLOSE:
-                raise SystemExit
-            elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
+            self.defaultEventHandler(event)
+            if event.type == pygame.MOUSEBUTTONDOWN and event.button:
                 if self.drawDownTriangle().collidepoint(event.pos):
-                    if self.barrier > 1:
-                        self.barrier -= 1
-                        self.upTriangleColor = self.white
-                    if self.barrier < 2:
-                        self.downTriangleColor = self.lighterBlue
+                    self.downTriangleHandler()
                 elif self.drawUpTriangle().collidepoint(event.pos):
-                    maxBarrierMap = {5: 2, 7: 4, 9: 7, 11: 10}
-                    if self.barrier < maxBarrierMap[self.GridSize]:
-                        self.barrier += 1
-                        self.downTriangleColor = self.white
-                    if self.barrier == maxBarrierMap[self.GridSize]:
-                        self.upTriangleColor = self.lighterBlue
+                    self.upTriangleHandler()
                 elif self.doneButton.collidepoint(event.pos):
-                    pygame.init()
-                    board = LocalGame(
-                        self.GridSize, self.NumberPlayers, self.barrier, self.NumberBots)
-                    time.sleep(0.2)
-                    while True:
-                        board.mainLoop()
-                        pygame.display.update()
+                    self.ButtonDoneHandler()
 
-                elif self.ButtonBack().collidepoint(event.pos) and event.button == 1:
-                    pygame.init()
-                    board = SizeGrid(self.NumberPlayers,
-                                     self.NumberBots, self.method)
-                    while True:
-                        board.setWindow()
-                        pygame.display.update()
+                self.back.Event(event, self, SizeGrid, (self.NumberPlayers,
+                                                        self.NumberBots,
+                                                        self.method,
+                                                        self.multi))
 
-    def setWindow(self) -> None:
+    def mainLoop(self) -> None:
         self.window.fill(self.backGround)
 
         text_surface = self.font.render(
-            "Choise the number of barrier", True, self.white)
+            "Choose the number of barrier", True, self.white)
         text_rect = text_surface.get_rect(center=(self.windowWidth // 2, 50))
 
         contour_surface = self.font.render(
-            "Choise the number of barrier", True, (0, 0, 0))
+            "Choose the number of barrier", True, (0, 0, 0))
         contour_rect = contour_surface.get_rect(
             center=(self.windowWidth // 2, 50))
         contour_rect.move_ip(2, 2)
@@ -121,7 +133,7 @@ class selectBarrier(Menu):
 
         Button(self.window, self.doneButton, self.lighterBlue, "Done")
         self.Event()
-        self.ButtonBack()
+        self.back.drawButton()
         pygame.display.flip()
 
 
@@ -130,5 +142,5 @@ if __name__ == "__main__":
     board = selectBarrier(1, 1, 11, 0)
 
     while True:
-        board.setWindow()
+        board.mainLoop()
         pygame.display.update()

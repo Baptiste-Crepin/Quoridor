@@ -1,6 +1,6 @@
 {
   "python.analysis.typeCheckingMode": "strict",
   "import-order": "off",
-  "cSpell.words": ["pygame", "Quoridor", "WINDOWCLOSE"]
-  // "cSpell.enabled": false,
+  "cSpell.enabled": false,
+  "cSpell.words": ["collidepoint", "freesansbold"]
 }
