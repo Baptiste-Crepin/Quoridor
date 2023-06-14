@@ -89,8 +89,9 @@ class SearchServer():
         nbBarrier = startVars[2]
         nbPlayer = startVars[3]
         nbBots = startVars[4]
+        startingPlayer = startVars[5]
         Game = MultiplayerGame(connection, width, nbBarrier,
-                               nbPlayer, host, nbBots, num)
+                               nbPlayer, host, startingPlayer, nbBots, num)
         Game.mainLoop()
 
     @staticmethod

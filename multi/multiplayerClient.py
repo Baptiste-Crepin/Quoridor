@@ -15,19 +15,19 @@ from player import Player
 class MultiplayerGame(LocalGame):
     """LocalGame child class  for multiplayer"""
 
-    def __init__(self, connection: socket.socket, width: int, nbBarrier: int, nbPlayer: int, host: bool,
-                 nbBots: int = 0,
-                 num: int = -1) -> None:
+    def __init__(self, connection: socket.socket, width: int, nbBarrier: int, nbPlayer: int, host: bool, startingPlayer,
+                 nbBots: int = 0, num: int = -1) -> None:
         super().__init__(width, nbPlayer, nbBarrier, nbBots)
         self.board = Board(self.game.getSquareWidth())
         self.num = num
         self.response_event = threading.Event()
         self.host = host
+        self.startingPlayer = startingPlayer
         self.thread = StoppableThreadClient(
             connection, self, self.response_event, host)
 
-        self.game.setCurrentPlayerIndex(0)
-        self.game.setCurrentPlayer(self.game.getPlayerList()[0])
+        self.game.setCurrentPlayerIndex(self.startingPlayer)
+        self.game.setCurrentPlayer(self.game.getPlayerList()[self.startingPlayer])
 
     def displayPossibleMoves(self, player: Player):
         """highlights the possible moves but only for the client's player"""

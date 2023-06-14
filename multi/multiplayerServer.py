@@ -14,9 +14,10 @@ class serverSubThread(threading.Thread):
     """ class that creates a thread for each client to handle incoming data at any time  """
 
     def __init__(self, connection: socket.socket, id: int, queue: queue.Queue[int], connected: dict[int, socket.socket],
-                 nbBots: int) -> None:
+                 nbBots: int, startingPlayer: int) -> None:
         threading.Thread.__init__(self)
         self.connection = connection
+        self.startingPlayer = startingPlayer
         self.clientId = id
         self.queue = queue
         self.connected = connected
@@ -130,7 +131,7 @@ class serverSubThread(threading.Thread):
 
 
 def acceptConnections(mySocket: socket.socket, init: list[int], initializedQueue: queue.Queue[int],
-                      lobbyinfos):
+                      lobbyinfos, startingPlayer: int):
     '''
     accepts the connections of the clients and creates a thread for each of them to handle the messages
     '''
@@ -139,12 +140,16 @@ def acceptConnections(mySocket: socket.socket, init: list[int], initializedQueue
     connected = dict[int, socket.socket]()
 
     mySocket.listen(nbPlayer)
+
+    init.append(startingPlayer)
+    print(init)
     while nbPlayer > len(connected):
+        print("starting player" ,startingPlayer)
         connection = mySocket.accept()[0]
 
         connected[init[0]] = connection
         serverSubThread(connection, init[0],
-                        initializedQueue, connected, nbBots)
+                        initializedQueue, connected, nbBots, init[5])
         print("new instance of  subserver:", serverSubThread)
 
         init_msg = pickle.dumps(init)
@@ -185,7 +190,8 @@ def discoveryServer(dsock: socket.socket, lobbyInfo: dict, stopEvent: threading.
         print("Stopped discovery server")
 
 
-def createServer(width: int, nbBarrier: int, nbPlayer: int, nbBots: int, name: str, port: int = 45678) -> None:
+def createServer(width: int, nbBarrier: int, nbPlayer: int, nbBots: int, name: str, startingPlayer: int, port: int =
+45678) -> None:
     '''creates a server with the given parameters'''
 
     ide = 0
@@ -208,7 +214,7 @@ def createServer(width: int, nbBarrier: int, nbPlayer: int, nbBots: int, name: s
                  }
 
     initializedQueue = queue.Queue[int]()
-    initializedQueue.put(0)
+    initializedQueue.put(startingPlayer)
     initializedQueue.task_done()
 
     # --- server creation
@@ -228,7 +234,7 @@ def createServer(width: int, nbBarrier: int, nbPlayer: int, nbBots: int, name: s
     discothread.start()
     lobbyInfo["connectedPlayers"] += 1
 
-    acceptConnections(serverSocket, init, initializedQueue, lobbyInfo)
+    acceptConnections(serverSocket, init, initializedQueue, lobbyInfo,startingPlayer)
     time.sleep(5)
     stopEvent.set()
     time.sleep(0.3)

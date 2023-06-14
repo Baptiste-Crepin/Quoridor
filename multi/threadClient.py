@@ -82,6 +82,7 @@ class StoppableThreadClient(threading.Thread):
                     print("connection error:")
                     print(e)
                     raise Exception("Player disconnected while in game") from e
+                time.sleep(0.03)
         # self.connection.close()
 
     def emet(self):

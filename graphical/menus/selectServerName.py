@@ -1,7 +1,7 @@
 import socket
 import threading
 import time
-
+import random
 import pygame
 
 from graphical.widgets.button import Button
@@ -32,16 +32,20 @@ class ServerName(Menu):
 
         self.searchServer = SearchServer()
 
-    def run_server(self):
+    def run_server(self,startingPlayer):
         createServer(self.width,
                      self.nbBarrier,
                      self.nbPlayer,
                      self.nbBot,
-                     self.input.text)
+                     self.input.text,
+                     startingPlayer
+                     )
+
 
     def launch_server(self):
+        startingPlayer = random.randint(0, self.nbPlayer - 1)
 
-        threading.Thread(target=self.run_server).start()
+        threading.Thread(target=self.run_server, args=(startingPlayer,) ).start()
         # wait for server to start before connecting the client
         time.sleep(0.5)
 
