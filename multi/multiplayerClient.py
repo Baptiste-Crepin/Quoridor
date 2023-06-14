@@ -26,6 +26,9 @@ class MultiplayerGame(LocalGame):
         self.thread = StoppableThreadClient(
             connection, self, self.response_event, host)
 
+        self.game.setCurrentPlayerIndex(0)
+        self.game.setCurrentPlayer(self.game.getPlayerList()[0])
+
     def displayPossibleMoves(self, player: Player):
         """highlights the possible moves but only for the client's player"""
         self.board.clearAllHighlight()
