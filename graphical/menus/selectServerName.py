@@ -57,8 +57,9 @@ class ServerName(Menu):
                     print("A")
                     time.sleep(2)
                     print("B")
+                    host = SearchServer.getSelfHost()
 
-                    self.startVars = self.searchServer.connect(socket.gethostbyname(socket.gethostname()), 45678)
+                    self.startVars = self.searchServer.connect(host, 45678)
                     print("Self connect to", socket.gethostbyname(socket.gethostname()))
                     print("C")
 
