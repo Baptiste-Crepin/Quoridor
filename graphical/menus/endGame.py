@@ -32,7 +32,7 @@ class End(Menu):
                                       self.windowHeight//2+150, 200, 80)
 
     def Winner(self) -> str:
-        return f"{self.curentplayer.stringColor()} Player won ! He have {self.score[self.curentplayer.getNumber()-1]} win(s)"
+        return f"{self.curentplayer.stringColor()} Player won ! {self.score[self.curentplayer.getNumber()-1]} win(s)"
 
     def actualizeScore(self):
         self.score[self.curentplayer.getNumber()-1] += 1

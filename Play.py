@@ -32,7 +32,7 @@ class Play(Menu):
                     board = Rules()
                     self.newMenu(self, board)
                 elif pygame.Rect(self.posQuit, self.buttonSize).collidepoint(event.pos):
-                    pygame.quit()
+                    raise SystemExit
 
     def mainLoop(self) -> None:
         self.window.fill(self.backGround)
