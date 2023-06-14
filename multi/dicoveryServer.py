@@ -71,6 +71,15 @@ class SearchServer():
         except Exception as e:
             return False, clientListLen
 
+    def roomstate(self):
+        try:
+            serverMessage = self.connection.recv(4096)
+            unpickeled_message = pickle.loads(serverMessage)
+            return unpickeled_message
+
+        except Exception:
+            return
+
     @staticmethod
     def createGame(connection: socket.socket, startVars: list[Any], host: bool):
         """ creates an instance of the class: MultiplayerGame passing the user's choices as parameters """
@@ -84,11 +93,15 @@ class SearchServer():
                                nbPlayer, host, nbBots, num)
         Game.mainLoop()
 
-    def roomstate(self):
+    @staticmethod
+    def getSelfHost() -> str:
+        s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         try:
-            serverMessage = self.connection.recv(4096)
-            unpickeled_message = pickle.loads(serverMessage)
-            return unpickeled_message
-
+            # Doesn't need to be reachable, it's used to make the OS determine the preferred outgoing IP interface
+            s.connect(('10.255.255.255', 1))
+            host = s.getsockname()[0]
         except Exception:
-            return
+            host = '0.0.0.0'  # Listen on all available interfaces
+        finally:
+            s.close()
+        return host

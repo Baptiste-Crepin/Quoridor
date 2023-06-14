@@ -7,6 +7,8 @@ import threading
 import time
 from typing import Any
 
+from multi.dicoveryServer import SearchServer
+
 
 class serverSubThread(threading.Thread):
     """ class that creates a thread for each client to handle incoming data at any time  """
@@ -38,7 +40,7 @@ class serverSubThread(threading.Thread):
         print(current_client, '-->', ((current_client + 1) % (len(self.connected) + self.nbBots)), " total clients :",
               len(self.connected) + self.nbBots)
         current_client = (
-            current_client + 1) % (len(self.connected) + self.nbBots)
+                                 current_client + 1) % (len(self.connected) + self.nbBots)
         self.queue.put(current_client)
         self.queue.task_done()
         return current_client
@@ -54,7 +56,7 @@ class serverSubThread(threading.Thread):
         print("chat not implemented yet")
 
     def handleEnd(self, message: list[
-            Any]) -> None:  # recieved the end game message send the current player to all clients then ends the server thread
+        Any]) -> None:  # recieved the end game message send the current player to all clients then ends the server thread
         pickeled_message = pickle.dumps(message)
         for i in range(len(self.connected)):
             self.connected[i].sendall(pickeled_message)
@@ -192,15 +194,7 @@ def createServer(width: int, nbBarrier: int, nbPlayer: int, nbBots: int, name: s
     # hostname = socket.gethostname()
     # host = socket.gethostbyname(hostname)
 
-    s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-    try:
-        # Doesn't need to be reachable, it's used to make the OS determine the preferred outgoing IP interface
-        s.connect(('10.255.255.255', 1))
-        host = s.getsockname()[0]
-    except Exception:
-        host = '0.0.0.0'  # Listen on all available interfaces
-    finally:
-        s.close()
+    host = SearchServer.getSelfHost()
 
     lobbyInfo = {'discoverymessage': b"SERVER_DISCOVERY_REQUEST",
                  'ip': host,
@@ -227,7 +221,6 @@ def createServer(width: int, nbBarrier: int, nbPlayer: int, nbBots: int, name: s
         print("error whilst launching server")
         print(e)
         sys.exit()
-
     print(f"\n\n\n{'=' * 15} Server |{host} : {port}| on {'=' * 15}\n\n")
     stopEvent = threading.Event()
     discothread = threading.Thread(
