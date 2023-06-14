@@ -10,23 +10,24 @@ if TYPE_CHECKING:
 
 
 class StoppableThreadClient(threading.Thread):
-    """this class runs itself in a thread and is meand to handle client action for each client at any time"""
+    """this class runs itself in a thread and is meant to handle client action for each client at any time"""
 
-    def __init__(self, connection: socket.socket, multiplayerClient: 'MultiplayerGame', response_event, host: bool):
+    def __init__(self, connection: socket.socket, multiplayerClient: 'MultiplayerGame', responseEvent: threading.Event, host: bool):
         # super(StoppableThreadClient, self).__init__()
         super().__init__()
         self.connection = connection
         self.multiplayerClient = multiplayerClient
-        self.response_event = response_event
+        self.responseEvent = responseEvent
         self.stopEvent = threading.Event()
         self.start()
 
     def handleGameState(self, message: list[Any]) -> None:
-        """upon reception of a 'game_state' messages update the state of the game accordingly"""
+        """upon reception of a 'gameState' messages update the state of the game accordingly"""
         self.multiplayerClient.game.setGrid(message[1])
-        self.multiplayerClient.game.setCurrentPlayerIndex(message[2])
-        self.multiplayerClient.game.setCurrentPlayer(
-            self.multiplayerClient.game.getPlayerList()[message[2]])
+        if isinstance(message[2], int):
+            self.multiplayerClient.game.setCurrentPlayerIndex(message[2])
+            self.multiplayerClient.game.setCurrentPlayer(
+                self.multiplayerClient.game.getPlayerList()[message[2]])
         self.multiplayerClient.game.getCurrentPlayer().setBarrier(message[3])
 
     def stop(self):
@@ -43,7 +44,7 @@ class StoppableThreadClient(threading.Thread):
         print(message)
 
     def handleEnd(self, message: list[Any]):
-        """ upon reception of a 'game_end' messages update the state of the game accordingly then stop the thread if
+        """ upon reception of a 'gameEnd' messages update the state of the game accordingly then stop the thread if
         possible """
         self.multiplayerClient.game.setCurrentPlayer(message[1])
         if self.is_alive():
@@ -62,10 +63,10 @@ class StoppableThreadClient(threading.Thread):
         while not self.stopped():
             time.sleep(0.03)
             message_handlers = {
-                'game_state': self.handleGameState,
+                'gameState': self.handleGameState,
                 'chat': self.handleChatMessage,
                 'mpAbort': self.handleAbort,
-                'game_end': self.handleEnd,
+                'gameEnd': self.handleEnd,
                 'resetGame': self.handleReset
             }
             while True:
@@ -73,7 +74,7 @@ class StoppableThreadClient(threading.Thread):
 
                     message = self.reco()
                     message_type = message[0]
-                    self.response_event.set()
+                    self.responseEvent.set()
                     if message_type in message_handlers:
                         message_handlers[message_type](message)
                     else:
@@ -85,18 +86,18 @@ class StoppableThreadClient(threading.Thread):
                 time.sleep(0.03)
         # self.connection.close()
 
-    def emet(self):
+    def emit(self):
         """sends the state of the game as well as the amount of remaining barriers for the current player"""
         grid = self.multiplayerClient.game.getGrid()
         barriersLeft = self.multiplayerClient.game.getCurrentPlayer().getBarrier()
-        msg = ['game_state', grid, self.multiplayerClient.num, barriersLeft]
+        msg = ['gameState', grid, self.multiplayerClient.num, barriersLeft]
         data = pickle.dumps(msg)
         self.connection.sendall(data)
 
     def ender(self) -> None:
-        """ sends the 'game_end' with the current player in it """
-        currentplayer = self.multiplayerClient.game.getCurrentPlayer()
-        msg = ['game_end', currentplayer]
+        """ sends the 'gameEnd' with the current player in it """
+        currentPlayer = self.multiplayerClient.game.getCurrentPlayer()
+        msg = ['gameEnd', currentPlayer]
         data = pickle.dumps(msg)
         self.connection.sendall(data)
 

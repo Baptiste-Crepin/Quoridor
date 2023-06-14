@@ -1,6 +1,14 @@
 {
   "python.analysis.typeCheckingMode": "strict",
   "import-order": "off",
-  "cSpell.enabled": false,
-  "cSpell.words": ["collidepoint", "freesansbold"]
+  "cSpell.enabled": true,
+  "cSpell.words": [
+    "collidepoint",
+    "DGRAM",
+    "freesansbold",
+    "gethostname",
+    "KEYDOWN",
+    "Quoridor",
+    "reco"
+  ]
 }

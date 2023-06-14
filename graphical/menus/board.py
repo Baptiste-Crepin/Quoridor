@@ -10,7 +10,7 @@ from graphical.menus.tablePlayer import TablePlayer
 from graphical.widgets.displayInformation import displayInformation
 from graphical.widgets.informationPlayer import informationPlayer
 from graphical.widgets.menu import Menu
-from player import Player
+from gameLogic.player import Player
 
 
 class Board(Menu):
@@ -89,7 +89,7 @@ class Board(Menu):
             pos = pygame.mouse.get_pos()
 
             for array in [self.verticalBarriers, self.horizontalBarriers, self.rect]:
-                if clickedElement := self.interactObject(array, pos):
+                if clickedElement := self.interactObject(array, pos): #type: ignore
                     return clickedElement
 
         if not pygame.mouse.get_pressed()[0] and self.clicked:
@@ -193,14 +193,16 @@ class Board(Menu):
                     if VnbBarriers % 2 == 0 and HnbBarriers % 2 == 0:
                         continue
 
-                    if i < len(self.verticalBarriers)-1 and i < len(self.horizontalBarriers)-1:
-                        if self.verticalBarriers[i+1][j].placed:
-                            self.intersection[i +
-                                              1][j].draw(self.window, self.grey)
-                    if j < len(self.verticalBarriers)-1 and j < len(self.horizontalBarriers)-1:
-                        if self.horizontalBarriers[i][j+1].placed:
-                            self.intersection[i][j +
-                                                 1].draw(self.window, self.grey)
+                    if (i < len(self.verticalBarriers)-1 and
+                        i < len(self.horizontalBarriers)-1 and
+                            self.verticalBarriers[i+1][j].placed):
+                        self.intersection[i +
+                                          1][j].draw(self.window, self.grey)
+                    if (j < len(self.verticalBarriers)-1 and
+                            j < len(self.horizontalBarriers)-1 and
+                            self.horizontalBarriers[i][j+1].placed):
+                        self.intersection[i][j +
+                                             1].draw(self.window, self.grey)
 
                     intersection.draw(self.window, self.purple)
                     continue

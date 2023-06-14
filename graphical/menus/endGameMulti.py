@@ -1,16 +1,16 @@
 import pygame
 
-from Play import Play
+from main import Play
 from graphical.menus.endGame import End
 from graphical.widgets.button import Button
-from player import Player
+from gameLogic.player import Player
 
 
 class EndGameMulti(End):
-    def __init__(self, curentPlayer: Player, width: int, nbPlayer: int, nbBarrier: int, nbBots: int,
-                 searchserver: object, host: bool):
-        super().__init__(curentPlayer, width, nbPlayer, nbBarrier, nbBots)
-        self.searchserevr = searchserver
+    def __init__(self, currentPlayer: Player, width: int, nbPlayer: int, nbBarrier: int, nbBots: int,
+                 searchServer: object, host: bool):
+        super().__init__(currentPlayer, width, nbPlayer, nbBarrier, nbBots)
+        self.searchServer = searchServer
         self.host = host
 
     def Event(self):

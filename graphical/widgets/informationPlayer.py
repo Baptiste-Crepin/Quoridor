@@ -1,5 +1,5 @@
 import pygame
-from player import Player
+from gameLogic.player import Player
 
 
 class informationPlayer():
@@ -11,22 +11,19 @@ class informationPlayer():
         self.rect = rect
         self.player = player
 
-    def barrerCoordX(self) -> int:
-        x = self.rect[3]//2+self.rect[1]
-        return x
+    def barrierCoordX(self) -> int:
+        return self.rect[3]//2+self.rect[1]
 
-    def barrerCoordY(self, i: int) -> int:
-        y = ((self.rect[2])//self.player.getBarrier()*i+self.rect[0]) + \
-            ((self.rect[2]//self.player.getBarrier())//2-self.barrerWidth()//2)
-        return y
+    def barrierCoordY(self, i: int) -> int:
+        return ((self.rect[2])//self.player.getBarrier()*i+self.rect[0]) + \
+            ((self.rect[2]//self.player.getBarrier()) //
+             2-self.barrierWidth()//2)
 
-    def barrerWidth(self) -> int:
-        width = 20
-        return width
+    def barrierWidth(self) -> int:
+        return 20
 
-    def barrerHeight(self) -> int:
-        height = self.rect[3]//2
-        return height
+    def barrierHeight(self) -> int:
+        return self.rect[3]//2
 
     def createRectPlayer(self) -> None:
         pygame.draw.rect(self.surface, self.color, self.rect, border_radius=10)
@@ -35,5 +32,5 @@ class informationPlayer():
         pygame.draw.circle(
             self.surface, self.player.getColor(), coordPlayer, 20)
         for i in range(self.player.getBarrier()):
-            pygame.draw.rect(self.surface, self.purple, (self.barrerCoordY(
-                i), self.barrerCoordX(), self.barrerWidth(), self.barrerHeight()))
+            pygame.draw.rect(self.surface, self.purple, (self.barrierCoordY(
+                i), self.barrierCoordX(), self.barrierWidth(), self.barrierHeight()))

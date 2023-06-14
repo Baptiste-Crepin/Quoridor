@@ -1,4 +1,4 @@
-from player import Player
+from gameLogic.player import Player
 
 
 class Cell():

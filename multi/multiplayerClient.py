@@ -4,30 +4,30 @@ import time
 
 import pygame
 
-from Bot import Bot
+from gameLogic.bot import Bot
 from graphical.menus.board import Board
 from graphical.menus.endGameMulti import EndGameMulti
-from localGame import LocalGame
+from gameLogic.localGame import LocalGame
 from multi.threadClient import StoppableThreadClient
-from player import Player
+from gameLogic.player import Player
 
 
 class MultiplayerGame(LocalGame):
     """LocalGame child class  for multiplayer"""
 
-    def __init__(self, connection: socket.socket, width: int, nbBarrier: int, nbPlayer: int, host: bool, startingPlayer,
-                 nbBots: int = 0, num: int = -1) -> None:
+    def __init__(self, connection: socket.socket, width: int, nbBarrier: int, nbPlayer: int, host: bool, startingPlayerIndex: int, nbBots: int = 0, num: int = -1) -> None:
         super().__init__(width, nbPlayer, nbBarrier, nbBots)
         self.board = Board(self.game.getSquareWidth())
         self.num = num
         self.response_event = threading.Event()
         self.host = host
-        self.startingPlayer = startingPlayer
+        self.startingPlayer = startingPlayerIndex
         self.thread = StoppableThreadClient(
             connection, self, self.response_event, host)
 
         self.game.setCurrentPlayerIndex(self.startingPlayer)
-        self.game.setCurrentPlayer(self.game.getPlayerList()[self.startingPlayer])
+        self.game.setCurrentPlayer(
+            self.game.getPlayerList()[self.startingPlayer])
 
     def displayPossibleMoves(self, player: Player):
         """highlights the possible moves but only for the client's player"""
@@ -39,47 +39,61 @@ class MultiplayerGame(LocalGame):
 
     def placement(self, currentPlayer: Player):
         """ logic for the player's actions, sends the state of the game when a player finishes he's turn """
-        if isinstance(currentPlayer, Bot) and self.num == 0:
-            self.board.newFrame(currentPlayer, self.game.getPlayerList())
-            currentPlayer.randomMoves(self.game.possibleBarrierPlacement(
-                currentPlayer), self.game.possibleMoves(currentPlayer.getCoordinates()))
-            print("Bot played")
-            # self.response_event.wait()  # waits for the server response
-            # self.response_event.clear()
-            self.thread.emet()  # sends the state of the game to the server when bot plays
+        # if isinstance(currentPlayer, Bot) and self.num == 0:
+        #     self.board.newFrame(currentPlayer, self.game.getPlayerList())
+        #     currentPlayer.randomMove(self.game.possibleBarrierPlacement(
+        #         currentPlayer), self.game.possibleMoves(currentPlayer.getCoordinates()))
+        #     print("Bot played")
+        #     # self.response_event.wait()  # waits for the server response
+        #     # self.response_event.clear()
+        #     self.thread.emit()  # sends the state of the game to the server when bot plays
 
+        if isinstance(currentPlayer, Bot):
+            randomAction = currentPlayer.randomAction(
+                self.game.possibleBarrierPlacement(currentPlayer))
+            if randomAction == 0:
+                coord = currentPlayer.randomMove(
+                    self.game.possibleMoves(currentPlayer.getCoordinates()))
+                self.game.movePlayer(currentPlayer, coord)
+            elif randomAction == 1:
+                coord, direction = currentPlayer.randomBarrier(
+                    self.game.possibleBarrierPlacement(currentPlayer))
+                self.game.placeWall(coord, direction, currentPlayer)
+            self.thread.emit()  # sends the state of the game to the server when bot plays
+            print("Bot played")
             return
+
         event = self.board.handleEvents()
         if not event:
             return
 
         (action, x, y) = event
-        clickCoordo = (x, y)
+        clickCoord = (x, y)
         if ((not isinstance(self.game.getCurrentPlayer(), Bot) or self.game.getCurrentPlayer().getNumber()
              == self.num + 1) and (self.game.getCurrentPlayer().getNumber() == self.num + 1)):
 
             if action == 'TablePlayer':
-                if clickCoordo not in self.game.possibleMoves(currentPlayer.getCoordinates()):
+                if clickCoord not in self.game.possibleMoves(currentPlayer.getCoordinates()):
                     return
                 self.board.clearHover(self.board.rect)
-                self.game.movePlayer(currentPlayer, clickCoordo)
+                self.game.movePlayer(currentPlayer, clickCoord)
 
             if action == 'VerticalBarrier':
-                if (clickCoordo, 'Right') not in self.game.possibleBarrierPlacement(currentPlayer):
+                if (clickCoord, 'Right') not in self.game.possibleBarrierPlacement(currentPlayer):
                     return
-                self.game.placeWall(clickCoordo, 'Right',
+                self.game.placeWall(clickCoord, 'Right',
                                     currentPlayer, place=True)
 
-            if action == 'HorrizontalBarrier':
-                if (clickCoordo, 'Down') not in self.game.possibleBarrierPlacement(currentPlayer):
+            if action == 'HorizontalBarrier':
+                if (clickCoord, 'Down') not in self.game.possibleBarrierPlacement(currentPlayer):
                     return
-                self.game.placeWall(clickCoordo, 'Down', currentPlayer)
+                self.game.placeWall(clickCoord, 'Down', currentPlayer)
 
             self.board.clearAllHighlight()
             self.highlightPlayer(currentPlayer)
             self.highlightBarrier()
-            print(f"tour fini pour {str(self.num)}")
-            self.thread.emet()  # sends the state of the game to the server when user plays
+            print(f"end of turn for player n° {str(self.num)}")
+            self.thread.emit()  # sends the state of the game to the server when user plays
             print("waiting for server response ")
             self.response_event.wait()  # waits for the server response
             print("server responded")
@@ -87,7 +101,7 @@ class MultiplayerGame(LocalGame):
             self.response_event.clear()
 
     def resetGameState(self):
-        print("reseting the game")
+        print("resetting the game")
 
     def mainLoop(self) -> None:
         """main loop of the class to play until victory is detected by End function"""
@@ -104,7 +118,7 @@ class MultiplayerGame(LocalGame):
             # TODO: Game has ended. display the end screen
             # self.thread.ender()  # send  the current player and the end game message
             self.thread.restart()
-            time.sleep(0.4)  # wait for the server to actualise every client
+            time.sleep(0.4)  # wait for the server to actualize every client
             end = EndGameMulti(self.game.getPreviousPlayer(), self.game.getSquareWidth(
             ), self.game.getNumberOfPlayers(), self.game.getNumberOfBarriers(), self.game.getNumberOfBots(), self.score, self.host)
             while self.game.checkGameOver():

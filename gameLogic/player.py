@@ -1,7 +1,7 @@
 class Player():
-    def __init__(self, number: int, barrer: int = 0):
+    def __init__(self, number: int, barrier: int = 0):
         self.__number = number
-        self.__barrier = barrer
+        self.__barrier = barrier
         self.__color = self.setColorFromNumber()
         self.__coordinates = (0, 0)
 

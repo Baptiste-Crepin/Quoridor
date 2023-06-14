@@ -24,7 +24,7 @@ class ChoiceHost(Menu):
         self.Event()
 
     def Event(self):
-        from graphical.menus.type import Menutype
+        from graphical.menus.type import MenuType
         from graphical.menus.choiceServer import ChoiceServer
 
         for event in pygame.event.get():
@@ -38,7 +38,7 @@ class ChoiceHost(Menu):
                     board = ChoiceServer()
                     self.newMenu(self, board)
 
-                self.back.Event(event, self, Menutype)
+                self.back.Event(event, self, MenuType)
             pygame.display.flip()
 
 

@@ -30,7 +30,7 @@ class NumberPlayer(Menu):
     def Event(self):
         from graphical.menus.choiceBot import NumberBots
         from graphical.menus.sizeGrid import SizeGrid
-        from graphical.menus.type import Menutype
+        from graphical.menus.type import MenuType
 
         PlayersFromPos = {self.posRect1: [NumberBots, (1, self.multi)],
                           self.posRect2: [NumberBots, (2, self.multi)],
@@ -56,7 +56,7 @@ class NumberPlayer(Menu):
                     if isinstance(board, object):
                         self.newMenu(self, board)
 
-            self.back.Event(event, self, Menutype)
+            self.back.Event(event, self, MenuType)
 
     def mainLoop(self):
         self.window.fill(self.backGround)

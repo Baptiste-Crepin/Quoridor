@@ -1,27 +1,18 @@
 import pygame
-from player import Player
-from Play import Play
+from gameLogic.player import Player
+from main import Play
 from graphical.widgets.button import Button
 from graphical.widgets.menu import Menu
 
 
 class End(Menu):
-    def __init__(self, curentPlayer: Player, width: int, nbPlayer: int, nbBarrier: int, nbBots: int, score: list[int] = [0, 0, 0, 0]):
+    def __init__(self, currentPlayer: Player, width: int, nbPlayer: int, nbBarrier: int, nbBots: int, score: list[int] = [0, 0, 0, 0]):
         super().__init__()
-        self.curentplayer = curentPlayer
+        self.currentPlayer = currentPlayer
         self.width = width
         self.nbPlayer = nbPlayer
         self.nbBarrier = nbBarrier
         self.nbBots = nbBots
-        self.windowWidth = 1330
-        self.windowHeight = 750
-        self.window = pygame.display.set_mode(
-            size=(self.windowWidth, self.windowHeight))
-        self.center = (self.windowWidth//2, self.windowHeight//2)
-        self.countPlayers1 = score[0]
-        self.countPlayers2 = score[1]
-        self.countPlayers3 = score[2]
-        self.countPlayers4 = score[3]
         self.score = score
         self.actualizeScore()
         self.coordQuit = pygame.Rect(self.windowWidth//2-110,
@@ -31,20 +22,21 @@ class End(Menu):
         self.coordLobby = pygame.Rect(self.windowWidth//2+20,
                                       self.windowHeight//2+150, 200, 80)
 
+
     def Winner(self) -> str:
-        return f"{self.curentplayer.stringColor()} Player won ! {self.score[self.curentplayer.getNumber()-1]} win(s)"
+        return f"{self.currentPlayer.stringColor()} Player won ! {self.score[self.currentPlayer.getNumber()-1]} win(s)"
 
     def actualizeScore(self):
-        self.score[self.curentplayer.getNumber()-1] += 1
+        self.score[self.currentPlayer.getNumber()-1] += 1
         return self.score
 
     def displayWinner(self) -> None:
         pygame.draw.circle(
-            self.window, self.curentplayer.getColor(), self.center, 100)
+            self.window, self.currentPlayer.getColor(), self.center, 100)
 
     def Event(self):
         for event in pygame.event.get():
-            from localGame import LocalGame
+            from gameLogic.localGame import LocalGame
             self.defaultEventHandler(event)
             if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
                 if pygame.Rect(self.coordLobby).collidepoint(event.pos):

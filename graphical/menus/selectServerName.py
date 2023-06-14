@@ -7,7 +7,7 @@ import pygame
 from graphical.widgets.button import Button
 from graphical.widgets.input import Input
 from graphical.widgets.menu import Menu
-from multi.dicoveryServer import SearchServer
+from multi.discoveryServer import SearchServer
 from multi.multiplayerServer import createServer
 
 
@@ -32,7 +32,7 @@ class ServerName(Menu):
 
         self.searchServer = SearchServer()
 
-    def run_server(self,startingPlayer):
+    def run_server(self, startingPlayer: int):
         createServer(self.width,
                      self.nbBarrier,
                      self.nbPlayer,
@@ -41,11 +41,11 @@ class ServerName(Menu):
                      startingPlayer
                      )
 
-
     def launch_server(self):
         startingPlayer = random.randint(0, self.nbPlayer - 1)
 
-        threading.Thread(target=self.run_server, args=(startingPlayer,) ).start()
+        threading.Thread(target=self.run_server,
+                         args=(startingPlayer,)).start()
         # wait for server to start before connecting the client
         time.sleep(0.5)
 
@@ -64,7 +64,8 @@ class ServerName(Menu):
                     host = SearchServer.getSelfHost()
 
                     self.startVars = self.searchServer.connect(host, 45678)
-                    print("Self connect to", socket.gethostbyname(socket.gethostname()))
+                    print("Self connect to", socket.gethostbyname(
+                        socket.gethostname()))
                     print("C")
 
                     board = WaitingRoom(self.startVars,
@@ -92,11 +93,11 @@ class ServerName(Menu):
             "Extra Bold Italic", 60, False, True)
         text = font.render(
             "chose the name of", True, self.white)
-        secondtext = font.render(
+        secondText = font.render(
             "the server", True, self.white)
         self.input.createInput()
         self.window.blit(text, (self.buttonWidth, 230))
-        self.window.blit(secondtext, (self.buttonWidth, 270))
+        self.window.blit(secondText, (self.buttonWidth, 270))
 
         Button(self.window, self.sendRect, self.lighterBlue, "send", 40, 10)
 

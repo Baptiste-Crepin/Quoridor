@@ -20,12 +20,12 @@ class Play(Menu):
 
     def Event(self) -> None:
         from graphical.menus.rules import Rules
-        from graphical.menus.type import Menutype
+        from graphical.menus.type import MenuType
         for event in pygame.event.get():
             self.defaultEventHandler(event)
             if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
                 if pygame.Rect(self.posPlay, self.buttonSize).collidepoint(event.pos):
-                    board = Menutype()
+                    board = MenuType()
                     self.newMenu(self, board)
 
                 elif pygame.Rect(self.posRules, self.buttonSize).collidepoint(event.pos):

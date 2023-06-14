@@ -9,7 +9,7 @@ class Menu():
         self.windowWidth = 1330
         self.windowHeight = 750
         self.window = pygame.display.set_mode(
-            (self.windowWidth, self.windowHeight))
+            size=(self.windowWidth, self.windowHeight))
         self.center = (self.windowWidth//2, self.windowHeight//2)
 
         self.clock = pygame.time.Clock()

@@ -46,36 +46,35 @@ class SearchServer():
             print("Connection active")
             serverMessage = self.connection.recv(4096)
             startVars = pickle.loads(serverMessage)
-            print("startvars : ", startVars)
+            print("startVars : ", startVars)
             return startVars
-        except socket.error:
-            print("Erreur sur la connection")
-            raise SystemExit
+        except socket.error as e:
+            print("Error on connection")
+            raise SystemExit from e
 
-    def multiLaunch(self, startVars: list[int], clientListLen, host: bool) -> tuple:
+    def multiLaunch(self, startVars: list[int], clientListLen: int, host: bool) -> tuple[bool, int]:
         try:
             serverMessage = self.connection.recv(4096)
-            print("recived:", serverMessage)
-            unpickeled_message = pickle.loads(serverMessage)
-            print("unpickeled : ", unpickeled_message)
-            if unpickeled_message[0] != "lenConnected":
+            print("received:", serverMessage)
+            unpickled_message = pickle.loads(serverMessage)
+            print("unpickled : ", unpickled_message)
+            if unpickled_message[0] != "lenConnected":
                 print("starting game", startVars)
                 self.connection.setblocking(True)
                 self.createGame(self.connection, startVars, host)
 
                 return True, clientListLen
             else:
-                print("conected players = ", unpickeled_message[1])
-                return False, int(unpickeled_message[1])
+                print("connected players = ", unpickled_message[1])
+                return False, int(unpickled_message[1])
 
-        except Exception as e:
+        except Exception:
             return False, clientListLen
 
-    def roomstate(self):
+    def roomState(self):
         try:
             serverMessage = self.connection.recv(4096)
-            unpickeled_message = pickle.loads(serverMessage)
-            return unpickeled_message
+            return pickle.loads(serverMessage)
 
         except Exception:
             return

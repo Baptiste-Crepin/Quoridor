@@ -3,8 +3,8 @@ import pygame
 from graphical.menus.choiceHost import ChoiceHost
 from graphical.widgets.button import Button
 from graphical.widgets.menu import Menu
-from multi.dicoveryServer import SearchServer
-from player import Player
+from multi.discoveryServer import SearchServer
+from gameLogic.player import Player
 
 
 class ChoiceServer(Menu):

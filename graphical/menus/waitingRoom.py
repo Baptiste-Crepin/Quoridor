@@ -4,8 +4,8 @@ import pygame
 
 from graphical.widgets.button import Button
 from graphical.widgets.menu import Menu
-from multi.dicoveryServer import SearchServer
-from player import Player
+from multi.discoveryServer import SearchServer
+from gameLogic.player import Player
 
 
 # from multiplayerServer import createServer
