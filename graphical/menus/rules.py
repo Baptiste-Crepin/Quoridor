@@ -42,8 +42,8 @@ class Rules(Menu):
 
     def mainLoop(self) -> None:
         self.window.fill(self.backGround)
-        rules = pygame.image.load("pictures/Rule.png")
-        picture = pygame.image.load("pictures/imageRules.jpg")
+        rules = pygame.image.load("assets/pictures/Rule.png")
+        picture = pygame.image.load("assets/pictures/imageRules.jpg")
         self.window.blit(rules, (265, self.coordYRules()))
         self.window.blit(picture, (265, self.coordYPictureRules()))
         self.ButtonBack()
