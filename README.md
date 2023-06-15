@@ -1,6 +1,124 @@
+<style>
+
+.authors {
+   text-align: right;
+}
+.authors li {
+   list-style-type: none;
+}
+
+.userDoc{
+   h1, h2, h3, h4, h5{
+      text-align: center;
+      font-weight: bold;
+   }
+
+   h1 {
+      font-size: 4.5rem;
+      text-transform: uppercase;
+      margin: 2rem 0;
+   }
+
+   h2 {
+      font-size: 2.5rem;
+      text-align: center;
+   }
+
+   h3 {
+      font-size: 2rem;
+      text-align: center;
+   }
+
+   h4 {
+      font-size: 1.5rem;
+      margin: 3rem 1rem 1rem 1rem;
+      text-align: center;
+   }
+
+   h6 {
+      text-align: end;
+   }
+
+   p {
+      margin-bottom: 1rem;
+      text-align: center;
+   }
+
+   pre {
+      background-color: #f6f8fa;
+      padding: 1rem;
+      border-radius: 4px;
+   }
+
+   code {
+      padding: 2px 4px;
+      background-color: #f6f8fa;
+      border-radius: 4px;
+   }
+
+   a {
+      color: #0366d6;
+      text-decoration: none;
+   }
+
+   a:hover {
+      text-decoration: underline;
+   }
+
+   img {
+      min-width: 15vw;
+      max-width: 50vw;
+      display: block;
+      margin-left: auto;
+      margin-right: auto;
+   }
+
+   .twoPicturesContainer {
+      display: flex;
+      flex-direction: row;
+      flex-basis: bottom;
+      align-items: end;
+      gap: 2rem;
+   }
+
+   .twoPicturesContainer img {
+      max-width: 40vw;
+   }
+
+   .bulletContainer {
+      display: flex;
+      align-items: flex-start;
+      flex-direction: column;
+      align-items: center;
+      width: min-content;
+      margin: auto;
+   }
+
+   .graph p img{
+      max-width: 90vw;
+      width: 90vw;
+   }
+}
+
+</style>
+
 # Quoridor
 
+<div class=authors>
+
+###### réalisé par
+
+- Baptiste Crepin
+- Loïc Verdier
+- Vivien Mauriaucourt
+
+</div>
+
+<section class=userDoc>
+
 ## Documentation utilisateur
+
+---
 
 ### Installation et exécution
 
@@ -16,6 +134,8 @@ Pour exécuter le jeu Quoridor, suivez les étapes ci-dessous
    > **python -m main**
 1. Le jeu **Quoridor** devrait se lancer avec une interface graphique.
 1. Si ce n'est pas le cas essayez de lancer le jeu en utilisant un IDE tel que **Visual Studio Code** ou **Pycharm**
+
+---
 
 ### Utilisation des menus
 
@@ -150,3 +270,169 @@ un serveur est trouvé, cliquez dessus pour le rejoindre.
 
 Vous avez rejoint la salle d'attente, plus qu'a patienter que l'host lance la partie.
 ![Salle d'attente](assets/pictures/manual/waitingRoomClient.png)
+
+</section>
+
+---
+
+## Documentation Technique
+
+### Rétrospective du code source
+
+- Un code réalisé en python
+- 2 modes de jeu différents.
+  - Local
+  - Multijoueur sans fil-local
+- Lisible, aéré, compréhensible et commenté pour les fonctions importantes.
+
+#### Langage utilisé
+
+Le jeu Quoridor a été développé en utilisant le langage de programmation Python. Python a été choisi en raison de ses nombreux avantages, notamment sa portabilité, sa simplicité d'utilisation et sa vaste collection de bibliothèques disponibles. Ces caractéristiques ont facilité le développement et l'extension du jeu avec des fonctionnalités supplémentaires.
+
+#### Dépendances
+
+Le jeu Quoridor utilise plusieurs bibliothèques Python pour faciliter son implémentation. Les principales dépendances sont les suivantes :
+
+##### 1. Pygame
+
+- Pygame est une bibliothèque de développement de jeux en Python qui facilite la création d'interfaces graphiques interactives.
+  - Dans le contexte du jeu Quoridor, Pygame est utilisé pour gérer les éléments visuels tels que les graphismes, les menus, l'affichage des joueurs et des murs, ainsi que la gestion des événements du clavier et de la souris.
+
+##### 2. Socket
+
+- La bibliothèque Socket en Python permet la communication réseau entre différents ordinateurs.
+  - Dans le contexte du jeu Quoridor, la bibliothèque Socket peut être utilisée pour mettre en place une communication entre les joueurs, permettant ainsi de jouer en sans fil local (LAN) contre d'autres joueurs.
+
+##### 3. Pickle
+
+- Pickle est une bibliothèque Python qui permet la sérialisation et la désérialisation d'objets Python.
+  - Dans le contexte du jeu Quoridor, Pickle est utilisé pour convertir les objets Python en binaire pouvant être transférée via le réseau, facilitant ainsi la communication entre les joueurs lors du jeu en ligne.
+
+##### 4. Threading
+
+- La bibliothèque Threading en Python permet la création de threads, c'est-à-dire des processus qui s'exécutent simultanément.
+  - Dans le contexte du jeu Quoridor, la bibliothèque Threading est utilisée pour gérer les communications réseau dans un thread séparé, afin de ne pas bloquer l'interface utilisateur pendant les échanges de données.
+
+##### 5. Random
+
+- La bibliothèque Random en Python fournit des fonctionnalités pour la génération de nombres aléatoires.
+  - Dans le contexte du jeu Quoridor, la bibliothèque Random est utilisée pour générer des mouvements aléatoires pour les bots ainsi que pour déterminer aléatoirement l'ordre des joueurs au début de la partie.
+
+##### 6. Time
+
+- La bibliothèque Time en Python fournit des fonctionnalités pour la gestion du temps.
+  - Dans le contexte du jeu Quoridor, la bibliothèque Time est utilisée pour introduire des délais entre les mouvements de bots, elle est également utilisée pour introduire un délais lors de la réception d'un message en multijoueur.
+
+##### 7. Typing
+
+- la blibliothèque Typing en Python permet de spécifier le type des variables et des fonctions.
+
+#### 4. Structure du code
+
+Le code source du jeu Quoridor est organisé en plusieurs modules pour faciliter la maintenance et l'extension. Les modules principaux comprennent :
+
+- Graphical → Partie graphique
+  - menu → Les menus permettant de lancer le jeu
+  - barriers → Les barrières qui seront affichées sur le plateau
+  - widgets → éléments présents dans les menus pouvant être crées facilement
+- gameLogic → Algorithmes de logique du jeu (jeu en console)
+- multi → Connexion des joueurs en P2P
+- main.py → exécutable reliant les different modules
+
+<div class=graph>
+
+![import graphique](/assets/pictures/manual/directoryGraph.svg)
+
+</div>
+
+Structure des importation entre fichiers (en retirant pygame, socket, etc..)
+
+bleue → graphique
+
+vert → logique
+
+rose → multijoueur
+
+<div class=graph>
+
+![import graphique](/assets/pictures/manual/importGraph.svg)
+
+</div>
+
+#### Structure du plateau de jeu
+
+Le plateau est représentée par un tableau a double entrées de classes "Cell"
+
+![grille](/assets/pictures/manual/gridLayout.png)
+
+Representation de la classe "Cell":
+
+![cell](/assets/pictures/manual/cell.png)
+
+- Coorinates: (x,y) : permet de connaitre la position de la case dans la grille
+- Player : indique le joueur positionné sur la case
+- Visited: sert a ne pas vérifier deux fois une case quand on utilise le pathfinding
+- Walls :
+- dictionnaire
+- Clés : bas, droite
+- Valeurs : booléens. False → le mur n'est pas posé | True → le mur est posé
+
+"Walls" ne garde en mémoire que les murs bas et droite. Les murs haut et gauche sont respectivement les mur bas du voisin d'en haut et le mur droit du voisin de gauche. Voici un exemple sur une grille en 2x2.
+
+![wall logic](/assets/pictures/manual/wallLogic.png)
+
+On ne souhaite pas poser de murs en dehors de la grille. On ignorera donc les murs créant le périmètre du carré. Les index pris en compte vont donc de 0 → longueur - 1.
+
+Une grille 2x2 ressemblerait donc plutôt a ceci:
+
+![2x2 example](/assets/pictures/manual/2x2Cells.png)
+
+#### Deux modes de jeu: Local et sans-fil local
+
+![game child parent logic](/assets/pictures/manual/gameChild.png)
+
+Les deux modes de jeu sont organisés en sous classes
+
+- Game → Classe parent comprenant toute la logique de jeu en console
+  - localGame → enfant de Game comprend l'integration du graphique
+    - multiplayerClient → enfant de localGame réécrivant des méthodes pour convenir au multijoueur
+
+Appliquer cette organisation en classes enfant et parents permet de garder les méthodes élémentaires tout en en ajoutant ou en écrivant de nouvelles fonctions par dessus ce qui nous permet de respecter le principe du DRY (don't repeat yourself)
+
+#### Pathfinding
+
+Dans Quoridor il est interdit d’empêcher un joueur de rejoindre son arrivée
+
+![pathfinding](/assets/pictures/manual/pathfinding.png)
+
+le pathfinding a pour but d’empêcher le cas si dessus de se produire.
+
+On commence par prendre les coordonnées des cases ou sont posés les joueurs,
+
+Pour chaque joueur on prend les coordonnées de la case sur laquelle il est posé. Nous appelons récursivement une méthode pour chaque case qui nous renvoie les voisins disponibles (cases sans joueur et sans murs bloquant le déplacement). Si on détecte la case d'arrivé du joueur alors le joueur n'est pas bloqué. Si on arrive a la fin de l'appel récursif et qu'aucune case d'arrivée n'as été trouvée alors le joueur est considéré comme bloqué et le pathfinding empêchera de poser la barrière.
+
+On a ensuite une méthode "possibleBarrierPlacement" qui utilise le pathfinding sus mentionné afin de créer une liste de barrières valides sur la grille. Cette liste est ensuite utilisé dans la partie graphique afin de pouvoir "hover" les barrières plaçable en rouge.
+
+#### Logique de déplacement
+
+Les joueurs peuvent se déplacer sur les cases orthogonalement adjacentes a celle ou ils sont positionnés. Si le joueur n'est pas bloqués par un mur ou un joueur adverse le mouvement est possible.
+
+Si un élément viens à bloquer le déplacement, alors on regarde s'il s’agit d'un joueur ou d'une barrière. Pour le cas d'un joueur on regarde si on peut effectuer un saut par dessus. Si on est bloqué par une barrière ou qu'on ne peut pas sauter au dessus d'un joueur adverse, alors on envisage les déplacements diagonales.
+
+#### Hover
+
+Afin de pouvoir afficher plus clairement les mouvements possibles pour le joueur nous avons implémenté la logique de "hover". Si un déplacement est possible il est affiché en rose, si une
+
+barrière est plaçable, elle est affichée en bleue quand on passe la souris dessus.
+
+Pour d'arriver a ce résultat, on crée deux listes, une destinée aux déplacements et une aux barrières.
+
+La liste de barrières test chaque case et direction possibles sur la grille (en excluant les cases les plus a droite et en bas, les barrières étant longue de 2 cases, impossible de les placer sur une fin de ligne ou de colonne). si le placement est valide, alors elle est ajoutée a la liste.
+
+La liste de déplacements utilise un procédé est similaire a l'exception près qu'elle ne s’intéresse plus a toute les cellules mais uniquement aux cellules orthogonalement voisine a celles du pion. On suit ensuite la logique de déplacement pour déterminer quelles sont les déplacements valides puis on les ajoutes a la liste.
+
+Au moment de l'affichage, on regarde si l'élément est dans la liste des actions possibles, si c'est le cas on change ses propriétés afin d'ajouter la logique de hover et de changer sa couleur.
+
+#### Bots
+
+Un bot est une classe enfant de la classe "Player". Il possédé donc les mêmes attributs qu'un joueur. Pour jouer rien de plus simple. Tout est aléatoire. En premier lieu on le bot choisi aléatoirement si il souhaite se déplacer ou poser une barrière. S'il ne possède plus de barrière, alors on le force a choisir l'opération déplacement. Le bot utilise ensuite la même liste de déplacement et placements possibles que le "hover" afin de choisir la coup a jouer.
