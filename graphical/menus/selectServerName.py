@@ -1,7 +1,8 @@
+import random
 import socket
 import threading
 import time
-import random
+
 import pygame
 
 from graphical.widgets.button import Button
@@ -33,13 +34,14 @@ class ServerName(Menu):
         self.searchServer = SearchServer()
 
     def run_server(self, startingPlayer: int):
-        createServer(self.width,
-                     self.nbBarrier,
-                     self.nbPlayer,
-                     self.nbBot,
-                     self.input.text,
-                     startingPlayer
-                     )
+        serverInsances = createServer(self.width,
+                                      self.nbBarrier,
+                                      self.nbPlayer,
+                                      self.nbBot,
+                                      self.input.text,
+                                      startingPlayer
+                                      )
+        return serverInsances
 
     def launch_server(self):
         startingPlayer = random.randint(0, self.nbPlayer - 1)

@@ -2,10 +2,10 @@ from typing import Any
 
 import pygame
 
+from gameLogic.player import Player
 from graphical.widgets.button import Button
 from graphical.widgets.menu import Menu
 from multi.discoveryServer import SearchServer
-from gameLogic.player import Player
 
 
 # from multiplayerServer import createServer
@@ -53,9 +53,24 @@ class WaitingRoom(Menu):
                 self.window.blit(
                     player, ((self.windowWidth // 5) * i + self.windowWidth // 7, self.windowHeight // 3 + 130))
 
+    def starter(self) -> None:
+        print("start button pressed")
+        ServerSubThread.starter(connected)
+
     def Event(self) -> None:
         for event in pygame.event.get():
             self.defaultEventHandler(event)
+
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                mousePos = pygame.mouse.get_pos()
+                buttonX = self.windowWidth // 2 - 150
+                buttonY = self.windowHeight * 0.60
+                buttonWidth = 300
+                buttonHeight = 80
+
+                if buttonX <= mousePos[0] <= buttonX + buttonWidth and buttonY <= mousePos[
+                    1] <= buttonY + buttonHeight:
+                    self.starter()
 
     def mainLoop(self) -> None:
 

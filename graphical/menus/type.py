@@ -1,7 +1,8 @@
 import pygame
+
+from graphical.menus.choiceHost import ChoiceHost
 from graphical.widgets.button import Button
 from graphical.widgets.menu import Menu
-from graphical.menus.choiceHost import ChoiceHost
 from main import Play
 
 
@@ -31,7 +32,6 @@ class MenuType(Menu):
             self.defaultEventHandler(event)
             if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
                 if pygame.Rect(self.posSolo, self.buttonSize).collidepoint(event.pos):
-
                     board = NumberPlayer()
                     self.newMenu(self, board)
 

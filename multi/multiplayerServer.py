@@ -41,7 +41,7 @@ class ServerSubThread(threading.Thread):
         print(current_client, '-->', ((current_client + 1) % (len(self.connected) + self.nbBots)), " total clients :",
               len(self.connected) + self.nbBots)
         current_client = (
-            current_client + 1) % (len(self.connected) + self.nbBots)
+                                 current_client + 1) % (len(self.connected) + self.nbBots)
         self.queue.put(current_client)
         self.queue.task_done()
         return current_client
@@ -57,7 +57,7 @@ class ServerSubThread(threading.Thread):
         print("chat not implemented yet")
 
     def handleEnd(self, message: list[
-            Any]) -> None:  # received the end game message send the current player to all clients then ends the server thread
+        Any]) -> None:  # received the end game message send the current player to all clients then ends the server thread
         pickled_message = pickle.dumps(message)
         for i in range(len(self.connected)):
             self.connected[i].sendall(pickled_message)
@@ -128,7 +128,8 @@ class ServerSubThread(threading.Thread):
 
 
 def acceptConnections(mySocket: socket.socket, init: list[int], initializedQueue: queue.Queue[int],
-                      lobbyInfos: dict[str, Any], startingPlayer: int):
+                      lobbyInfos: dict[str, Any], startingPlayer: int) -> tuple[dict[int, socket.socket],
+list[ServerSubThread]]:
     '''
     accepts the connections of the clients and creates a thread for each of them to handle the messages
     '''
@@ -140,14 +141,16 @@ def acceptConnections(mySocket: socket.socket, init: list[int], initializedQueue
 
     init.append(startingPlayer)
     print(init)
+    serverInsances = []
     while nbPlayer > len(connected):
         print("starting player", startingPlayer)
         connection = mySocket.accept()[0]
 
         connected[init[0]] = connection
-        ServerSubThread(connection, init[0],
-                        initializedQueue, connected, nbBots, init[5])
-        print("new instance of  subServer:", ServerSubThread)
+
+        serverInsances.append(ServerSubThread(connection, init[0],
+                                              initializedQueue, connected, nbBots, init[5]))
+        print("new instance of  subServer:", serverInsances)
 
         init_msg = pickle.dumps(init)
         print("sending init msg")
@@ -157,7 +160,7 @@ def acceptConnections(mySocket: socket.socket, init: list[int], initializedQueue
         ServerSubThread.roomStatus(connected)
         init[0] += 1
     ServerSubThread.starter(connected)
-    return connected
+    return connected, serverInsances
 
 
 def handle_client_request(data: bytes, client_address: tuple[str, int], discoSock: socket.socket,
@@ -188,7 +191,7 @@ def discoveryServer(discoSock: socket.socket, lobbyInfo: dict[str, Any], stopEve
 
 
 def createServer(width: int, nbBarrier: int, nbPlayer: int, nbBots: int, name: str, startingPlayer: int, port: int =
-                 45678) -> None:
+45678) -> list[ServerSubThread]:
     '''creates a server with the given parameters'''
 
     ide = 0
@@ -228,8 +231,8 @@ def createServer(width: int, nbBarrier: int, nbPlayer: int, nbBots: int, name: s
     if isinstance(lobbyInfo["connectedPlayers"], int):
         lobbyInfo["connectedPlayers"] += 1
 
-    acceptConnections(serverSocket, init, initializedQueue,
-                      lobbyInfo, startingPlayer)
+    connections, serverInsances = acceptConnections(serverSocket, init, initializedQueue,
+                                                    lobbyInfo, startingPlayer)
     time.sleep(5)
     stopEvent.set()
     time.sleep(0.3)
@@ -237,11 +240,4 @@ def createServer(width: int, nbBarrier: int, nbPlayer: int, nbBots: int, name: s
     discoSock.close()
     print("stopped discovery response procedure")
 
-
-if __name__ == "__main__":
-    width = 5
-    nbBarrier = 10
-    nbPlayer = 2
-    nbBot = 0
-    serverName = "test"
-    createServer(width, nbBarrier, nbPlayer, nbBot, serverName, 0)
+    return serverInsances
