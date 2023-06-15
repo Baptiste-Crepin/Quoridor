@@ -48,7 +48,7 @@ class MultiplayerGame(LocalGame):
         #     # self.response_event.clear()
         #     self.thread.emit()  # sends the state of the game to the server when bot plays
 
-        if isinstance(currentPlayer, Bot):
+        if isinstance(currentPlayer, Bot) and self.num == 0:
             randomAction = currentPlayer.randomAction(
                 self.game.possibleBarrierPlacement(currentPlayer))
             if randomAction == 0:
