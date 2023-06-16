@@ -1,15 +1,16 @@
 import pygame
 
+from gameLogic.player import Player
 from graphical.menus.choiceHost import ChoiceHost
 from graphical.widgets.button import Button
 from graphical.widgets.menu import Menu
 from multi.discoveryServer import SearchServer
-from gameLogic.player import Player
 
 
 class ChoiceServer(Menu):
     def __init__(self) -> None:
         super().__init__()
+        self.server = None
         self.searchServer = SearchServer()
         self.startvars = list[int]()
         self.serverList = self.searchServer.discover()
@@ -83,11 +84,11 @@ class ChoiceServer(Menu):
                                             self.serverList[i]["players"],
                                             self.serverList[i]["barriers"],
                                             self.serverList[i]["bots"],
+                                            None,  # server_instances_queue is None for non-host client
                                             self.serverList[i]["lobbyName"],
                                             self.serverList[i]["connectedPlayers"],
-
                                             self.searchServer,
-                                            False)
+                                            False)  # host flag
                         self.newMenu(self, board)
                 self.back.Event(event, self, ChoiceHost)
 

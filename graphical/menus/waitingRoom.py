@@ -13,7 +13,8 @@ from multi.discoveryServer import SearchServer
 
 
 class WaitingRoom(Menu):
-    def __init__(self, startVars: list[Any], width: int, nbPlayer: int, nbBarrier: int, nbBot: int, serverName: str,
+    def __init__(self, startVars: list[Any], width: int, nbPlayer: int, nbBarrier: int, nbBot: int,
+                 server_instances_queue, serverName: str,
                  connectedPlayers: int,
                  serverConnection: SearchServer, Host: bool = False) -> None:
         super().__init__()
@@ -27,7 +28,7 @@ class WaitingRoom(Menu):
         self.start = False
         self.startVars = startVars
         self.serverConnection.connection.setblocking(False)
-
+        self.server_instances_queue = server_instances_queue
         self.clientListLen = connectedPlayers
 
     def displayPlayer(self) -> None:
@@ -53,9 +54,17 @@ class WaitingRoom(Menu):
                 self.window.blit(
                     player, ((self.windowWidth // 5) * i + self.windowWidth // 7, self.windowHeight // 3 + 130))
 
-    def starter(self) -> None:
-        print("start button pressed")
-        ServerSubThread.starter(connected)
+    def handle_start_button_press(self):
+        # Check if this is a host and if the server instances are available in the queue
+        if self.host and self.server_instances_queue is not None and not self.server_instances_queue.empty():
+            # Get the server instances
+            serverInstances = self.server_instances_queue.get()
+
+            # Call the desired method on the server instance(s)
+            if serverInstances:
+                serverInstances[0].starter(serverInstances[0].connected)
+        else:
+            print("Waiting for server to be ready...")
 
     def Event(self) -> None:
         for event in pygame.event.get():
@@ -70,7 +79,7 @@ class WaitingRoom(Menu):
 
                 if buttonX <= mousePos[0] <= buttonX + buttonWidth and buttonY <= mousePos[
                     1] <= buttonY + buttonHeight:
-                    self.starter()
+                    self.handle_start_button_press()
 
     def mainLoop(self) -> None:
 

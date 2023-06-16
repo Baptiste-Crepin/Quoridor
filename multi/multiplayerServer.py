@@ -159,7 +159,8 @@ list[ServerSubThread]]:
         print("Client", init[0], "connected, awaiting other players")
         ServerSubThread.roomStatus(connected)
         init[0] += 1
-    ServerSubThread.starter(connected)
+    # ServerSubThread.starter(connected) this line was meant to send the starter message to all client but is now
+    # called by the user
     return connected, serverInsances
 
 
