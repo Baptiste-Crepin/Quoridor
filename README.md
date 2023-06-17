@@ -207,7 +207,7 @@ Le jeu Quoridor utilise plusieurs bibliothèques Python pour faciliter son impl�
 ##### 4. Threading
 
 - La bibliothèque Threading en Python permet la création de threads, c'est-à-dire des processus qui s'exécutent simultanément.
-  - Dans le contexte du jeu Quoridor, la bibliothèque Threading est utilisée pour gérer les communications réseau dans un thread séparé, afin de ne pas bloquer l'interface utilisateur pendant les échanges de données.
+  - Dans le contexte du jeu Quoridor, la bibliothèque Threading est utilisée pour gérer les communications réseau dans des thread séparé, afin de ne pas bloquer l'interface utilisateur pendant les échanges de données.
 
 ##### 5. Random
 
@@ -291,7 +291,7 @@ Les deux modes de jeu sont organisés en sous classes
 
 - Game → Classe parent comprenant toute la logique de jeu en console
   - localGame → enfant de Game comprend l'integration du graphique
-    - multiplayerClient → enfant de localGame réécrivant des méthodes pour convenir au multijoueur
+    - MultiplayerClient → enfant de LocalGame réécrivant certaines méthodes pour implémenter les fonctionnalités du mode multijoueur.
 
 Appliquer cette organisation en classes enfant et parents permet de garder les méthodes élémentaires tout en en ajoutant ou en écrivant de nouvelles fonctions par dessus ce qui nous permet de respecter le principe du DRY (don't repeat yourself)
 
@@ -332,3 +332,55 @@ Au moment de l'affichage, on regarde si l'élément est dans la liste des action
 #### Bots
 
 Un bot est une classe enfant de la classe "Player". Il possédé donc les mêmes attributs qu'un joueur. Pour jouer rien de plus simple. Tout est aléatoire. En premier lieu on le bot choisi aléatoirement si il souhaite se déplacer ou poser une barrière. S'il ne possède plus de barrière, alors on le force a choisir l'opération déplacement. Le bot utilise ensuite la même liste de déplacement et placements possibles que le "hover" afin de choisir la coup a jouer.
+
+
+### multijoueur
+#### joueur
+Dans le mode multijoueur, un client possède les caractéristiques suivantes :
+
+- **Communication de Données et Synchronisation :** 
+  Les fonctions responsables de la communication de données et de la synchronisation sont exécutées dans un thread séparé. Cette structure permet une meilleure adaptabilité aux actions des autres joueurs, qui peuvent survenir à tout moment.
+
+- **Stabilité de l'Intégration avec Pygame :** 
+  Exécuter ces fonctions dans un thread distinct assure une intégration stable avec Pygame, en particulier lors de l'utilisation d'instructions bloquantes.
+
+#### Description des Fonctionnalités du Joueur :
+
+La fonctionnalité multijoueur est principalement divisée en deux parties: le programme principal (classe `MultiplayerGame`) et le thread client (`StoppableThreadClient`).
+
+1. **Programme Principal - MultiplayerGame :**
+
+   - Après qu'un joueur effectue une action, le programme principal envoie un message via le thread client. Ce message contient l'état actuel du plateau de jeu, le numéro du joueur qui a effectué l'action, et le nombre de barrières restantes pour ce joueur. Ensuite, les fonctions de jeu sont temporairement en pause jusqu'à ce qu'une réponse du serveur soit reçue.
+  
+   - L'affichage et les fonctions de jeu ne sont actifs pour le pion du joueur que pendant son tour.
+
+2. **Thread Client - StoppableThreadClient :**
+
+   - Ce thread est responsable de communiquer avec le serveur et de mettre à jour les données de jeu en conséquence. Voici comment il fonctionne principalement:
+
+     - Pendant le jeu, la procédure d'écoute du serveur est toujours active. Elle exécute différentes fonctions en fonction de l'en-tête du message reçu.
+    
+       - Si le message contient l'état du jeu, une fonction est appelée pour mettre à jour l'état du jeu dans le programme principal.
+    
+       - Si le message contient l'instruction de fin de partie, l'état du plateau de jeu est mis à jour, et la procédure de fin de partie est appelée.
+
+En séparant les tâches de communication et de synchronisation de la boucle de jeu principale, le programme peut gérer efficacement les interactions multijoueurs en temps réel tout en maintenant la stabilité. 
+
+##### Hôte
+En plus du programme et du thread client, le joueur qui sert d'hôte exécute également un thread distinct pour chaque joueur qui se connecte à la partie. Ces threads sont essentiels pour assurer la synchronisation de certaines données entre les joueurs, notamment en ce qui concerne la gestion de l'ordre des tours. Pour faciliter cette synchronisation, la classe utilise un objet `queue` qui permet de suivre et de gérer efficacement l'ordre dans lequel les joueurs jouent.
+
+pour chaque instance su server la procedure principale est la suivante: 
+
+###### Fonction principale de la Classe `serverSubThread`:
+
+La fonction `run` est centrale au fonctionnement du thread serveur hébergé par le joueur. Elle gère la communication entre les joueurs connectés. Voici comment cette fonction fonctionne principalement:
+
+   - **Réception des Messages:** La méthode `run` écoute en continu les messages provenant du client connecté à ce thread. Elle décode les messages reçus qui sont sérialisés avec `pickle`.
+
+   - **Gestion des Messages:** Une fois un message reçu, la méthode détermine le type de message à l'aide de son en-tête et appelle la fonction de gestion appropriée. Les types de messages et leurs gestionnaires sont définis dans un dictionnaire `message_handlers`.
+
+   - **Traitement Spécifique des Messages:** Selon le type de message reçu (`game_state`, `chat`, `game_end`, `resetGame`), différentes fonctions sont appelées pour effectuer des actions spécifiques, telles que la mise à jour de l'état du jeu ou la gestion des messages de chat.
+
+   - **Gestion des Erreurs:** Si une erreur se produit lors de la réception ou du traitement d'un message (par exemple, en cas de déconnexion d'un client), un message de déconnexion est envoyé à tous les clients connectés, et une exception est levée.
+
+En utilisant un thread dédié pour chaque client connecté, l'hôte peut gérer efficacement la communication et la synchronisation de l'état du jeu entre tous les joueurs de manière concurrente, ce qui permet de maintenir des performances élevées et une expérience de jeu fluide.
