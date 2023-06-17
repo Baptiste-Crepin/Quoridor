@@ -4,23 +4,21 @@ from graphical.widgets.menu import Menu
 
 
 class NumberPlayer(Menu):
-    def __init__(self, multi: bool = False):
-        super().__init__()
+    def __init__(self, multi: bool = False, fullScreen: bool = False):
         self.multi = multi
-        self.initializeButton()
+        super().__init__(fullScreen)
 
     def button2pos(self, yOffset: float, yPos: float) -> tuple[float, float]:
         if self.multi:
             return ((self.windowWidth//2) - (self.buttonWidth//2), yPos)
         return (self.buttonX + yOffset, yPos)
 
-    def initializeButton(self):
+    def calculateElements(self):
         offset = self.buttonWidth*0.7
-        yPos = self.windowHeight // 3
-        self.posRect1 = (self.buttonX - offset, yPos)
-        self.posRect2 = self.button2pos(offset, yPos)
-        self.posRect3 = (self.buttonX - offset, yPos * 2)
-        self.posRect4 = (self.buttonX + offset, yPos * 2)
+        self.posRect1 = (self.buttonX - offset, self.windowHeight//3)
+        self.posRect2 = self.button2pos(offset, self.windowHeight//3)
+        self.posRect3 = (self.buttonX - offset, self.windowHeight//3 * 2)
+        self.posRect4 = (self.buttonX + offset, self.windowHeight//3 * 2)
 
         self.Rect1 = pygame.Rect(self.posRect1, self.buttonSize)
         self.Rect2 = pygame.Rect(self.posRect2, self.buttonSize)
@@ -52,11 +50,12 @@ class NumberPlayer(Menu):
                     if not isinstance(args, tuple):
                         continue
                     # calls the constructor of the class in PlayersFromPos[pos][0] with the arguments in PlayersFromPos[pos][1]
-                    board = PlayersFromPos[pos][0](*args)  # type: ignore
+                    board = PlayersFromPos[pos][0](
+                        *args, self.fullScreen)  # type: ignore
                     if isinstance(board, object):
                         self.newMenu(self, board)
 
-            self.back.Event(event, self, Menutype)
+            self.back.Event(event, self, Menutype, self.fullScreen)
 
     def mainLoop(self):
         self.window.fill(self.backGround)

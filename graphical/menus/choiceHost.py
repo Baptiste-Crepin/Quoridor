@@ -5,16 +5,21 @@ from graphical.menus.choicePlayer import NumberPlayer
 
 
 class ChoiceHost(Menu):
-    def __init__(self):
-        super().__init__()
+    def __init__(self, fullScreen: bool = False):
+        super().__init__(fullScreen)
 
-        self.posHost = (self.buttonX, 200)
-        self.posJoin = (self.buttonX, 370)
+        self.calculateElements()
+
+    def calculateElements(self) -> None:
+        self.posHost = (self.buttonX, self.windowHeight *
+                        0.40 - self.buttonHeight//2)
+        self.posJoin = (self.buttonX, self.windowHeight *
+                        0.60 - self.buttonHeight//2)
 
         self.soloButton = pygame.Rect(
-            self.buttonX, 200, self.buttonWidth, self.buttonHeight)
+            self.posHost, (self.buttonWidth, self.buttonHeight))
         self.multiButton = pygame.Rect(
-            self.buttonX, 370, self.buttonWidth, self.buttonHeight)
+            self.posJoin, (self.buttonWidth, self.buttonHeight))
 
     def mainLoop(self):
         self.window.fill(self.backGround)
@@ -31,14 +36,14 @@ class ChoiceHost(Menu):
             self.defaultEventHandler(event)
             if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
                 if pygame.Rect(self.posHost, self.buttonSize).collidepoint(event.pos):
-                    board = NumberPlayer(True)
+                    board = NumberPlayer(True, self.fullScreen)
                     self.newMenu(self, board)
 
                 elif pygame.Rect(self.posJoin, self.buttonSize).collidepoint(event.pos):
-                    board = ChoiceServer()
+                    board = ChoiceServer(self.fullScreen)
                     self.newMenu(self, board)
 
-                self.back.Event(event, self, Menutype)
+                self.back.Event(event, self, Menutype, self.fullScreen)
             pygame.display.flip()
 
 

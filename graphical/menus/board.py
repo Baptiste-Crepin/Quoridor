@@ -17,23 +17,23 @@ class Board(Menu):
     """Class that handles the display of the board"""
     BarrierOrCell = TypeVar('BarrierOrCell', Barrier, TablePlayer)
 
-    def __init__(self, Width: int, score: list[int] = [0, 0, 0, 0]):
+    def __init__(self, Width: int, score: list[int] = [0, 0, 0, 0], fullScreen: bool = False):
         """Initializes the board"""
-        super().__init__()
         self.col = Width
         self.score = score
 
+        super().__init__(fullScreen)
         self.clicked = False
+        self.play = True
+        pygame.display.set_caption("plateau")
 
+    def calculateElements(self):
         self.rect = self.initializeObjectList(TablePlayer)
         self.verticalBarriers = self.initializeObjectList(
             VerticalBarrier, 1, 0)
         self.horizontalBarriers = self.initializeObjectList(
             HorizontalBarrier, 0, 1)
         self.intersection = self.initializeObjectList(Intersection, 1, 1)
-
-        pygame.display.set_caption("plateau")
-        self.play = True
 
     def initializeObjectList(self, objectType: type[BarrierOrCell], offsetRow: int = 0, offsetCol: int = 0) -> list[
             list[BarrierOrCell]]:
@@ -259,25 +259,42 @@ class Board(Menu):
                 pygame.draw.polygon(
                     self.window, player.getColor(), Triangle_point)
 
-    def displayPlayerInformation(self, currentPlayer: Player, playerList: list[Player]) -> None:
-        height = 330 if len(playerList) == 4 else 190
-        pygame.draw.rect(self.window, self.lightBlue,
-                         (750, 10, 570, height), border_radius=10)
+    def displayContainer(self, xOffset: int, height: int):
+        x = self.windowHeight + (xOffset//2)
+        width = self.windowWidth-self.windowHeight - xOffset
+        rect = pygame.Rect(x, 10, width, height)
+        pygame.draw.rect(self.window, self.lightBlue, rect, border_radius=10)
 
+    def displayPlayerInformation(self, currentPlayer: Player, playerList: list[Player]) -> None:
+        playerAmount = len(playerList)
+        xOffset = 10
+        x = self.windowHeight + xOffset
+        playerRectWidth = self.windowWidth-self.windowHeight - 2*xOffset
+        height = self.fullScreenHeight//2 if playerAmount == 4 else self.fullScreenHeight//4
+        gap = ((height-(height*0.45+height*((playerAmount-1)
+                                            * (0.60/playerAmount))))/playerAmount)
+
+        self.displayContainer(xOffset, height)
         for i, player in enumerate(playerList):
             if player == currentPlayer:
+                y = 15+(gap+height*(0.60/playerAmount))*i
+                rect = pygame.Rect(x, y, playerRectWidth, height*0.45)
                 informationPlayer(
-                    self.window, self.black, pygame.Rect(760, 20 + i * 70, 550, 100), player).createRectPlayer()
+                    self.window,
+                    self.black,
+                    rect,
+                    player).createRectPlayer()
 
             else:
-                offset = 0
+                Yoffset = 0
                 if player.getNumber() > currentPlayer.getNumber():
-                    offset = 50
+                    Yoffset = height*(0.45-(0.6/playerAmount))
 
+                y = 15 + Yoffset + (gap+height*(0.60/playerAmount))*i
+                rectHeight = height*(0.60/playerAmount)
+                rect = pygame.Rect(x, y, playerRectWidth, rectHeight)
                 displayInformation(player, playerList, self.window,
-                                   self.black, pygame.Rect(
-                                       760, 20 + offset + i * 70, 550, 50), i,
-                                   self.score).displayNeutral()
+                                   self.black, rect, i, self.score).displayNeutral()
 
     def newFrame(self, currentPlayer: Player, playerList: list[Player]) -> None:
         self.clearScreen()

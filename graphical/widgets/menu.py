@@ -3,22 +3,28 @@ from graphical.widgets.back import Back
 
 
 class Menu():
-    def __init__(self) -> None:
+    def __init__(self, fullScreen: bool = False) -> None:
         pygame.display.set_caption("Quoridor")
 
-        self.windowWidth = 1330
-        self.windowHeight = 750
-        self.window = pygame.display.set_mode(
-            (self.windowWidth, self.windowHeight))
+        self.baseWindowWidth = 1330
+        self.baseWindowHeight = 750
+        self.windowWidth = self.baseWindowWidth
+        self.windowHeight = self.baseWindowHeight
         self.center = (self.windowWidth//2, self.windowHeight//2)
+        self.fullScreen = fullScreen
+        self.fullScreenHeight = pygame.display.Info().current_h
+        self.fullScreenWidth = pygame.display.Info().current_w
+        self.buttonWidth = self.windowWidth//3
+        self.buttonHeight = self.windowHeight//7
+        self.buttonSize = (self.buttonWidth, self.buttonHeight)
+        self.buttonX = self.windowWidth//2-self.buttonWidth//2
 
         self.clock = pygame.time.Clock()
         self.fps = 30
         self.clock.tick(self.fps)
 
-        self.backGround = pygame.Color(23, 43, 79)
         self.font = pygame.font.Font(None, 36)
-
+        self.backGround = pygame.Color(23, 43, 79)
         self.white = pygame.Color(255, 255, 255)
         self.grey = pygame.Color(217, 217, 217, 35)
         self.black = pygame.Color(0, 0, 0)
@@ -28,15 +34,56 @@ class Menu():
         self.darkBlue = pygame.Color(0, 0, 48)
         self.purple = pygame.Color(204, 0, 204)
 
-        self.buttonWidth = 400
-        self.buttonHeight = 120
+        self.initialize()
+        self.actualizeInfos()
+        self.calculateElements()
+
+    def initialize(self) -> None:
+        if self.fullScreen:
+            self.window = pygame.display.set_mode(
+                (self.windowWidth, self.windowHeight), pygame.FULLSCREEN)
+        else:
+            self.window = pygame.display.set_mode(
+                (self.baseWindowWidth, self.baseWindowHeight))
+        self.calculateElements()
+        self.back = Back(self.window)
+
+    def actualizeInfos(self) -> None:
+        info = pygame.display.Info()
+        self.windowWidth = info.current_w
+        self.windowHeight = info.current_h
+
+        self.buttonWidth = self.windowWidth//3
+        self.buttonHeight = self.windowHeight//7
         self.buttonSize = (self.buttonWidth, self.buttonHeight)
         self.buttonX = self.windowWidth//2-self.buttonWidth//2
-        self.back = Back(self.window)
+        self.center = (self.windowWidth//2, self.windowHeight//2)
+
+    def calculateElements(self) -> None:
+        """Implemented in childs
+        Calculate the elements of the menu"""
+        pass
+
+    def toggle_fullscreen(self):
+        self.fullScreen = not self.fullScreen
+        if self.fullScreen:
+            pygame.display.set_mode(
+                (self.windowWidth, self.windowHeight), pygame.FULLSCREEN)
+        else:
+            pygame.display.set_mode(
+                (self.baseWindowWidth, self.baseWindowHeight))
+
+        self.actualizeInfos()
+        self.calculateElements()
 
     def defaultEventHandler(self, event: pygame.event.Event) -> None:
         if event.type in [pygame.QUIT, pygame.WINDOWCLOSE]:
             raise SystemExit
+        elif event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_ESCAPE:
+                raise SystemExit
+            elif event.key == pygame.K_f or event.key == pygame.K_F11:
+                self.toggle_fullscreen()
 
     def mainLoop(self):
         self.window.fill(self.darkBlue)

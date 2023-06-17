@@ -8,15 +8,21 @@ from player import Player
 
 
 class ChoiceServer(Menu):
-    def __init__(self) -> None:
-        super().__init__()
+    def __init__(self, fullScreen: bool = False) -> None:
+        super().__init__(fullScreen)
         self.searchServer = SearchServer()
         self.startvars = list[int]()
         self.serverList = self.searchServer.discover()
         print(self.serverList)
         self.serverPosition = 0
         self.serverPositions = list[pygame.Rect]()
-        self.refresh = pygame.Rect(900, 50, 300, 100)
+
+    def calculateElements(self) -> None:
+        self.refreshWidth = self.buttonWidth//2
+        self.refreshPos = (self.windowWidth*0.9 -
+                           self.refreshWidth//2, self.windowHeight*0.05)
+        self.refresh = pygame.Rect(
+            self.refreshPos, (self.refreshWidth, self.buttonHeight))
 
     def coordYServer(self, i: int) -> int:
         return 220 * i + 70 + self.serverPosition
@@ -56,7 +62,8 @@ class ChoiceServer(Menu):
                                        (70 * j + dico[self.serverList[i]["players"]], self.coordYServer(i) + 160), 25)
                 else:
                     pygame.draw.circle(self.window, Player(j + 1).getColor(),
-                                       (70 * j + dico[self.serverList[i]["players"]], self.coordYServer(i) + 160), 25,
+                                       (70 * j + dico[self.serverList[i]["players"]],
+                                        self.coordYServer(i) + 160), 25,
                                        5)
 
             self.serverPositions.append(pygame.Rect(
@@ -85,11 +92,11 @@ class ChoiceServer(Menu):
                                             self.serverList[i]["bots"],
                                             self.serverList[i]["lobbyName"],
                                             self.serverList[i]["connectedPlayers"],
-
                                             self.searchServer,
-                                            False)
+                                            False,
+                                            self.fullScreen)
                         self.newMenu(self, board)
-                self.back.Event(event, self, ChoiceHost)
+                self.back.Event(event, self, ChoiceHost, self.fullScreen)
 
     def mainLoop(self) -> None:
         self.window.fill(self.backGround, rect=None, special_flags=0)

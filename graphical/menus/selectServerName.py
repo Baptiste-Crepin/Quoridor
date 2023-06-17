@@ -12,21 +12,22 @@ from multi.multiplayerServer import createServer
 
 
 class ServerName(Menu):
-    def __init__(self, width: int, nbPlayer: int, nbBarrier: int, nbBot: int, method: int) -> None:
-        super().__init__()
+    def __init__(self, width: int, nbPlayer: int, nbBarrier: int, nbBot: int, method: int, fullScreen: bool = False) -> None:
+        super().__init__(fullScreen)
         self.startVars = []
         self.width = width
         self.nbPlayer = nbPlayer
         self.nbBarrier = nbBarrier
         self.nbBot = nbBot
         self.method = method
-        self.sendPos = (self.buttonX, 500)
-        self.buttonSize = (self.buttonWidth, 50)
 
         self.sendRect = pygame.Rect(
             self.sendPos, self.buttonSize)
 
+    def calculateElements(self):
+        self.sendPos = (self.buttonX, 500)
         self.inputPos = (self.buttonX, 400)
+        # self.buttonSize = (self.buttonWidth, 50)
         self.input = Input(self.window, pygame.Rect(
             self.inputPos, self.buttonSize), self.white)
 
@@ -60,7 +61,8 @@ class ServerName(Menu):
                     host = SearchServer.getSelfHost()
 
                     self.startVars = self.searchServer.connect(host, 45678)
-                    print("Self connect to", socket.gethostbyname(socket.gethostname()))
+                    print("Self connect to", socket.gethostbyname(
+                        socket.gethostname()))
                     print("C")
 
                     board = WaitingRoom(self.startVars,
@@ -71,7 +73,7 @@ class ServerName(Menu):
                                         self.input.text,
                                         0,
                                         self.searchServer,
-                                        True)
+                                        True, self.fullScreen)
                     self.newMenu(self, board)
                     print("D")
 
@@ -79,7 +81,7 @@ class ServerName(Menu):
                                                              self.nbBot,
                                                              self.width,
                                                              self.method,
-                                                             True))
+                                                             True, self.fullScreen))
                 print("E")
 
     def mainLoop(self):

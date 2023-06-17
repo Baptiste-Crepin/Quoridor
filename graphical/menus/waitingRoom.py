@@ -14,9 +14,8 @@ from player import Player
 
 class WaitingRoom(Menu):
     def __init__(self, startVars: list[Any], width: int, nbPlayer: int, nbBarrier: int, nbBot: int, serverName: str,
-                 connectedPlayers: int,
-                 serverConnection: SearchServer, Host: bool = False) -> None:
-        super().__init__()
+                 connectedPlayers: int, serverConnection: SearchServer, Host: bool = False, fullScreen: bool = False) -> None:
+        super().__init__(fullScreen)
         self.width = width
         self.nbPlayer = nbPlayer
         self.nbBarrier = nbBarrier
