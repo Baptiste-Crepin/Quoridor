@@ -12,9 +12,7 @@ class SizeGrid(Menu):
         self.nbBot = nbBot
         self.multi = multi
 
-        self.initializeButton()
-
-    def initializeButton(self):
+    def calculateElements(self):
         yPos = self.windowHeight // 3
         self.posButton1 = (self.buttonX - (self.buttonWidth*0.7), yPos)
         self.posButton2 = (self.buttonX + (self.buttonWidth*0.7), yPos)

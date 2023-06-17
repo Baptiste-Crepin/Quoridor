@@ -19,21 +19,21 @@ class Board(Menu):
 
     def __init__(self, Width: int, score: list[int] = [0, 0, 0, 0], fullScreen: bool = False):
         """Initializes the board"""
-        super().__init__(fullScreen)
         self.col = Width
         self.score = score
 
+        super().__init__(fullScreen)
         self.clicked = False
+        self.play = True
+        pygame.display.set_caption("plateau")
 
+    def calculateElements(self):
         self.rect = self.initializeObjectList(TablePlayer)
         self.verticalBarriers = self.initializeObjectList(
             VerticalBarrier, 1, 0)
         self.horizontalBarriers = self.initializeObjectList(
             HorizontalBarrier, 0, 1)
         self.intersection = self.initializeObjectList(Intersection, 1, 1)
-
-        pygame.display.set_caption("plateau")
-        self.play = True
 
     def initializeObjectList(self, objectType: type[BarrierOrCell], offsetRow: int = 0, offsetCol: int = 0) -> list[
             list[BarrierOrCell]]:

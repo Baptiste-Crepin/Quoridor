@@ -7,16 +7,20 @@ class Play(Menu):
     def __init__(self, fullScreen: bool = False) -> None:
         super().__init__(fullScreen)
 
-        self.posPlay = (self.buttonX, 150)
-        self.posRules = (self.buttonX, 320)
-        self.posQuit = (self.buttonX, 490)
+    def calculateElements(self) -> None:
+        self.posPlay = (self.buttonX, self.windowHeight *
+                        0.25 - self.buttonHeight//2)
+        self.posRules = (self.buttonX, self.windowHeight *
+                         0.50 - self.buttonHeight//2)
+        self.posQuit = (self.buttonX, self.windowHeight *
+                        0.75 - self.buttonHeight//2)
 
         self.playButton = pygame.Rect(
-            self.buttonX, self.windowHeight*0.25 - self.buttonHeight//2, self.buttonWidth, self.buttonHeight)
+            self.posPlay, (self.buttonWidth, self.buttonHeight))
         self.rulesButton = pygame.Rect(
-            self.buttonX, self.windowHeight*0.50 - self.buttonHeight//2, self.buttonWidth, self.buttonHeight)
+            self.posRules, (self.buttonWidth, self.buttonHeight))
         self.quitButton = pygame.Rect(
-            self.buttonX, self.windowHeight*0.75 - self.buttonHeight//2, self.buttonWidth, self.buttonHeight)
+            self.posQuit, (self.buttonWidth, self.buttonHeight))
 
     def Event(self) -> None:
         from graphical.menus.rules import Rules

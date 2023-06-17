@@ -10,9 +10,7 @@ class NumberBots(Menu):
         self.nbPlayers = nbPlayers
         self.multi = multi
 
-        self.initializeButton()
-
-    def initializeButton(self) -> None:
+    def calculateElements(self):
         self.ypos = self.windowHeight // 3
         self.firstRect = (self.buttonX,
                           self.ypos,

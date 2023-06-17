@@ -5,6 +5,8 @@ from graphical.widgets.menu import Menu
 class Rules(Menu):
     def __init__(self, fullScreen: bool = False) -> None:
         super().__init__(fullScreen)
+
+    def calculateElements(self) -> None:
         self.imagepos = 0
 
     def coordYRules(self) -> int:

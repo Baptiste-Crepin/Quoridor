@@ -6,13 +6,15 @@ class Menu():
     def __init__(self, fullScreen: bool = False) -> None:
         pygame.display.set_caption("Quoridor")
 
-        self.windowWidth = 1330
-        self.windowHeight = 750
+        self.baseWindowWidth = 1330
+        self.baseWindowHeight = 750
+        self.windowWidth = self.baseWindowWidth
+        self.windowHeight = self.baseWindowHeight
         self.center = (self.windowWidth//2, self.windowHeight//2)
         self.fullScreen = fullScreen
 
-        self.buttonWidth = 400
-        self.buttonHeight = 120
+        self.buttonWidth = self.windowWidth//3
+        self.buttonHeight = self.windowHeight//7
         self.buttonSize = (self.buttonWidth, self.buttonHeight)
         self.buttonX = self.windowWidth//2-self.buttonWidth//2
 
@@ -32,6 +34,8 @@ class Menu():
         self.purple = pygame.Color(204, 0, 204)
 
         self.initialize()
+        self.actualizeInfos()
+        self.calculateElements()
 
     def initialize(self) -> None:
         if self.fullScreen:
@@ -39,9 +43,20 @@ class Menu():
                 (self.windowWidth, self.windowHeight), pygame.FULLSCREEN)
         else:
             self.window = pygame.display.set_mode(
-                (self.windowWidth, self.windowHeight))
-
+                (self.baseWindowWidth, self.baseWindowHeight))
+        self.calculateElements()
         self.back = Back(self.window)
+
+    def actualizeInfos(self) -> None:
+        info = pygame.display.Info()
+        self.windowWidth = info.current_w
+        self.windowHeight = info.current_h
+
+        self.buttonWidth = self.windowWidth//3
+        self.buttonHeight = self.windowHeight//7
+        self.buttonSize = (self.buttonWidth, self.buttonHeight)
+        self.buttonX = self.windowWidth//2-self.buttonWidth//2
+        self.center = (self.windowWidth//2, self.windowHeight//2)
 
     def toggle_fullscreen(self):
         self.fullScreen = not self.fullScreen
@@ -49,7 +64,11 @@ class Menu():
             pygame.display.set_mode(
                 (self.windowWidth, self.windowHeight), pygame.FULLSCREEN)
         else:
-            pygame.display.set_mode((self.windowWidth, self.windowHeight))
+            pygame.display.set_mode(
+                (self.baseWindowWidth, self.baseWindowHeight))
+
+        self.actualizeInfos()
+        self.calculateElements()
 
     def defaultEventHandler(self, event: pygame.event.Event) -> None:
         if event.type in [pygame.QUIT, pygame.WINDOWCLOSE]:

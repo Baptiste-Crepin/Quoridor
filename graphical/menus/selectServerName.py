@@ -20,13 +20,14 @@ class ServerName(Menu):
         self.nbBarrier = nbBarrier
         self.nbBot = nbBot
         self.method = method
-        self.sendPos = (self.buttonX, 500)
-        self.buttonSize = (self.buttonWidth, 50)
 
         self.sendRect = pygame.Rect(
             self.sendPos, self.buttonSize)
 
+    def calculateElements(self):
+        self.sendPos = (self.buttonX, 500)
         self.inputPos = (self.buttonX, 400)
+        # self.buttonSize = (self.buttonWidth, 50)
         self.input = Input(self.window, pygame.Rect(
             self.inputPos, self.buttonSize), self.white)
 
@@ -85,11 +86,11 @@ class ServerName(Menu):
 
     def mainLoop(self):
         self.window.fill(self.backGround, rect=None, special_flags=0)
-        font=pygame.font.SysFont(
+        font = pygame.font.SysFont(
             "Extra Bold Italic", 60, False, True)
-        text=font.render(
+        text = font.render(
             "chose the name of", True, self.white)
-        secondtext=font.render(
+        secondtext = font.render(
             "the server", True, self.white)
         self.input.createInput()
         self.window.blit(text, (self.buttonWidth, 230))

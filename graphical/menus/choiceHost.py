@@ -8,13 +8,18 @@ class ChoiceHost(Menu):
     def __init__(self, fullScreen: bool = False):
         super().__init__(fullScreen)
 
-        self.posHost = (self.buttonX, 200)
-        self.posJoin = (self.buttonX, 370)
+        self.calculateElements()
+
+    def calculateElements(self) -> None:
+        self.posHost = (self.buttonX, self.windowHeight *
+                        0.40 - self.buttonHeight//2)
+        self.posJoin = (self.buttonX, self.windowHeight *
+                        0.60 - self.buttonHeight//2)
 
         self.soloButton = pygame.Rect(
-            self.buttonX, 200, self.buttonWidth, self.buttonHeight)
+            self.posHost, (self.buttonWidth, self.buttonHeight))
         self.multiButton = pygame.Rect(
-            self.buttonX, 370, self.buttonWidth, self.buttonHeight)
+            self.posJoin, (self.buttonWidth, self.buttonHeight))
 
     def mainLoop(self):
         self.window.fill(self.backGround)

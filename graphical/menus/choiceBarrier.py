@@ -18,11 +18,15 @@ class selectBarrier(Menu):
         self.multi = multi
         self.barrier = 1
         self.circleWidth = 100
-        self.doneButton = pygame.Rect(
-            self.buttonX, 560, self.buttonWidth, self.buttonHeight)
 
         self.upTriangleColor = self.white
         self.downTriangleColor = self.lighterBlue
+
+    def calculateElements(self) -> None:
+        self.center = (self.windowWidth // 2, self.windowHeight // 2)
+        self.doneButtonPos = (self.buttonX, self.windowHeight*0.8)
+        self.doneButton = pygame.Rect(
+            self.doneButtonPos, (self.buttonWidth, self.buttonHeight))
 
     def drawCircleOutline(self) -> object:
         return pygame.draw.circle(self.window, self.black, self.center, self.circleWidth + 15, width=0)

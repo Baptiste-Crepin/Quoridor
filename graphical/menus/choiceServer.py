@@ -16,7 +16,13 @@ class ChoiceServer(Menu):
         print(self.serverList)
         self.serverPosition = 0
         self.serverPositions = list[pygame.Rect]()
-        self.refresh = pygame.Rect(900, 50, 300, 100)
+
+    def calculateElements(self) -> None:
+        self.refreshWidth = self.buttonWidth//2
+        self.refreshPos = (self.windowWidth*0.9 -
+                           self.refreshWidth//2, self.windowHeight*0.05)
+        self.refresh = pygame.Rect(
+            self.refreshPos, (self.refreshWidth, self.buttonHeight))
 
     def coordYServer(self, i: int) -> int:
         return 220 * i + 70 + self.serverPosition

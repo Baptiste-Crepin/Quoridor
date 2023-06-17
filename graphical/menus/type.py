@@ -9,13 +9,17 @@ class Menutype(Menu):
     def __init__(self, fullScreen: bool = False):
         super().__init__(fullScreen)
 
-        self.posSolo = (self.buttonX, 200)
-        self.posMulti = (self.buttonX, 370)
+
+    def calculateElements(self) -> None:
+        self.posSolo = (self.buttonX, self.windowHeight *
+                        0.40 - self.buttonHeight//2)
+        self.posMulti = (self.buttonX, self.windowHeight *
+                         0.60 - self.buttonHeight//2)
 
         self.soloButton = pygame.Rect(
-            self.buttonX, 200, self.buttonWidth, self.buttonHeight)
+            self.posSolo, (self.buttonWidth, self.buttonHeight))
         self.multiButton = pygame.Rect(
-            self.buttonX, 370, self.buttonWidth, self.buttonHeight)
+            self.posMulti, (self.buttonWidth, self.buttonHeight))
 
     def mainLoop(self):
         self.window.fill(self.backGround)
@@ -32,7 +36,8 @@ class Menutype(Menu):
             if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
                 if pygame.Rect(self.posSolo, self.buttonSize).collidepoint(event.pos):
 
-                    board = NumberPlayer(fullScreen=self.fullScreen)
+                    board = NumberPlayer(
+                        multi=False, fullScreen=self.fullScreen)
                     self.newMenu(self, board)
 
                 elif pygame.Rect(self.posMulti, self.buttonSize).collidepoint(event.pos):
