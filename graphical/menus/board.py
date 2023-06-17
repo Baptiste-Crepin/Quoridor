@@ -260,23 +260,28 @@ class Board(Menu):
                     self.window, player.getColor(), Triangle_point)
 
     def displayPlayerInformation(self, currentPlayer: Player, playerList: list[Player]) -> None:
-        height = 330 if len(playerList) == 4 else 190
+
+        playerNumber = len(playerList)
+        height = self.fullScreenHeight//2 if playerNumber == 4 else self.fullScreenHeight//4
+        ecart = ((height-(height*0.45+height*((playerNumber-1)
+                 * (0.60/playerNumber))))/playerNumber)
+
         pygame.draw.rect(self.window, self.lightBlue,
-                         (750, 10, 570, height), border_radius=10)
+                         (self.windowWidth*0.57, 10, 570, height), border_radius=10)  # type: ignore
 
         for i, player in enumerate(playerList):
             if player == currentPlayer:
                 informationPlayer(
-                    self.window, self.black, pygame.Rect(760, 20 + i * 70, 550, 100), player).createRectPlayer()
+                    self.window, self.black, pygame.Rect(self.windowWidth*0.57+10, 15+(ecart+height*(0.60/playerNumber))*i, 550, height*0.45), player).createRectPlayer()
 
             else:
                 offset = 0
                 if player.getNumber() > currentPlayer.getNumber():
-                    offset = 50
+                    offset = height*(0.45-0.60/playerNumber)
 
                 displayInformation(player, playerList, self.window,
                                    self.black, pygame.Rect(
-                                       760, 20 + offset + i * 70, 550, 50), i,
+                                       self.windowWidth*0.57+10, 15 + offset + (ecart+height*(0.60/playerNumber))*i, 550, height*(0.60/playerNumber)), i,
                                    self.score).displayNeutral()
 
     def newFrame(self, currentPlayer: Player, playerList: list[Player]) -> None:

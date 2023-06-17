@@ -12,7 +12,8 @@ class Menu():
         self.windowHeight = self.baseWindowHeight
         self.center = (self.windowWidth//2, self.windowHeight//2)
         self.fullScreen = fullScreen
-
+        self.fullScreenHeight = pygame.display.Info().current_h
+        self.fullScreenWidth = pygame.display.Info().current_w
         self.buttonWidth = self.windowWidth//3
         self.buttonHeight = self.windowHeight//7
         self.buttonSize = (self.buttonWidth, self.buttonHeight)
@@ -76,7 +77,7 @@ class Menu():
         elif event.type == pygame.KEYDOWN:
             if event.key == pygame.K_ESCAPE:
                 raise SystemExit
-            elif event.key == pygame.K_f:
+            elif event.key == pygame.K_f or event.key == pygame.K_F11:
                 self.toggle_fullscreen()
 
     def mainLoop(self):
