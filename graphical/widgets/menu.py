@@ -59,6 +59,11 @@ class Menu():
         self.buttonX = self.windowWidth//2-self.buttonWidth//2
         self.center = (self.windowWidth//2, self.windowHeight//2)
 
+    def calculateElements(self) -> None:
+        """Implemented in childs
+        Calculate the elements of the menu"""
+        pass
+
     def toggle_fullscreen(self):
         self.fullScreen = not self.fullScreen
         if self.fullScreen:
