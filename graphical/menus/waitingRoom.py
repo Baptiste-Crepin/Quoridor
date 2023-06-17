@@ -8,10 +8,6 @@ from graphical.widgets.menu import Menu
 from multi.discoveryServer import SearchServer
 
 
-# from multiplayerServer import createServer
-# from multiplayerClient import SearchServer
-
-
 class WaitingRoom(Menu):
     def __init__(self, startVars: list[Any], width: int, nbPlayer: int, nbBarrier: int, nbBot: int,
                  server_instances_queue, serverName: str,
@@ -78,26 +74,23 @@ class WaitingRoom(Menu):
                 buttonHeight = 80
 
                 if buttonX <= mousePos[0] <= buttonX + buttonWidth and buttonY <= mousePos[
-                    1] <= buttonY + buttonHeight:
+                        1] <= buttonY + buttonHeight:
                     self.handle_start_button_press()
 
     def mainLoop(self) -> None:
-
         self.window.fill(self.backGround, rect=None, special_flags=0)
 
         self.displayPlayer()
         if self.host:
             Button(self.window, pygame.Rect(
                 self.windowWidth // 2 - 150, self.windowHeight * 0.60, 300, 80), self.lighterBlue, "Start")
-            Button(self.window, pygame.Rect(
-                self.windowWidth // 2 - 150, self.windowHeight * 0.75, 300, 80), self.lighterBlue, "Refresh")
         self.Event()
         pygame.display.flip()
         if self.start == False:
             try:
                 # This will now return immediately if there is no data to receive
                 self.start, self.clientListLen = self.serverConnection.multiLaunch(self.startVars, self.clientListLen,
-                                                                                   self.host)
+                                                                                   self.host, self)
             except Exception as e:
                 print("Unexpected error:", e)
             # Handle other exceptions

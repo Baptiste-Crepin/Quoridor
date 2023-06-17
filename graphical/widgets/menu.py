@@ -46,6 +46,7 @@ class Menu():
 
     @staticmethod
     def newMenu(currentBoard: object, newBoard: object) -> None:
+        print(currentBoard, newBoard)
         del currentBoard
         while True:
             newBoard.mainLoop()  # type: ignore

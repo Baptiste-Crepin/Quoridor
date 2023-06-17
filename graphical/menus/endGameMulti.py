@@ -12,6 +12,10 @@ class EndGameMulti(End):
         super().__init__(currentPlayer, width, nbPlayer, nbBarrier, nbBots)
         self.searchServer = searchServer
         self.host = host
+        self.coordLobby = pygame.Rect(self.windowWidth//2-100 - 150,
+                                      self.windowHeight//2 + 250, 200, 80)
+        self.coordQuit = pygame.Rect(self.windowWidth//2 - 100 + 150,
+                                     self.windowHeight//2+250, 200, 80)
 
     def Event(self):
         for event in pygame.event.get():
@@ -20,11 +24,8 @@ class EndGameMulti(End):
                 if pygame.Rect(self.coordLobby).collidepoint(event.pos):
                     board = Play()
                     self.newMenu(self, board)
-                elif pygame.Rect(self.coordReplay).collidepoint(event.pos):
-                    if self.host:
-                        print("host clicked on replay")
-                        pass
                 elif pygame.Rect(self.coordQuit).collidepoint(event.pos):
+                    print("a")
                     raise SystemExit
 
     def mainLoop(self):
@@ -36,7 +37,5 @@ class EndGameMulti(End):
         self.displayWinner()
         Button(self.window, self.coordLobby, self.blue, "LOBBY")
         Button(self.window, self.coordQuit, self.blue, "QUIT")
-        if self.host:
-            Button(self.window, self.coordReplay, self.blue, "REPLAY")
         self.Event()
         pygame.display.flip()

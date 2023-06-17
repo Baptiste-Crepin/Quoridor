@@ -10,6 +10,7 @@ from graphical.menus.endGameMulti import EndGameMulti
 from gameLogic.localGame import LocalGame
 from multi.threadClient import StoppableThreadClient
 from gameLogic.player import Player
+from graphical.widgets.menu import Menu
 
 
 class MultiplayerGame(LocalGame):
@@ -37,17 +38,8 @@ class MultiplayerGame(LocalGame):
             self.highlightPlayer(player)
             self.highlightBarrier()
 
-    def placement(self, currentPlayer: Player):
+    def placement(self, currentPlayer: Player) -> None:
         """ logic for the player's actions, sends the state of the game when a player finishes he's turn """
-        # if isinstance(currentPlayer, Bot) and self.num == 0:
-        #     self.board.newFrame(currentPlayer, self.game.getPlayerList())
-        #     currentPlayer.randomMove(self.game.possibleBarrierPlacement(
-        #         currentPlayer), self.game.possibleMoves(currentPlayer.getCoordinates()))
-        #     print("Bot played")
-        #     # self.response_event.wait()  # waits for the server response
-        #     # self.response_event.clear()
-        #     self.thread.emit()  # sends the state of the game to the server when bot plays
-
         if isinstance(currentPlayer, Bot) and self.num == 0:
             randomAction = currentPlayer.randomAction(
                 self.game.possibleBarrierPlacement(currentPlayer))
@@ -115,13 +107,9 @@ class MultiplayerGame(LocalGame):
                 self.actualizeGame()
                 self.board.newFrame(
                     self.game.getCurrentPlayer(), self.game.getPlayerList())
-            # TODO: Game has ended. display the end screen
-            # self.thread.ender()  # send  the current player and the end game message
-            self.thread.restart()
+            # Game has ended. displays the end screen
+            self.thread.ender()  # send  the current player and the end game message
             time.sleep(0.4)  # wait for the server to actualize every client
             end = EndGameMulti(self.game.getPreviousPlayer(), self.game.getSquareWidth(
             ), self.game.getNumberOfPlayers(), self.game.getNumberOfBarriers(), self.game.getNumberOfBots(), self.score, self.host)
-            while self.game.checkGameOver():
-                end.mainLoop()
-                pygame.display.update()
-            raise SystemExit
+            Menu.newMenu(self, end)

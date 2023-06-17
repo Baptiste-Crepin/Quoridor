@@ -41,7 +41,7 @@ class ServerSubThread(threading.Thread):
         print(current_client, '-->', ((current_client + 1) % (len(self.connected) + self.nbBots)), " total clients :",
               len(self.connected) + self.nbBots)
         current_client = (
-                                 current_client + 1) % (len(self.connected) + self.nbBots)
+            current_client + 1) % (len(self.connected) + self.nbBots)
         self.queue.put(current_client)
         self.queue.task_done()
         return current_client
@@ -57,15 +57,14 @@ class ServerSubThread(threading.Thread):
         print("chat not implemented yet")
 
     def handleEnd(self, message: list[
-        Any]) -> None:  # received the end game message send the current player to all clients then ends the server thread
+            Any]) -> None:  # received the end game message send the current player to all clients then ends the server thread
         pickled_message = pickle.dumps(message)
         for i in range(len(self.connected)):
             self.connected[i].sendall(pickled_message)
         time.sleep(0.2)
-        if self.is_alive():
+        while self.is_alive():
             print("Server side Thread is still alive; stopping it now.")
             self.stop()
-        while self.is_alive():
             time.sleep(1)
 
     def restartMP(self, message: list[Any]) -> None:
@@ -87,7 +86,7 @@ class ServerSubThread(threading.Thread):
         messageHandlers = {
             'gameState': self.handleGameState,
             'chat': self.handleChatMessage,
-            'gameEnd': print('game has ended'),  # self.handleEnd,
+            'gameEnd': self.handleEnd,
             'resetGame': self.restartMP
         }
 
@@ -129,7 +128,7 @@ class ServerSubThread(threading.Thread):
 
 def acceptConnections(mySocket: socket.socket, init: list[int], initializedQueue: queue.Queue[int],
                       lobbyInfos: dict[str, Any], startingPlayer: int) -> tuple[dict[int, socket.socket],
-list[ServerSubThread]]:
+                                                                                list[ServerSubThread]]:
     '''
     accepts the connections of the clients and creates a thread for each of them to handle the messages
     '''
@@ -192,7 +191,7 @@ def discoveryServer(discoSock: socket.socket, lobbyInfo: dict[str, Any], stopEve
 
 
 def createServer(width: int, nbBarrier: int, nbPlayer: int, nbBots: int, name: str, startingPlayer: int, port: int =
-45678) -> list[ServerSubThread]:
+                 45678) -> list[ServerSubThread]:
     '''creates a server with the given parameters'''
 
     ide = 0

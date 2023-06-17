@@ -2,6 +2,7 @@ import pickle
 import socket
 import time
 from typing import Any
+from graphical.widgets.menu import Menu
 
 from multi.multiplayerClient import MultiplayerGame
 
@@ -52,7 +53,7 @@ class SearchServer():
             print("Error on connection")
             raise SystemExit from e
 
-    def multiLaunch(self, startVars: list[int], clientListLen: int, host: bool) -> tuple[bool, int]:
+    def multiLaunch(self, startVars: list[int], clientListLen: int, host: bool, currentMenu: object) -> tuple[bool, int]:
         try:
             serverMessage = self.connection.recv(4096)
             print("received:", serverMessage)
@@ -61,7 +62,7 @@ class SearchServer():
             if unpickled_message[0] != "lenConnected":
                 print("starting game", startVars)
                 self.connection.setblocking(True)
-                self.createGame(self.connection, startVars, host)
+                self.createGame(self.connection, startVars, host, currentMenu)
 
                 return True, clientListLen
             else:
@@ -80,7 +81,7 @@ class SearchServer():
             return
 
     @staticmethod
-    def createGame(connection: socket.socket, startVars: list[Any], host: bool):
+    def createGame(connection: socket.socket, startVars: list[Any], host: bool, currentMenu: object):
         """ creates an instance of the class: MultiplayerGame passing the user's choices as parameters """
         print("Game infos:", startVars)
         num = int(startVars[0])
@@ -89,9 +90,9 @@ class SearchServer():
         nbPlayer = startVars[3]
         nbBots = startVars[4]
         startingPlayer = startVars[5]
-        Game = MultiplayerGame(connection, width, nbBarrier,
-                               nbPlayer, host, startingPlayer, nbBots, num)
-        Game.mainLoop()
+        board = MultiplayerGame(connection, width, nbBarrier,
+                                nbPlayer, host, startingPlayer, nbBots, num)
+        Menu.newMenu(currentMenu, board)
 
     @staticmethod
     def getSelfHost() -> str:
