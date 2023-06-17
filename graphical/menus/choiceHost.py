@@ -38,7 +38,7 @@ class ChoiceHost(Menu):
                     board = ChoiceServer(self.fullScreen)
                     self.newMenu(self, board)
 
-                self.back.Event(event, self, Menutype)
+                self.back.Event(event, self, Menutype, self.fullScreen)
             pygame.display.flip()
 
 

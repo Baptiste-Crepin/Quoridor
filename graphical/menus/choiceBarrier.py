@@ -111,7 +111,8 @@ class selectBarrier(Menu):
                 self.back.Event(event, self, SizeGrid, (self.NumberPlayers,
                                                         self.NumberBots,
                                                         self.method,
-                                                        self.multi))
+                                                        self.multi,
+                                                        self.fullScreen))
 
     def mainLoop(self) -> None:
         self.window.fill(self.backGround)

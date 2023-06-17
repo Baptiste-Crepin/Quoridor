@@ -90,7 +90,7 @@ class ChoiceServer(Menu):
                                             False,
                                             self.fullScreen)
                         self.newMenu(self, board)
-                self.back.Event(event, self, ChoiceHost)
+                self.back.Event(event, self, ChoiceHost, self.fullScreen)
 
     def mainLoop(self) -> None:
         self.window.fill(self.backGround, rect=None, special_flags=0)

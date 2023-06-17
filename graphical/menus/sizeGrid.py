@@ -37,7 +37,8 @@ class SizeGrid(Menu):
                         self.nbPlayers, self.nbBot, sizeFromPos[pos], self.method, self.multi, self.fullScreen)
                     self.newMenu(self, board)
 
-            self.back.Event(event, self, NumberPlayer, (self.multi))
+            self.back.Event(event, self, NumberPlayer,
+                            (self.multi, self.fullScreen))
 
     def mainLoop(self) -> None:
         self.window.fill(self.backGround)

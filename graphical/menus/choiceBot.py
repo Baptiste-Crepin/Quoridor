@@ -45,7 +45,8 @@ class NumberBots(Menu):
                                      nbBotsFromPos[method][pos], method, self.multi, self.fullScreen)
                     self.newMenu(self, board)
 
-            self.back.Event(event, self, NumberPlayer, (self.multi))
+            self.back.Event(event, self, NumberPlayer,
+                            (self.multi, self.fullScreen))
 
     def displayChoice(self, message: str, button1Txt: str, button2Txt: str, method: int) -> None:
         text_surface = self.font.render(message, True, self.white)

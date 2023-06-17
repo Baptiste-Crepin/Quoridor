@@ -80,16 +80,16 @@ class ServerName(Menu):
                                                              self.nbBot,
                                                              self.width,
                                                              self.method,
-                                                             True))
+                                                             True, self.fullScreen))
                 print("E")
 
     def mainLoop(self):
         self.window.fill(self.backGround, rect=None, special_flags=0)
-        font = pygame.font.SysFont(
+        font=pygame.font.SysFont(
             "Extra Bold Italic", 60, False, True)
-        text = font.render(
+        text=font.render(
             "chose the name of", True, self.white)
-        secondtext = font.render(
+        secondtext=font.render(
             "the server", True, self.white)
         self.input.createInput()
         self.window.blit(text, (self.buttonWidth, 230))

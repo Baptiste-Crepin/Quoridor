@@ -57,7 +57,7 @@ class NumberPlayer(Menu):
                     if isinstance(board, object):
                         self.newMenu(self, board)
 
-            self.back.Event(event, self, Menutype)
+            self.back.Event(event, self, Menutype, self.fullScreen)
 
     def mainLoop(self):
         self.window.fill(self.backGround)
