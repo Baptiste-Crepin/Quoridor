@@ -259,30 +259,42 @@ class Board(Menu):
                 pygame.draw.polygon(
                     self.window, player.getColor(), Triangle_point)
 
+    def displayContainer(self, xOffset: int, height: int):
+        x = self.windowHeight + (xOffset//2)
+        width = self.windowWidth-self.windowHeight - xOffset
+        rect = pygame.Rect(x, 10, width, height)
+        pygame.draw.rect(self.window, self.lightBlue, rect, border_radius=10)
+
     def displayPlayerInformation(self, currentPlayer: Player, playerList: list[Player]) -> None:
+        playerAmount = len(playerList)
+        xOffset = 10
+        x = self.windowHeight + xOffset
+        playerRectWidth = self.windowWidth-self.windowHeight - 2*xOffset
+        height = self.fullScreenHeight//2 if playerAmount == 4 else self.fullScreenHeight//4
+        gap = ((height-(height*0.45+height*((playerAmount-1)
+                                            * (0.60/playerAmount))))/playerAmount)
 
-        playerNumber = len(playerList)
-        height = self.fullScreenHeight//2 if playerNumber == 4 else self.fullScreenHeight//4
-        ecart = ((height-(height*0.45+height*((playerNumber-1)
-                 * (0.60/playerNumber))))/playerNumber)
-
-        pygame.draw.rect(self.window, self.lightBlue,
-                         (self.windowWidth*0.57, 10, 570, height), border_radius=10)  # type: ignore
-
+        self.displayContainer(xOffset, height)
         for i, player in enumerate(playerList):
             if player == currentPlayer:
+                y = 15+(gap+height*(0.60/playerAmount))*i
+                rect = pygame.Rect(x, y, playerRectWidth, height*0.45)
                 informationPlayer(
-                    self.window, self.black, pygame.Rect(self.windowWidth*0.57+10, 15+(ecart+height*(0.60/playerNumber))*i, 550, height*0.45), player).createRectPlayer()
+                    self.window,
+                    self.black,
+                    rect,
+                    player).createRectPlayer()
 
             else:
-                offset = 0
+                Yoffset = 0
                 if player.getNumber() > currentPlayer.getNumber():
-                    offset = height*(0.45-0.60/playerNumber)
+                    Yoffset = height*(0.45-(0.6/playerAmount))
 
+                y = 15 + Yoffset + (gap+height*(0.60/playerAmount))*i
+                rectHeight = height*(0.60/playerAmount)
+                rect = pygame.Rect(x, y, playerRectWidth, rectHeight)
                 displayInformation(player, playerList, self.window,
-                                   self.black, pygame.Rect(
-                                       self.windowWidth*0.57+10, 15 + offset + (ecart+height*(0.60/playerNumber))*i, 550, height*(0.60/playerNumber)), i,
-                                   self.score).displayNeutral()
+                                   self.black, rect, i, self.score).displayNeutral()
 
     def newFrame(self, currentPlayer: Player, playerList: list[Player]) -> None:
         self.clearScreen()
