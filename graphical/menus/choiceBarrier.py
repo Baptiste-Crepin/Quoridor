@@ -9,8 +9,8 @@ from graphical.menus.sizeGrid import SizeGrid
 
 class selectBarrier(Menu):
 
-    def __init__(self, NumberPlayers: int, NumberBots: int, GridSize: int, method: int, multi: bool = False) -> None:
-        super().__init__()
+    def __init__(self, NumberPlayers: int, NumberBots: int, GridSize: int, method: int, multi: bool = False, fullScreen: bool = False) -> None:
+        super().__init__(fullScreen)
         self.NumberPlayers = NumberPlayers
         self.NumberBots = NumberBots
         self.GridSize = GridSize
@@ -69,12 +69,14 @@ class selectBarrier(Menu):
                            self.NumberPlayers,
                            self.barrier,
                            self.NumberBots,
-                           self.method)
+                           self.method,
+                           self.fullScreen)
         if not self.multi:
             board = LocalGame(self.GridSize,
                               self.NumberPlayers,
                               self.barrier,
-                              self.NumberBots)
+                              self.NumberBots,
+                              fullScreen=self.fullScreen)
         time.sleep(0.2)
         while True:
             board.mainLoop()

@@ -9,11 +9,11 @@ from graphical.menus.endGame import End
 class LocalGame():
     """This class is the main class of the game. It handles the game logic and the graphical interface."""
 
-    def __init__(self, width, nbPlayer, nbBarrier, nbBots, score: list[int] = [0, 0, 0, 0]) -> None:
+    def __init__(self, width, nbPlayer, nbBarrier, nbBots, score: list[int] = [0, 0, 0, 0], fullScreen: bool = False) -> None:
         """Initializes the game"""
         self.game = Game(width, nbPlayer, nbBarrier, nbBots)
         self.score = score
-        self.board = Board(self.game.getSquareWidth(), score)
+        self.board = Board(self.game.getSquareWidth(), score, fullScreen)
         self.newTurn = True
 
         pygame.mixer.init()
@@ -145,7 +145,9 @@ class LocalGame():
                         self.game.getSquareWidth(),
                         self.game.getNumberOfPlayers(),
                         self.game.getNumberOfBarriers(),
-                        self.game.getNumberOfBots())
+                        self.game.getNumberOfBots(),
+                        self.score,
+                        self.board.fullScreen)
         while True:
             endWindow.mainLoop()
             pygame.display.update()

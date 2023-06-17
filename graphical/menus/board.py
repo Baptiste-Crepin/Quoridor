@@ -17,9 +17,9 @@ class Board(Menu):
     """Class that handles the display of the board"""
     BarrierOrCell = TypeVar('BarrierOrCell', Barrier, TablePlayer)
 
-    def __init__(self, Width: int, score: list[int] = [0, 0, 0, 0]):
+    def __init__(self, Width: int, score: list[int] = [0, 0, 0, 0], fullScreen: bool = False):
         """Initializes the board"""
-        super().__init__()
+        super().__init__(fullScreen)
         self.col = Width
         self.score = score
 

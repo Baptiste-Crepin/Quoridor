@@ -8,8 +8,8 @@ from player import Player
 
 
 class ChoiceServer(Menu):
-    def __init__(self) -> None:
-        super().__init__()
+    def __init__(self, fullScreen: bool = False) -> None:
+        super().__init__(fullScreen)
         self.searchServer = SearchServer()
         self.startvars = list[int]()
         self.serverList = self.searchServer.discover()
@@ -56,7 +56,8 @@ class ChoiceServer(Menu):
                                        (70 * j + dico[self.serverList[i]["players"]], self.coordYServer(i) + 160), 25)
                 else:
                     pygame.draw.circle(self.window, Player(j + 1).getColor(),
-                                       (70 * j + dico[self.serverList[i]["players"]], self.coordYServer(i) + 160), 25,
+                                       (70 * j + dico[self.serverList[i]["players"]],
+                                        self.coordYServer(i) + 160), 25,
                                        5)
 
             self.serverPositions.append(pygame.Rect(
@@ -85,9 +86,9 @@ class ChoiceServer(Menu):
                                             self.serverList[i]["bots"],
                                             self.serverList[i]["lobbyName"],
                                             self.serverList[i]["connectedPlayers"],
-
                                             self.searchServer,
-                                            False)
+                                            False,
+                                            self.fullScreen)
                         self.newMenu(self, board)
                 self.back.Event(event, self, ChoiceHost)
 

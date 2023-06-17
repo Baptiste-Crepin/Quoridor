@@ -5,8 +5,8 @@ from graphical.menus.choicePlayer import NumberPlayer
 
 
 class NumberBots(Menu):
-    def __init__(self, nbPlayers: int, multi: bool = False) -> None:
-        super().__init__()
+    def __init__(self, nbPlayers: int, multi: bool = False, fullScreen: bool = False) -> None:
+        super().__init__(fullScreen)
         self.nbPlayers = nbPlayers
         self.multi = multi
 
@@ -42,7 +42,7 @@ class NumberBots(Menu):
             for pos in nbBotsFromPos[method]:
                 if pygame.Rect(pos).collidepoint(event.pos):
                     board = SizeGrid(self.nbPlayers,
-                                     nbBotsFromPos[method][pos], method, self.multi)
+                                     nbBotsFromPos[method][pos], method, self.multi, self.fullScreen)
                     self.newMenu(self, board)
 
             self.back.Event(event, self, NumberPlayer, (self.multi))
@@ -52,7 +52,8 @@ class NumberBots(Menu):
         text_rect = text_surface.get_rect(center=(self.windowWidth // 2, 50))
 
         contour_surface = self.font.render(message, True, (0, 0, 0))
-        contour_rect = contour_surface.get_rect(center=(self.windowWidth // 2, 50))
+        contour_rect = contour_surface.get_rect(
+            center=(self.windowWidth // 2, 50))
         contour_rect.move_ip(2, 2)
 
         self.window.blit(contour_surface, contour_rect)

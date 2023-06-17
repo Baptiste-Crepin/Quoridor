@@ -4,8 +4,8 @@ from graphical.widgets.menu import Menu
 
 
 class NumberPlayer(Menu):
-    def __init__(self, multi: bool = False):
-        super().__init__()
+    def __init__(self, multi: bool = False, fullScreen: bool = False):
+        super().__init__(fullScreen)
         self.multi = multi
         self.initializeButton()
 
@@ -52,7 +52,8 @@ class NumberPlayer(Menu):
                     if not isinstance(args, tuple):
                         continue
                     # calls the constructor of the class in PlayersFromPos[pos][0] with the arguments in PlayersFromPos[pos][1]
-                    board = PlayersFromPos[pos][0](*args)  # type: ignore
+                    board = PlayersFromPos[pos][0](
+                        *args, self.fullScreen)  # type: ignore
                     if isinstance(board, object):
                         self.newMenu(self, board)
 

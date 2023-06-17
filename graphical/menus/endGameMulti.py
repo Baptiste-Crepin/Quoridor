@@ -18,7 +18,7 @@ class EndGameMulti(End):
             self.defaultEventHandler(event)
             if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
                 if pygame.Rect(self.coordLobby).collidepoint(event.pos):
-                    board = Play()
+                    board = Play(self.fullScreen)
                     self.newMenu(self, board)
                 elif pygame.Rect(self.coordReplay).collidepoint(event.pos):
                     if self.host:
