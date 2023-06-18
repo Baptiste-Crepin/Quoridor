@@ -7,13 +7,13 @@ class Rules(Menu):
         super().__init__(fullScreen)
 
     def calculateElements(self) -> None:
-        self.imagepos = 0
+        self.imagePos = 0
 
     def coordYRules(self) -> int:
-        return 10+self.picturePos
+        return 10+self.imagePos
 
     def coordYPictureRules(self) -> int:
-        return 918+self.picturePos
+        return 918+self.imagePos
 
     def ButtonBack(self) -> pygame.Rect:
         coord = [(5, 40), (30, 10), (30, 20), (70, 20),
@@ -30,10 +30,10 @@ class Rules(Menu):
         for event in pygame.event.get():
             self.defaultEventHandler(event)
             if event.type == pygame.MOUSEWHEEL:
-                if event.y < 0 and self.picturePos > -1500:
-                    self.picturePos -= 50
-                elif event.y > 0 and self.picturePos < 0:
-                    self.picturePos += 50
+                if event.y < 0 and self.imagePos > -1500:
+                    self.imagePos -= 50
+                elif event.y > 0 and self.imagePos < 0:
+                    self.imagePos += 50
             elif (event.type == pygame.MOUSEBUTTONDOWN and
                   event.button == 1 and
                   self.ButtonBack().collidepoint(event.pos)):

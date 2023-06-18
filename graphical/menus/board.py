@@ -89,7 +89,8 @@ class Board(Menu):
             pos = pygame.mouse.get_pos()
 
             for array in [self.verticalBarriers, self.horizontalBarriers, self.rect]:
-                if clickedElement := self.interactObject(array, pos): #type: ignore
+                # type: ignore
+                if clickedElement := self.interactObject(array, pos):
                     return clickedElement
 
         if not pygame.mouse.get_pressed()[0] and self.clicked:
@@ -285,7 +286,7 @@ class Board(Menu):
                     self.window,
                     self.black,
                     rect,
-                    player).createRectPlayer()
+                    player, self.score).createRectPlayer()
 
             else:
                 Yoffset = 0
