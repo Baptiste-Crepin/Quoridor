@@ -28,28 +28,34 @@ class WaitingRoom(Menu):
         self.server_instances_queue = server_instances_queue
         self.clientListLen = connectedPlayers
 
+    def playerCoordX(self, i: int) -> int:
+        return (self.fullScreenWidth // (self.nbPlayer+1)) * (i) + (self.fullScreenWidth // (self.nbPlayer+1))
+
+    def textPlayerCoordX(self, i: int) -> int:
+        return self.playerCoordX(i)-70
+
     def displayPlayer(self) -> None:
         for i in range(self.nbPlayer):
             if self.clientListLen - 1 >= i:
                 pygame.draw.circle(self.window, Player(i + 1).getColor(
-                ), ((self.windowWidth // 5) * i + self.windowWidth // 5, self.windowHeight // 3), 70)
+                ), (self.playerCoordX(i), self.windowHeight // 3), 70)
                 font = pygame.font.SysFont(
                     "Extra Bold Italic", 60, False, True)
                 player = font.render(f"player {str(i + 1)}", True, self.white)
                 self.window.blit(
-                    player, ((self.windowWidth // 5) * i + self.windowWidth // 7, self.windowHeight // 3 + 80))
+                    player, (self.textPlayerCoordX(i), self.windowHeight // 3 + 80))
             else:
                 pygame.draw.circle(self.window, Player(i + 1).getColor(
-                ), ((self.windowWidth // 5) * i + self.windowWidth // 5, self.windowHeight // 3), 70, 10)
+                ), (self.playerCoordX(i), self.windowHeight // 3), 70, 10)
                 font = pygame.font.SysFont(
                     "Extra Bold Italic", 60, False, True)
                 wait = font.render(
                     "waiting for", True, self.white)
                 player = font.render(f"player {str(i + 1)}", True, self.white)
                 self.window.blit(
-                    wait, ((self.windowWidth // 5) * i + self.windowWidth // 8, self.windowHeight // 3 + 80))
+                    wait, (self.textPlayerCoordX(i)-35, self.windowHeight // 3 + 80))
                 self.window.blit(
-                    player, ((self.windowWidth // 5) * i + self.windowWidth // 7, self.windowHeight // 3 + 130))
+                    player, (self.textPlayerCoordX(i), self.windowHeight // 3 + 130))
 
     def handle_start_button_press(self):
         # Check if this is a host and if the server instances are available in the queue

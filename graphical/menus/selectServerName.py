@@ -32,7 +32,7 @@ class ServerName(Menu):
         self.inputPos = (self.buttonX, 400)
         # self.buttonSize = (self.buttonWidth, 50)
         self.input = Input(self.window, pygame.Rect(
-            self.inputPos, self.buttonSize), self.white)
+            self.inputPos, self.inputSize), self.white)
 
         self.searchServer = SearchServer()
 

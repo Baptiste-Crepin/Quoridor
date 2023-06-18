@@ -16,7 +16,9 @@ class Menu():
         self.fullScreenWidth = pygame.display.Info().current_w
         self.buttonWidth = self.windowWidth//3
         self.buttonHeight = self.windowHeight//7
+        self.inputHeight = self.windowHeight//14
         self.buttonSize = (self.buttonWidth, self.buttonHeight)
+        self.inputSize = (self.buttonWidth, self.inputHeight)
         self.buttonX = self.windowWidth//2-self.buttonWidth//2
 
         self.clock = pygame.time.Clock()
