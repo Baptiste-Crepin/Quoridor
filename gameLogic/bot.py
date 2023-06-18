@@ -1,4 +1,4 @@
-from player import Player
+from gameLogic.player import Player
 import random
 import time
 
@@ -16,7 +16,7 @@ class Bot(Player):
     def randomAction(self, possibleBarrierPlacement: list[tuple[tuple[int, int], str]]) -> int:
         """
         return 1 if the bot wants to place a barrier, 0 if it wants to move
-        sleeps for 0.2 seconds for the player to see the bot's move
+        sleeps for 0.4 seconds for the player to see the bot's move
         """
         time.sleep(0.4)
-        return 0 if not possibleBarrierPlacement else random.randint(0, 1)
+        return random.randint(0, 1) if possibleBarrierPlacement else 0

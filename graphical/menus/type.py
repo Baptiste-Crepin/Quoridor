@@ -1,8 +1,9 @@
 import pygame
+
+from graphical.menus.choiceHost import ChoiceHost
 from graphical.widgets.button import Button
 from graphical.widgets.menu import Menu
-from graphical.menus.choiceHost import ChoiceHost
-from Play import Play
+from main import Play
 
 
 class Menutype(Menu):
@@ -51,7 +52,7 @@ class Menutype(Menu):
 
 if __name__ == "__main__":
     pygame.init()
-    board = Menutype()
+    board = MenuType()
 
     while True:
         board.mainLoop()

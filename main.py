@@ -31,7 +31,6 @@ class Play(Menu):
                 if pygame.Rect(self.posPlay, self.buttonSize).collidepoint(event.pos):
                     board = Menutype(self.fullScreen)
                     self.newMenu(self, board)
-
                 elif pygame.Rect(self.posRules, self.buttonSize).collidepoint(event.pos):
                     board = Rules(self.fullScreen)
                     self.newMenu(self, board)

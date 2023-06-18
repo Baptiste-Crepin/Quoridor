@@ -1,8 +1,8 @@
 import pygame
-from game import Game
+from gameLogic.game import Game
 from graphical.menus.board import Board
-from Bot import Bot
-from player import Player
+from gameLogic.bot import Bot
+from gameLogic.player import Player
 from graphical.menus.endGame import End
 
 
@@ -137,9 +137,6 @@ class LocalGame():
 
             self.board.newFrame(self.game.getCurrentPlayer(),
                                 self.game.getPlayerList())
-            # TODO: Game has ended. display the end screen
-            # end = End(self.game.getPreviousPlayer(), self.game.getSquareWidth(
-            # ), self.game.getNumberOfPlayers(), self.game.getNumberOfBarriers(), self.game.getNumberOfBots(), self.score)
 
         endWindow = End(self.game.getPreviousPlayer(),
                         self.game.getSquareWidth(),

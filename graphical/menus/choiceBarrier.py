@@ -1,6 +1,6 @@
 import pygame
 import time
-from localGame import LocalGame
+from gameLogic.localGame import LocalGame
 from graphical.widgets.button import Button
 from graphical.widgets.menu import Menu
 

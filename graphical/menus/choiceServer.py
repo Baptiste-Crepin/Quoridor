@@ -1,10 +1,10 @@
 import pygame
 
+from gameLogic.player import Player
 from graphical.menus.choiceHost import ChoiceHost
 from graphical.widgets.button import Button
 from graphical.widgets.menu import Menu
-from multi.dicoveryServer import SearchServer
-from player import Player
+from multi.discoveryServer import SearchServer
 
 
 class ChoiceServer(Menu):
@@ -90,6 +90,7 @@ class ChoiceServer(Menu):
                                             self.serverList[i]["players"],
                                             self.serverList[i]["barriers"],
                                             self.serverList[i]["bots"],
+                                            None,  # server_instances_queue is None for non-host client
                                             self.serverList[i]["lobbyName"],
                                             self.serverList[i]["connectedPlayers"],
                                             self.searchServer,

@@ -1,6 +1,6 @@
-from Bot import Bot
-from cell import Cell
-from player import Player
+from gameLogic.bot import Bot
+from gameLogic.cell import Cell
+from gameLogic.player import Player
 import random
 
 
