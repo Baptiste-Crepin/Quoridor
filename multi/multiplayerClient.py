@@ -16,9 +16,12 @@ from graphical.widgets.menu import Menu
 class MultiplayerGame(LocalGame):
     """LocalGame child class  for multiplayer"""
 
-    def __init__(self, connection: socket.socket, width: int, nbBarrier: int, nbPlayer: int, host: bool, startingPlayerIndex: int, nbBots: int = 0, num: int = -1) -> None:
-        super().__init__(width, nbPlayer, nbBarrier, nbBots)
-        self.board = Board(self.game.getSquareWidth())
+    def __init__(self, connection: socket.socket, fullScreen, width: int, nbBarrier: int, nbPlayer: int, host: bool,
+                 startingPlayerIndex: int, nbBots: int = 0, num: int = -1) -> None:
+        print(fullScreen)
+        super().__init__(width, nbPlayer, nbBarrier, nbBots,[0, 0, 0, 0],fullScreen)
+        self.board = Board(self.game.getSquareWidth(),[0, 0, 0, 0],fullScreen)
+        self.fullScreen = fullScreen
         self.num = num
         self.response_event = threading.Event()
         self.host = host
@@ -110,6 +113,6 @@ class MultiplayerGame(LocalGame):
             # Game has ended. displays the end screen
             self.thread.ender()  # send  the current player and the end game message
             time.sleep(0.4)  # wait for the server to actualize every client
-            end = EndGameMulti(self.game.getPreviousPlayer(), self.game.getSquareWidth(
+            end = EndGameMulti(self.game.getPreviousPlayer(), self.fullScreen, self.game.getSquareWidth(
             ), self.game.getNumberOfPlayers(), self.game.getNumberOfBarriers(), self.game.getNumberOfBots(), self.score, self.host)
             Menu.newMenu(self, end)

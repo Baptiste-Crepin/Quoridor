@@ -9,7 +9,6 @@ from multi.discoveryServer import SearchServer
 
 
 class WaitingRoom(Menu):
-
     def __init__(self, startVars: list[Any], width: int, nbPlayer: int, nbBarrier: int, nbBot: int,
                  server_instances_queue, serverName: str,
                  connectedPlayers: int,
@@ -22,6 +21,7 @@ class WaitingRoom(Menu):
         self.serverName = serverName
         self.serverConnection = serverConnection
         self.host = Host
+        self.fullScreen = fullScreen
         self.start = False
         self.startVars = startVars
         self.serverConnection.connection.setblocking(False)
@@ -96,8 +96,10 @@ class WaitingRoom(Menu):
         if self.start == False:
             try:
                 # This will now return immediately if there is no data to receive
-                self.start, self.clientListLen = self.serverConnection.multiLaunch(self.startVars, self.clientListLen,
-                                                                                   self.host, self)
+                self.start, self.clientListLen = self.serverConnection.multiLaunch(self.fullScreen,
+                                                                                   self.startVars,
+                                                                                   self.clientListLen,
+                                                                                   self.host, self,)
             except Exception as e:
                 print("Unexpected error:", e)
             # Handle other exceptions

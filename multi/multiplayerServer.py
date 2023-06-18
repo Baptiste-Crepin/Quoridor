@@ -60,7 +60,7 @@ class ServerSubThread(threading.Thread):
         pickled_message = pickle.dumps(message)
         for i in range(len(self.connected)):
             self.connected[i].sendall(pickled_message)
-        time.sleep(0.2)
+        time.sleep(1)
         while not self.stopEvent.is_set():
             print("Thread is still alive; stopping it now.")
             try:

@@ -76,7 +76,8 @@ class ServerName(Menu):
                                         self.input.text,
                                         0,
                                         self.searchServer,
-                                        True, self.fullScreen)
+                                        True,
+                                        self.fullScreen)
                     self.newMenu(self, board)
                     print("D")
 

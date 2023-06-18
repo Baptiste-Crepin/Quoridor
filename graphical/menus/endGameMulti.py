@@ -7,11 +7,12 @@ from gameLogic.player import Player
 
 
 class EndGameMulti(End):
-    def __init__(self, currentPlayer: Player, width: int, nbPlayer: int, nbBarrier: int, nbBots: int,
+    def __init__(self, currentPlayer: Player,fullScreen: bool, width: int, nbPlayer: int, nbBarrier: int, nbBots: int,
                  searchServer: object, host: bool):
-        super().__init__(currentPlayer, width, nbPlayer, nbBarrier, nbBots)
+        super().__init__(currentPlayer, width, nbPlayer, nbBarrier, nbBots,[0,0,0,0],fullScreen)
         self.searchServer = searchServer
         self.host = host
+        self.fullScreen = fullScreen
         self.coordLobby = pygame.Rect(self.windowWidth//2-100 - 150,
                                       self.windowHeight//2 + 250, 200, 80)
         self.coordQuit = pygame.Rect(self.windowWidth//2 - 100 + 150,
