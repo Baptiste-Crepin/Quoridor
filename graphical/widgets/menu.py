@@ -60,6 +60,7 @@ class Menu():
         self.buttonSize = (self.buttonWidth, self.buttonHeight)
         self.buttonX = self.windowWidth//2-self.buttonWidth//2
         self.center = (self.windowWidth//2, self.windowHeight//2)
+        self.inputSize = (self.buttonWidth, self.inputHeight)
 
     def calculateElements(self) -> None:
         """Implemented in childs

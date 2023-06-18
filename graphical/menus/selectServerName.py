@@ -24,15 +24,11 @@ class ServerName(Menu):
         self.method = method
         self.server_instances_queue = queue.Queue()
 
-        self.sendRect = pygame.Rect(
-            self.sendPos, self.buttonSize)
-
     def calculateElements(self):
         self.sendPos = (self.buttonX, 500)
+        self.sendRect = pygame.Rect(self.sendPos, self.buttonSize)
         self.inputPos = (self.buttonX, 400)
-        # self.buttonSize = (self.buttonWidth, 50)
-        self.input = Input(self.window, pygame.Rect(
-            self.inputPos, self.inputSize), self.white)
+        self.input = Input(self.window, pygame.Rect(self.inputPos, self.inputSize), self.white)
 
         self.searchServer = SearchServer()
 
