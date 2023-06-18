@@ -29,7 +29,7 @@ class WaitingRoom(Menu):
         self.clientListLen = connectedPlayers
 
     def playerCoordX(self, i: int) -> int:
-        return (self.fullScreenWidth // (self.nbPlayer+1)) * (i) + (self.fullScreenWidth // (self.nbPlayer+1))
+        return (self.windowWidth // (self.nbPlayer+1)) * (i) + (self.windowWidth // (self.nbPlayer+1))
 
     def textPlayerCoordX(self, i: int) -> int:
         return self.playerCoordX(i)-70

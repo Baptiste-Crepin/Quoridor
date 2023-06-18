@@ -12,8 +12,6 @@ class Menu():
         self.windowHeight = self.baseWindowHeight
         self.center = (self.windowWidth//2, self.windowHeight//2)
         self.fullScreen = fullScreen
-        self.fullScreenHeight = pygame.display.Info().current_h
-        self.fullScreenWidth = pygame.display.Info().current_w
         self.buttonWidth = self.windowWidth//3
         self.buttonHeight = self.windowHeight//7
         self.inputHeight = self.windowHeight//14

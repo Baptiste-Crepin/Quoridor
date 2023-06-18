@@ -273,7 +273,7 @@ class Board(Menu):
         xOffset = 10
         x = self.windowHeight + xOffset
         playerRectWidth = self.windowWidth-self.windowHeight - 2*xOffset
-        height = self.fullScreenHeight//2 if playerAmount == 4 else self.fullScreenHeight//4
+        height = self.windowHeight//2 if playerAmount == 4 else self.windowHeight//4
         gap = ((height-(height*0.45+height*((playerAmount-1)
                                             * (0.60/playerAmount))))/playerAmount)
 
