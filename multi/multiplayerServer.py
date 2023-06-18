@@ -97,7 +97,7 @@ class ServerSubThread(threading.Thread):
 
         while not self.stopEvent.is_set():
             try:
-                received_message = self.connection.recv(4096)
+                received_message = self.connection.recv(8192)
                 message = pickle.loads(received_message)
                 message_type = message[0]
                 if message_type == 'resetGame':

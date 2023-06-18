@@ -112,5 +112,5 @@ class StoppableThreadClient(threading.Thread):
 
     def reco(self):
         """receives message from server then return the unpicked version of it """
-        dump = self.connection.recv(4096)
+        dump = self.connection.recv(8192)
         return pickle.loads(dump)
