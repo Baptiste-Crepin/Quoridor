@@ -22,15 +22,14 @@ class ServerSubThread(threading.Thread):
         self.queue = queue
         self.connected = connected
         self.nbBots = nbBots
-        self.start()
         self.stopEvent = threading.Event()
         self.response_event = threading.Event()
+        self.start()
 
     def stop(self):
         self.stopEvent.set()
 
-    def stopped(self):
-        return self.stopEvent.is_set()
+
 
     def getConnected(self):
         return self.connected
@@ -62,10 +61,16 @@ class ServerSubThread(threading.Thread):
         for i in range(len(self.connected)):
             self.connected[i].sendall(pickled_message)
         time.sleep(0.2)
-        while self.is_alive():
-            print("Server side Thread is still alive; stopping it now.")
-            self.stop()
-            time.sleep(1)
+        while not self.stopEvent.is_set():
+            print("Thread is still alive; stopping it now.")
+            try:
+                self.connection.shutdown(socket.SHUT_RDWR)
+                self.connection.close()
+                self.stopEvent.set()
+            except OSError:
+                print(f"Error closing socket: socket already closed")
+            time.sleep(0.2)
+
 
     def restartMP(self, message: list[Any]) -> None:
         print("restarting the multiplayer for all client")
@@ -90,12 +95,13 @@ class ServerSubThread(threading.Thread):
             'resetGame': self.restartMP
         }
 
-        while True:
+        while not self.stopEvent.is_set():
             try:
                 received_message = self.connection.recv(4096)
                 message = pickle.loads(received_message)
-
                 message_type = message[0]
+                if message_type == 'resetGame':
+                    self.connection.setblocking(False)
                 if message_type in messageHandlers:
                     messageHandlers[message_type](message)
                 else:
@@ -233,7 +239,6 @@ def createServer(width: int, nbBarrier: int, nbPlayer: int, nbBots: int, name: s
 
     connections, serverInsances = acceptConnections(serverSocket, init, initializedQueue,
                                                     lobbyInfo, startingPlayer)
-    time.sleep(5)
     stopEvent.set()
     time.sleep(0.3)
     discoThread.join()

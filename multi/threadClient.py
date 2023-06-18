@@ -30,11 +30,8 @@ class StoppableThreadClient(threading.Thread):
                 self.multiplayerClient.game.getPlayerList()[message[2]])
         self.multiplayerClient.game.getCurrentPlayer().setBarrier(message[3])
 
-    def stop(self):
-        self.stopEvent.set()
 
-    def stopped(self):
-        return self.stopEvent.is_set()
+
 
     def handleChatMessage(self, message: list[Any]) -> None:
         print("chat not implemented yet")
@@ -47,11 +44,16 @@ class StoppableThreadClient(threading.Thread):
         """ upon reception of a 'gameEnd' messages update the state of the game accordingly then stop the thread if
         possible """
         self.multiplayerClient.game.setCurrentPlayer(message[1])
-        if self.is_alive():
-            print("Thread is still alive; stopping it now.")
-            self.stop()
-        while self.is_alive():
-            time.sleep(1)
+        while not self.stopEvent.is_set():
+                print("Thread is still alive; stopping it now.")
+                try:
+                    self.connection.shutdown(socket.SHUT_RDWR)
+                    self.connection.close()
+                    self.stopEvent.set()
+                except OSError:
+                    print(f"Error closing socket: socket already closed")
+
+                time.sleep(0.2)
 
     def handleReset(self, message: list[Any]):
         """Call resetGameState method of 'MultiplayerGame' instance"""
@@ -60,30 +62,31 @@ class StoppableThreadClient(threading.Thread):
     def run(self):
         """ this function is executed at the start of the thread try to receive message then calls the appropriate
         method depending on the message type /'header'"""
-        while not self.stopped():
-            time.sleep(0.03)
-            message_handlers = {
-                'gameState': self.handleGameState,
-                'chat': self.handleChatMessage,
-                'mpAbort': self.handleAbort,
-                'gameEnd': self.handleEnd,
-                'resetGame': self.handleReset
-            }
-            while True:
-                try:
+        time.sleep(0.03)
+        message_handlers = {
+            'gameState': self.handleGameState,
+            'chat': self.handleChatMessage,
+            'mpAbort': self.handleAbort,
+            'gameEnd': self.handleEnd,
+            'resetGame': self.handleReset
+        }
+        while not self.stopEvent.is_set():
+            try:
+                message = self.reco()
+                self.responseEvent.set()
+                message_type = message[0]
+                if message[0] == 'gameEnd':
+                    self.connection.setblocking(False)
 
-                    message = self.reco()
-                    message_type = message[0]
-                    self.responseEvent.set()
-                    if message_type in message_handlers:
-                        message_handlers[message_type](message)
-                    else:
-                        print("unexpected data in header can't interpret packet")
-                except Exception as e:
-                    print("connection error:")
-                    print(e)
-                    raise Exception("Player disconnected while in game") from e
-                time.sleep(0.03)
+                if message_type in message_handlers:
+                    message_handlers[message_type](message)
+                else:
+                    print("unexpected data in header can't interpret packet")
+            except Exception as e:
+                print("connection error:")
+                print(e)
+                raise Exception("Player disconnected while in game") from e
+            time.sleep(0.03)
         # self.connection.close()
 
     def emit(self):
