@@ -83,7 +83,7 @@ class Menu():
         elif event.type == pygame.KEYDOWN:
             if event.key == pygame.K_ESCAPE:
                 raise SystemExit
-            elif event.key == pygame.K_f or event.key == pygame.K_F11:
+            elif event.key in [pygame.K_RSHIFT, pygame.K_LSHIFT]:
                 self.toggle_fullscreen()
 
     def mainLoop(self):
